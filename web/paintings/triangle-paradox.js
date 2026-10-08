@@ -20,15 +20,38 @@ Gallery.register({
   draw: function draw(p, pen) {
     const cell = (pen.width - 2 * p.margin) / p.n;
 
+    // With a still hand, every triangle goes into one path in tenths of a pixel, each point
+    // relative to the one before: the same lines in a fraction of the bytes. A moving hand
+    // bends polygons but not raw paths, so then each triangle stays a polygon.
+    const still = !p.handWobble && !p.handJitter && !p.handPressure;
+    const num = (t) => String(t / 10).replace(/^(-?)0\./, "$1.");
+    let d = "";
+    let at = [0, 0];
+    const to = (command, [x, y]) => {
+      const point = [Math.round(x * 10), Math.round(y * 10)];
+      const [dx, dy] = [num(point[0] - at[0]), num(point[1] - at[1])];
+      at = point;
+      return (command || (dx[0] === "-" ? "" : " ")) + dx + (dy[0] === "-" ? "" : " ") + dy;
+    };
+    const polygon = (list) => {
+      if (!still) return pen.polygon(list);
+      // Pairs after a move are lines, so they need no command of their own.
+      d += to("m", list[0]);
+      const start = at;
+      for (const point of list.slice(1)) d += to("", point);
+      d += "z";
+      at = start;
+    };
+
     const spiral = (poly, clockwise) => {
       const next = clockwise ? 1 : poly.length - 1;
-      pen.polygon(poly);
+      polygon(poly);
       for (let s = 0; s < p.steps; s++) {
         poly = poly.map(([x, y], i) => {
           const [nx, ny] = poly[(i + next) % poly.length];
           return [x + p.ratio * (nx - x), y + p.ratio * (ny - y)];
         });
-        pen.polygon(poly);
+        polygon(poly);
       }
     };
 
@@ -53,5 +76,6 @@ Gallery.register({
         }
       }
     }
+    if (d) pen.path(d);
   },
 });

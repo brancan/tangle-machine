@@ -22,6 +22,29 @@ Gallery.register({
   draw: function draw(p, pen) {
     const cell = (pen.width - 2 * p.margin) / p.n;
 
+    // With a still hand, every square goes into one path in tenths of a pixel, each point
+    // relative to the one before: the same lines in a fraction of the bytes. A moving hand
+    // bends polygons but not raw paths, so then each square stays a polygon.
+    const still = !p.handWobble && !p.handJitter && !p.handPressure;
+    const num = (t) => String(t / 10).replace(/^(-?)0\./, "$1.");
+    let d = "";
+    let at = [0, 0];
+    const to = (command, [x, y]) => {
+      const point = [Math.round(x * 10), Math.round(y * 10)];
+      const [dx, dy] = [num(point[0] - at[0]), num(point[1] - at[1])];
+      at = point;
+      return (command || (dx[0] === "-" ? "" : " ")) + dx + (dy[0] === "-" ? "" : " ") + dy;
+    };
+    const polygon = (list) => {
+      if (!still) return pen.polygon(list);
+      // Pairs after a move are lines, so they need no command of their own.
+      d += to("m", list[0]);
+      const start = at;
+      for (const point of list.slice(1)) d += to("", point);
+      d += "z";
+      at = start;
+    };
+
     for (let row = 0; row < p.n; row++) {
       for (let col = 0; col < p.n; col++) {
         const x = p.margin + col * cell;
@@ -30,16 +53,17 @@ Gallery.register({
         const next = clockwise ? 1 : 3;
 
         let square = [[x, y], [x + cell, y], [x + cell, y + cell], [x, y + cell]];
-        pen.polygon(square);
+        polygon(square);
 
         for (let s = 0; s < p.steps; s++) {
           square = square.map(([px, py], i) => {
             const [nx, ny] = square[(i + next) % 4];
             return [px + p.ratio * (nx - px), py + p.ratio * (ny - py)];
           });
-          pen.polygon(square);
+          polygon(square);
         }
       }
     }
+    if (d) pen.path(d);
   },
 });

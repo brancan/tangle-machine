@@ -24,6 +24,19 @@ Gallery.register({
     const palette = ["#c0392b", "#e67e22", "#d4a017", p.ink];
     const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
 
+    // With a still hand, a corner's strings go into one path in tenths of a pixel, each
+    // point relative to the one before: the same lines in a fraction of the bytes. A moving
+    // hand bends lines but not raw paths, so then each string stays a line.
+    const still = !p.handWobble && !p.handJitter && !p.handPressure;
+    const num = (t) => String(t / 10).replace(/^(-?)0\./, "$1.");
+    let at = [0, 0];
+    const to = (command, [x, y]) => {
+      const point = [Math.round(x * 10), Math.round(y * 10)];
+      const [dx, dy] = [num(point[0] - at[0]), num(point[1] - at[1])];
+      at = point;
+      return command + dx + (dy[0] === "-" ? "" : " ") + dy;
+    };
+
     for (let row = 0; row < p.n; row++) {
       for (let col = 0; col < p.n; col++) {
         const x = p.margin + col * cell;
@@ -37,12 +50,17 @@ Gallery.register({
           const next = c[(k + 1) % 4];
           const prev = c[(k + 3) % 4];
           const style = p.colors ? { stroke: palette[k] } : undefined;
+          // A path's first move is absolute, so each corner starts from the origin.
+          let d = "";
+          at = [0, 0];
           for (let i = 0; i <= p.lines; i++) {
             const s = i / p.lines;
             const [x0, y0] = lerp(prev, corner, s);
             const [x1, y1] = lerp(corner, next, s);
-            pen.line(x0, y0, x1, y1, style);
+            if (still) d += to("m", [x0, y0]) + to("l", [x1, y1]);
+            else pen.line(x0, y0, x1, y1, style);
           }
+          if (d) pen.path(d, style);
         }
         pen.polygon(c, { width: 0.5 });
       }
