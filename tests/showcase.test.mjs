@@ -155,6 +155,10 @@ test("publish link asks for a pasted link when the code was edited or the link i
   }
 });
 
+test("comments.js loads headless without touching the DOM", () => {
+  assert.doesNotThrow(() => loadScript("js/comments.js"));
+});
+
 test("showcase.html loads the same painting scripts as index.html", () => {
   const html = readFileSync(join(WEB, "showcase.html"), "utf8");
   const scripts = [...html.matchAll(/<script src="(paintings\/[^"]+)"/g)].map((m) => m[1]).sort();
