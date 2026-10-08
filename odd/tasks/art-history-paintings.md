@@ -25,7 +25,7 @@ tangles still missing, and three mathematical pieces (two may animate).
 - [x] T4 README painting list — route: delegated (writer), may ride with T3
 
 - [x] T5 Modern masters: mondrian, kandinsky, suprematism, klimt-mosaic, great-wave, color-fields (style only, no Rothko), impossible-tiling (style only, no Escher) — route: delegated (writer)
-- [ ] T6 Old masters and patterns: bosch-garden, mandala, dynamism, scream-sky, impression-sunrise, babel-tower, metamorphosis-tiling (no Escher), woven-modules (no Albers) — route: delegated (writer)
+- [x] T6 Old masters and patterns: bosch-garden, mandala, dynamism, scream-sky, impression-sunrise, babel-tower, metamorphosis-tiling (no Escher), woven-modules (no Albers) — route: delegated (writer)
 
 Route evidence: 12 new non-trivial files → writer trigger.
 
@@ -62,5 +62,13 @@ with the user's approval.
   reshaped so the curl reads; impossible-tiling got paper seams between tiles).
   No Rothko or Escher names anywhere; path strings checked for M L H V Q C A Z only.
 
+- T6 done in the commit `feat(web): add eight paintings after old masters and patterns`:
+  `npm test` 64/64 pass; snapshots only added 8 new keys; screenshots checked
+  (bosch stems lengthened, dynamism group enlarged, scream bridge reoriented,
+  impression marks given more color scatter). dynamism and scream-sky are tagged
+  animated and change with p.time. showcase.html untouched (lists no paintings).
+- Pre-existing, not touched: `florz.js` emits lowercase `h`/`v` path commands,
+  which a strict M L H V Q C A Z plotter check would flag.
+
 ## Next step
-T6.
+User decides on fast-forwarding the group commits to main.

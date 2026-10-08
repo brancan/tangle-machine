@@ -75,8 +75,10 @@ Logarithmic Spiral, L-System Tree, Reaction Diffusion, Schotter,
 Interruptions, (Des)Ordres, Wall Drawing, Movement in Squares, Printemps,
 Crescent Moon, Static, Cadent, Harmonograph, Hilbert Curve, Moiré, Composition
 (after Mondrian), Composition (after Kandinsky), Suprematist Composition (after
-Malevich), Golden Mosaic (after Klimt), Great Wave (after Hokusai), Color Fields
-and Impossible Tiling.
+Malevich), Golden Mosaic (after Klimt), Great Wave (after Hokusai), Color Fields,
+Impossible Tiling, Garden of Delights (after Bosch), Mandala, Dynamism (after
+Boccioni), Scream Sky (after Munch), Impression, Sunrise (after Monet), Tower of
+Babel (after Bruegel), Metamorphosis Tiling and Woven Modules.
 
 ## Public gallery and comments
 
