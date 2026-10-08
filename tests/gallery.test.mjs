@@ -73,3 +73,43 @@ test("plain paper adds nothing; other textures overlay noise on the paper", () =
   const both = Gallery.render(draw, { ...values, paperTexture: "grain", handRoughness: 2 });
   assert.equal(both.match(/<defs>/g).length, 1);
 });
+
+// Points of the first traced shape.
+const tracePoints = (draw, values) => Array.from(Gallery.trace(draw, values)[0].points, ([x, y]) => [x, y]);
+
+// Distance from point p to the segment ab.
+function toSegment([px, py], [ax, ay], [bx, by]) {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy || 1)));
+  return Math.hypot(px - ax - t * dx, py - ay - t * dy);
+}
+
+test("wobble samples a long stroke sparsely but stays on its drift curve", () => {
+  const values = { ...Gallery.initialValues({ params: [] }), handWobble: 8, handSeed: 7 };
+  // As a curve, a stroke draws the same drift however many vertices it has, so a stroke
+  // with a vertex every 2px traces the drift curve itself.
+  const sparse = tracePoints((p, pen) => pen.polyline([[100, 400], [700, 400]], null, true), values);
+  const dense = Array.from({ length: 301 }, (_, i) => [100 + i * 2, 400]);
+  const curve = tracePoints((p, pen) => pen.polyline(dense, null, true), values);
+  assert.ok(sparse.length <= 600 / 12, `${sparse.length} points, the old 6px sampling had 101`);
+  const off = Math.max(...curve.map((p) => Math.min(...sparse.slice(1).map((b, i) => toSegment(p, sparse[i], b)))));
+  assert.ok(off < 0.35, `strays ${off}px from the drift curve`);
+  for (const [x, y] of sparse) assert.equal(Math.round(x * 10) / 10, x, "tenths of a pixel");
+  assert.ok(Math.max(...curve.map(([, y]) => Math.abs(y - 400))) > 1, "it does wobble");
+});
+
+test("a hand-bent circle uses fewer points yet stays round", () => {
+  const values = { ...Gallery.initialValues({ params: [] }), handJitter: 2, handSeed: 3 };
+  const exact = Gallery.trace((p, pen) => pen.circle(400, 400, 100), Gallery.initialValues({ params: [] }))[0].points;
+  // The last point is the hand's loose end near the start; the rest is the shifted circle.
+  const ring = tracePoints((p, pen) => pen.circle(400, 400, 100), values).slice(0, -1);
+  assert.ok(ring.length < exact.length / 2, `${ring.length} vs ${exact.length} points`);
+  const cx = ring.reduce((s, [x]) => s + x, 0) / ring.length;
+  const cy = ring.reduce((s, [, y]) => s + y, 0) / ring.length;
+  for (const [i, a] of ring.entries()) {
+    const b = ring[(i + 1) % ring.length];
+    assert.ok(Math.abs(Math.hypot(a[0] - cx, a[1] - cy) - 100) < 0.15, "points on the circle");
+    assert.ok(100 - Math.hypot((a[0] + b[0]) / 2 - cx, (a[1] + b[1]) / 2 - cy) < 0.3, "chords hug the circle");
+  }
+});

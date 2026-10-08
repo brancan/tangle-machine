@@ -82,6 +82,13 @@
     };
   }
 
+  // Hand-drawn drift sampling: max chord error (px) and the spacing bounds of its samples.
+  const DRIFT_TOLERANCE = 0.2;
+  const MIN_GAP = 6;
+  const MAX_GAP = 48;
+
+  const tenths = ([x, y]) => [Math.round(x * 10) / 10, Math.round(y * 10) / 10];
+
   // Turns perfect geometry into hand-drawn strokes. Every value at 0 leaves shapes untouched.
   function createHand({ handWobble: wobble = 0, handJitter: jitter = 0, handPressure: pressure = 0, handSeed = 1, strokeWidth = 1 }) {
     const rand = random(handSeed * 7919 + 13);
@@ -89,9 +96,14 @@
     const spread = (amount) => (rand() * 2 - 1) * amount;
 
     // Low-frequency waves with random phases: a slow, continuous drift of the pen.
+    // `gap` is how far apart (px) drift samples can sit: a chord of a wave with amplitude A
+    // and frequency f over h px strays about A·(f·h)²/8 from it, so the sum over the waves
+    // is kept under DRIFT_TOLERANCE. The drift is smooth, so dense samples add only bytes.
     function drift() {
       const waves = [1, 2, 3].map((k) => ({ f: (0.006 + rand() * 0.012) * k, x: rand() * 6.3, y: rand() * 6.3 }));
-      return (d) => {
+      const bend = waves.reduce((sum, w, i) => sum + (w.f * w.f) / (i + 1), 0) * (wobble / 1.83);
+      const gap = Math.min(MAX_GAP, Math.max(MIN_GAP, Math.sqrt((8 * DRIFT_TOLERANCE) / bend)));
+      const offset = (d) => {
         let dx = 0;
         let dy = 0;
         for (const [i, w] of waves.entries()) {
@@ -100,10 +112,12 @@
         }
         return [(dx * wobble) / 1.83, (dy * wobble) / 1.83];
       };
+      return { offset, gap };
     }
 
-    // Jitters the vertices, then resamples every ~6px and adds the drift along the way.
-    // Sampled curves (arcs, circles) move as a whole instead, or jitter would saw-tooth them.
+    // Jitters the vertices, then resamples them along the drift (see drift's gap). Sampled
+    // curves (arcs, circles) move as a whole instead, or jitter would saw-tooth them.
+    // Bent points are rounded to tenths of a pixel: finer detail is invisible but costs bytes.
     function stroke(list, closed, curve = false) {
       if (!bends || list.length < 2) return list;
       let moved;
@@ -116,25 +130,25 @@
       }
       // A closing stroke ends near, not exactly on, its start: the hand never quite meets itself.
       if (closed) moved.push([moved[0][0] + spread(jitter), moved[0][1] + spread(jitter)]);
-      if (wobble <= 0) return moved;
-      const offset = drift();
+      if (wobble <= 0) return moved.map(tenths);
+      const { offset, gap } = drift();
       const out = [];
       let travelled = 0;
       for (let i = 0; i < moved.length - 1; i++) {
         const [ax, ay] = moved[i];
         const [bx, by] = moved[i + 1];
         const length = Math.hypot(bx - ax, by - ay);
-        const steps = Math.max(1, Math.ceil(length / 6));
+        const steps = Math.max(1, Math.ceil(length / gap));
         for (let s = 0; s < steps; s++) {
           const t = s / steps;
           const [ox, oy] = offset(travelled + t * length);
-          out.push([ax + (bx - ax) * t + ox, ay + (by - ay) * t + oy]);
+          out.push(tenths([ax + (bx - ax) * t + ox, ay + (by - ay) * t + oy]));
         }
         travelled += length;
       }
       const [lx, ly] = moved[moved.length - 1];
       const [ox, oy] = offset(travelled);
-      out.push([lx + ox, ly + oy]);
+      out.push(tenths([lx + ox, ly + oy]));
       return out;
     }
 
@@ -178,14 +192,14 @@
         record({ kind: "poly", points: [[x1, y1], [x2, y2]], closed: false, style: styled });
       },
       circle(cx, cy, r, style) {
-        if (hand.bends) return pen.polygon(arcPoints(cx, cy, r, 0, 2 * Math.PI).slice(0, -1), style, true);
+        if (hand.bends) return pen.polygon(arcPoints(cx, cy, r, 0, 2 * Math.PI, true).slice(0, -1), style, true);
         const styled = hand.style(style);
         shapes.push(`<circle cx="${fmt(cx)}" cy="${fmt(cy)}" r="${fmt(r)}"${attrs(styled)}/>`);
         record({ kind: "poly", points: arcPoints(cx, cy, r, 0, 2 * Math.PI).slice(0, -1), closed: true, style: styled });
       },
       // Arc of a circle from angle a0 to a1 (radians, clockwise on screen when a1 > a0).
       arc(cx, cy, r, a0, a1, style) {
-        if (hand.bends) return pen.polyline(arcPoints(cx, cy, r, a0, a1), style, true);
+        if (hand.bends) return pen.polyline(arcPoints(cx, cy, r, a0, a1, true), style, true);
         const large = Math.abs(a1 - a0) > Math.PI ? 1 : 0;
         const sweep = a1 > a0 ? 1 : 0;
         const x0 = cx + r * Math.cos(a0);
@@ -220,9 +234,15 @@
     return pen;
   }
 
-  // Points along an arc, about every 6px.
-  function arcPoints(cx, cy, r, a0, a1) {
-    const steps = Math.max(8, Math.ceil((Math.abs(a1 - a0) * r) / 6));
+  // Points along an arc, about every 6px. A hand-bent arc is drawn as a polyline, so it
+  // only needs its chords within DRIFT_TOLERANCE of the circle: fewer points, never more.
+  function arcPoints(cx, cy, r, a0, a1, bent = false) {
+    const sweep = Math.abs(a1 - a0);
+    let steps = Math.max(8, Math.ceil((sweep * r) / 6));
+    if (bent) {
+      const angle = 2 * Math.acos(Math.max(-1, 1 - DRIFT_TOLERANCE / Math.abs(r)));
+      steps = Math.min(steps, Math.max(2, Math.ceil(sweep / angle)));
+    }
     const list = [];
     for (let s = 0; s <= steps; s++) {
       const a = a0 + ((a1 - a0) * s) / steps;
