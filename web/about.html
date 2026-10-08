@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>About · Zentangles</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .about {
+        max-width: 68ch;
+        margin: 0 auto;
+        padding: 1rem 0 3rem;
+      }
+
+      .about h1,
+      .about h2 {
+        font-family: var(--serif);
+        font-weight: 500;
+      }
+
+      .about h1 {
+        font-size: 2.4rem;
+        margin: 0.5rem 0 0.25rem;
+      }
+
+      .about .lede {
+        margin: 0 0 2rem;
+        font-family: var(--serif);
+        font-size: 1.25rem;
+        color: var(--muted);
+      }
+
+      .about blockquote {
+        margin: 2rem 0;
+        padding: 0 0 0 1.25rem;
+        border-left: 3px solid var(--accent);
+        font-family: var(--serif);
+        font-size: 1.2rem;
+      }
+
+      .about blockquote cite {
+        display: block;
+        margin-top: 0.5rem;
+        font-family: var(--sans);
+        font-size: 0.85rem;
+        font-style: normal;
+        color: var(--muted);
+      }
+
+      .about ol {
+        padding-left: 1.25rem;
+      }
+
+      .about li {
+        margin-bottom: 1.1rem;
+      }
+
+      .about li strong {
+        display: block;
+        font-family: var(--serif);
+        font-size: 1.15rem;
+        font-weight: 500;
+      }
+
+      .about table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0 2rem;
+        font-size: 0.95rem;
+      }
+
+      .about th,
+      .about td {
+        padding: 0.5rem 0.6rem;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      .about th {
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      .about .credits {
+        margin-top: 3rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="index.html">Zentangles</a>
+      <span class="tagline">Drawings made with code</span>
+    </header>
+
+    <main>
+      <article class="about">
+        <h1>An instruction is the work</h1>
+        <p class="lede">Every piece in this gallery is a short set of rules written as code. Your browser is the hand that carries them out.</p>
+
+        <blockquote>
+          “The idea becomes a machine that makes the art.”
+          <cite>Sol LeWitt, <em>Paragraphs on Conceptual Art</em>, Artforum, Summer 1967</cite>
+        </blockquote>
+
+        <h2>Manifesto</h2>
+        <ol>
+          <li>
+            <strong>The code is the instruction, not the picture.</strong>
+            A drawing here is a function: lines, distances, angles, decided before anything is drawn.
+            What you see is one execution of it. Change a value and you get another, equally valid.
+          </li>
+          <li>
+            <strong>The rule generates the variety.</strong>
+            A few primitives and simple arithmetic make every piece. Repetition with variation is not a
+            limitation of the system; it is its subject.
+          </li>
+          <li>
+            <strong>The hand is computed.</strong>
+            Wobble, jitter, pressure and roughness are parameters. The same hand seed always draws the
+            same way; a new seed is a new draftsman working from the same instruction.
+          </li>
+          <li>
+            <strong>You execute the work.</strong>
+            Moving a slider or rewriting a line of code is carrying out the instruction. Share the link
+            and someone else can carry it out exactly as you did, or differently.
+          </li>
+        </ol>
+
+        <h2>Wall drawings, in code</h2>
+        <p>
+          Sol LeWitt’s wall drawings exist as written instructions. Draftsmen execute them on a wall, and
+          every installation differs a little because hands differ. This gallery follows the same system:
+        </p>
+        <table>
+          <thead>
+            <tr><th>Sol LeWitt</th><th>Here</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>The instruction</td><td>The painting’s <code>draw</code> function</td></tr>
+            <tr><td>Choices it leaves open</td><td>The painting’s variables</td></tr>
+            <tr><td>The draftsman’s hand</td><td>The Hand-drawn variables</td></tr>
+            <tr><td>A different draftsman</td><td>A different hand seed</td></tr>
+            <tr><td>The certificate that travels with the work</td><td>The share link</td></tr>
+          </tbody>
+        </table>
+
+        <p><a href="index.html">Open the gallery →</a></p>
+
+        <p class="credits">
+          Zentangle® is a registered trademark of Zentangle, Inc. This is an independent project, not
+          created, endorsed or licensed by Zentangle, Inc.; many pieces are inspired by the Zentangle®
+          Method of pattern drawing, and tangle names belong to their creators. Source code on
+          <a href="https://github.com/brancan/zentangles">GitHub</a>.
+        </p>
+      </article>
+    </main>
+  </body>
+</html>

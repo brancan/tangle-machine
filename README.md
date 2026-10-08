@@ -3,6 +3,13 @@
 Drawings made with code: an interactive gallery of generative zentangles,
 written in plain JavaScript and rendered as SVG.
 
+The project takes Sol LeWitt's conceptual art as its compass: each piece is an
+instruction, and each rendering is one execution of it. See the
+[project dossier](docs/dossier.md) and the site's About page.
+
+Zentangle® is a registered trademark of Zentangle, Inc. This is an independent
+project, not created, endorsed or licensed by Zentangle, Inc.
+
 ## Web gallery
 
 Live at **https://brancan.github.io/zentangles/** (deployed by GitHub Actions on every push to `main` that touches `web/`).
