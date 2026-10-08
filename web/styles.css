@@ -127,6 +127,10 @@ main {
   line-height: 0;
 }
 
+.thumb {
+  aspect-ratio: 1;
+}
+
 .frame svg {
   width: 100%;
   height: auto;

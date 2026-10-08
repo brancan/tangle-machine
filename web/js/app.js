@@ -30,6 +30,19 @@
 
   // ---------- Gallery ----------
 
+  // Thumbnails render only when a card scrolls near the viewport, and are cached
+  // so coming back to the gallery is instant.
+  const thumbnails = new Map();
+  let thumbnailObserver = null;
+
+  function renderThumbnail(frame) {
+    const painting = Gallery.find(frame.dataset.id);
+    if (!thumbnails.has(painting.id)) {
+      thumbnails.set(painting.id, Gallery.render(painting.draw, Gallery.initialValues(painting)));
+    }
+    frame.innerHTML = thumbnails.get(painting.id);
+  }
+
   function showGallery() {
     $("#studio").hidden = true;
     $("#gallery").hidden = false;
@@ -39,12 +52,30 @@
       .map(
         (painting) => `
         <a class="card" href="#/${painting.id}">
-          <div class="frame">${Gallery.render(painting.draw, Gallery.initialValues(painting))}</div>
+          <div class="frame thumb" data-id="${painting.id}"></div>
           <h2>${painting.title}</h2>
           <p>${painting.description}</p>
         </a>`
       )
       .join("");
+
+    const frames = document.querySelectorAll("#gallery-grid .thumb");
+    if (!("IntersectionObserver" in window)) {
+      frames.forEach(renderThumbnail);
+      return;
+    }
+    thumbnailObserver?.disconnect();
+    thumbnailObserver = new IntersectionObserver(
+      (entries, observer) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          observer.unobserve(entry.target);
+          renderThumbnail(entry.target);
+        }
+      },
+      { rootMargin: "300px 0px" }
+    );
+    frames.forEach((frame) => thumbnailObserver.observe(frame));
   }
 
   // ---------- Studio ----------
@@ -62,7 +93,7 @@
         tabSize: 2,
         indentUnit: 2,
         viewportMargin: Infinity,
-        extraKeys: { "Ctrl-Enter": runCode, "Cmd-Enter": runCode },
+        extraKeys: { "Ctrl-Enter": () => runCode(), "Cmd-Enter": () => runCode() },
       });
       return {
         get: () => cm.getValue(),
@@ -157,8 +188,16 @@
     }
   }
 
-  function runCode() {
-    const source = editor.get();
+  // The editor loads lazily, so the current code also lives in state.source.
+  const currentSource = () => (editor ? editor.get() : state.source);
+
+  function setSource(source) {
+    state.source = source;
+    if (editor) editor.set(source);
+  }
+
+  function runCode(source = currentSource()) {
+    state.source = source;
     try {
       state.draw = Gallery.compile(source);
     } catch (error) {
@@ -227,7 +266,7 @@
 
   // The link carries the variables and, when the code was edited, the code itself.
   async function copyLink() {
-    const source = editor.get();
+    const source = currentSource();
     const search = new URLSearchParams(buildQuery(state.painting, state.values));
     if (source !== state.original) search.set("code", await Share.encodeCode(source));
     const query = search.toString();
@@ -254,9 +293,10 @@
 
   function acceptSharedCode() {
     $("#shared-code").hidden = true;
-    editor.set(state.sharedCode);
+    const source = state.sharedCode;
     state.sharedCode = null;
-    runCode();
+    setSource(source);
+    runCode(source);
   }
 
   function rejectSharedCode() {
@@ -293,13 +333,17 @@
     $("#next").textContent = `${neighbour(1).title} →`;
     $("#shared-code").hidden = true;
     buildControls(painting, state.values);
-    editor.set(saved ?? original);
-    editor.refresh();
-    if (saved) runCode();
+    setSource(saved ?? original);
+    if (saved) runCode(saved);
     else {
       $("#code-edited").hidden = true;
       draw();
     }
+    ensureEditor().then(() => {
+      if (state.painting !== painting) return;
+      editor.set(state.source);
+      editor.refresh();
+    });
     const shared = new URLSearchParams(query).get("code");
     if (shared) offerSharedCode(painting, shared);
   }
@@ -314,12 +358,46 @@
     window.scrollTo(0, 0);
   }
 
-  function init() {
-    editor = createEditor($("#code"));
-    editor.onChange(() => {
-      clearTimeout(codeTimer);
-      codeTimer = setTimeout(runCode, 500);
+  // CodeMirror is only needed in the studio, so it is fetched on the first visit there.
+  // If the CDN is slow or down, the editor falls back to a plain textarea.
+  const CODEMIRROR = "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/";
+  let editorReady = null;
+
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
     });
+  }
+
+  function ensureEditor() {
+    if (!editorReady) {
+      const css = document.createElement("link");
+      css.rel = "stylesheet";
+      css.href = `${CODEMIRROR}codemirror.min.css`;
+      document.head.appendChild(css);
+      const load = loadScript(`${CODEMIRROR}codemirror.min.js`).then(() =>
+        loadScript(`${CODEMIRROR}mode/javascript/javascript.min.js`)
+      );
+      const timeout = new Promise((_, reject) => setTimeout(reject, 5000));
+      editorReady = Promise.race([load, timeout])
+        .catch(() => {})
+        .then(() => {
+          editor = createEditor($("#code"));
+          editor.onChange(() => {
+            if (editor.get() === state.source) return;
+            clearTimeout(codeTimer);
+            codeTimer = setTimeout(() => runCode(editor.get()), 500);
+          });
+        });
+    }
+    return editorReady;
+  }
+
+  function init() {
 
     $("#controls").addEventListener("input", (event) => {
       const input = event.target.closest("[data-param]");
@@ -332,10 +410,10 @@
       scheduleDraw();
     });
 
-    $("#run").addEventListener("click", runCode);
+    $("#run").addEventListener("click", () => runCode());
     $("#reset-code").addEventListener("click", () => {
-      editor.set(state.original);
-      runCode();
+      setSource(state.original);
+      runCode(state.original);
     });
     $("#reset-params").addEventListener("click", resetParams);
     $("#randomize").addEventListener("click", randomize);
