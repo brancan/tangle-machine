@@ -3,13 +3,19 @@ name: Deploy gallery to GitHub Pages
 on:
   push:
     branches: [main]
-    paths: ["web/**", ".github/workflows/pages.yml"]
+    paths: ["web/**", "scripts/**", ".github/workflows/pages.yml"]
+  # Rebuild the public gallery (web/showcase.json) when Gallery posts change.
+  discussion:
+    types: [created, edited, deleted, category_changed, labeled, unlabeled, locked, unlocked]
+  schedule:
+    - cron: "17 */6 * * *"
   workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
+  discussions: read
 
 concurrency:
   group: pages
@@ -23,6 +29,14 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # Never fails: without a token, the category or the network it writes an empty gallery.
+      - name: Build showcase.json
+        run: node scripts/build-showcase.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
