@@ -59,6 +59,11 @@ Route evidence: 5+ new non-trivial files across scripts/, web/, workflow → wri
   "Comments are not configured yet."; gallery view hides it. `web/showcase.json` restored to `[]`.
 - Not verified live: giscus iframe and GitHub GraphQL (need the owner setup below and a deploy).
 
+## Review
+- Native review (risk high, granted): 4 lenses, approved, acknowledged (lineage review-07efbecd1a4e7fcc).
+- Non-blocking follow-ups: build writes `[]` on transient API failure (wipes the gallery) and has no fetch timeout; duplicated painting list in showcase.html; build script untested.
+- Engram mirror: pending (server unavailable).
+
 ## Next step
 Owner setup (README "One-time setup"): enable Discussions, create *Gallery* (slug `gallery`, open-ended) and *Comments*
 (announcement) categories, install the giscus app, paste repoId/categoryId into `GISCUS_CONFIG` in `web/js/comments.js`.
