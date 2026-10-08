@@ -44,9 +44,10 @@ Gallery.register({
     // Voronoi cell of site i, pulled back by `inset` from every neighbour and from the frame.
     const cell = (sites, i, inset) => {
       const lo = M + inset;
-      const hi = W - M - inset;
-      let poly = [[lo, lo], [hi, lo], [hi, hi], [lo, hi]];
-      if (hi <= lo) return [];
+      const right = W - M - inset;
+      const bottom = H - M - inset;
+      if (right <= lo || bottom <= lo) return [];
+      let poly = [[lo, lo], [right, lo], [right, bottom], [lo, bottom]];
       const [sx, sy] = sites[i];
       for (let j = 0; j < sites.length && poly.length > 2; j++) {
         if (j === i) continue;
@@ -63,7 +64,7 @@ Gallery.register({
       poly.reduce((s, q) => s + q[1], 0) / poly.length,
     ];
 
-    // Jittered grid of sites, relaxed twice towards their cell centres for even pebbles.
+    // Jittered grid of sites, relaxed once towards their cell centres for even pebbles.
     const side = Math.ceil(Math.sqrt(p.cells));
     const w = (W - 2 * M) / side;
     const h = (H - 2 * M) / Math.ceil(p.cells / side);
@@ -71,12 +72,10 @@ Gallery.register({
     for (let k = 0; k < p.cells; k++) {
       sites.push([M + ((k % side) + 0.15 + rand() * 0.7) * w, M + (Math.floor(k / side) + 0.15 + rand() * 0.7) * h]);
     }
-    for (let it = 0; it < 1; it++) {
-      sites = sites.map((s, i) => {
-        const poly = cell(sites, i, 0);
-        return poly.length ? centroid(poly) : s;
-      });
-    }
+    sites = sites.map((s, i) => {
+      const poly = cell(sites, i, 0);
+      return poly.length ? centroid(poly) : s;
+    });
 
     // Corners become quadratic curves; roundness 1 runs them from edge midpoint to edge midpoint.
     const rounded = (poly) => {
