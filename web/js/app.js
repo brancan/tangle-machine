@@ -323,11 +323,12 @@
     applyValues(Gallery.initialValues(state.painting));
   }
 
-  // Random value for every painting variable, snapped to its slider step.
+  // Random value for every painting variable: ranges snapped to their slider step, any option of a select.
   function randomize() {
     const values = { ...state.values };
     for (const param of state.painting.params) {
       if (param.type === "checkbox") values[param.name] = Math.random() < 0.5;
+      if (param.type === "select") values[param.name] = param.options[Math.floor(Math.random() * param.options.length)].value;
       if (param.type === "range") {
         const steps = Math.round((param.max - param.min) / param.step);
         const value = param.min + Math.floor(Math.random() * (steps + 1)) * param.step;

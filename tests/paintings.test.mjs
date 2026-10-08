@@ -49,6 +49,7 @@ test("paintings render without NaN across random variables", () => {
       for (const p of [...painting.params, ...Gallery.HAND_PARAMS]) {
         if (p.type === "range") values[p.name] = p.min + Math.round((rand() * (p.max - p.min)) / p.step) * p.step;
         if (p.type === "checkbox") values[p.name] = rand() < 0.5;
+        if (p.type === "select") values[p.name] = p.options[Math.floor(rand() * p.options.length)].value;
       }
       const svg = Gallery.render(painting.draw, values);
       assert.ok(!svg.includes("NaN"), `${painting.id} produced NaN with ${JSON.stringify(values)}`);
