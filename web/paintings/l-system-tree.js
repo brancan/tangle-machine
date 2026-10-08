@@ -9,8 +9,9 @@ Gallery.register({
     "Start from the {grammar} rule and rewrite it {iterations} times, stopping before 20,000 strokes. " +
     "Walk the result as a turtle pointing up: F steps forward, + and − turn {angle}°, brackets save and " +
     "return to a branch point. Let every turn waver by up to {jitter%} and every step by half as much " +
-    "(seed {seed}). Draw thinner at each branching level and fit the plant to the sheet" +
-    "{leaves?, then put a small blossom at the tip of every twig:}.",
+    "(seed {seed}). Turn the plant about its root until the middle of its strokes stands straight above it, " +
+    "draw thinner at each branching level and fit it to the sheet" +
+    "{leaves?, then put a small blossom at the end of each branch, skipping any that would touch another:}.",
   params: [
     {
       name: "grammar",
@@ -27,7 +28,7 @@ Gallery.register({
     { name: "angle", label: "Angle", type: "range", min: 5, max: 45, step: 0.5, value: 22.5 },
     { name: "jitter", label: "Jitter", type: "range", min: 0, max: 1, step: 0.01, value: 0.25 },
     { name: "leaves", label: "Blossoms", type: "checkbox", value: true },
-    { name: "seed", label: "Seed", type: "range", min: 1, max: 100, step: 1, value: 7 },
+    { name: "seed", label: "Seed", type: "range", min: 1, max: 100, step: 1, value: 14 },
   ],
   draw: function draw(p, pen) {
     const rand = pen.random(p.seed);
@@ -82,6 +83,22 @@ Gallery.register({
     }
     if (!segments.length) return;
 
+    // Stand the plant up: turn it about the root until the centre of its strokes sits right above it.
+    let cx = 0;
+    let cy = 0;
+    for (const [ax, ay, bx, by] of segments) {
+      cx += ax + bx;
+      cy += ay + by;
+    }
+    const tilt = -Math.PI / 2 - Math.atan2(cy, cx);
+    if (Math.hypot(cx, cy) > 1e-6 && Number.isFinite(tilt)) {
+      const cos = Math.cos(tilt);
+      const sin = Math.sin(tilt);
+      const spin = (px, py) => [px * cos - py * sin, px * sin + py * cos];
+      for (const s of segments) [s[0], s[1], s[2], s[3]] = [...spin(s[0], s[1]), ...spin(s[2], s[3])];
+      for (const t of tips) [t[0], t[1]] = spin(t[0], t[1]);
+    }
+
     // Fit: scale the bounds into the sheet, centred, standing on the bottom margin.
     let [minX, minY, maxX, maxY] = [0, 0, 0, 0];
     for (const [ax, ay, bx, by] of segments) {
@@ -113,8 +130,28 @@ Gallery.register({
     if (p.leaves) {
       const r = Math.max(1.5, Math.min(4, scale * 0.45));
       let d = "";
-      for (const [tx, ty] of tips) {
-        d += `M${f(X(tx) - r)} ${f(Y(ty))}a${f(r)} ${f(r)} 0 1 0 ${f(2 * r)} 0a${f(r)} ${f(r)} 0 1 0 ${f(-2 * r)} 0`;
+      // Skip tips closer than a blossom's width to one already drawn, so blossoms never crowd.
+      const gap = 3 * r;
+      const taken = new Map();
+      const near = (sx, sy) => {
+        const gx = Math.floor(sx / gap);
+        const gy = Math.floor(sy / gap);
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            for (const [ox, oy] of taken.get(`${gx + dx},${gy + dy}`) || []) {
+              if (Math.hypot(ox - sx, oy - sy) < gap) return true;
+            }
+          }
+        }
+        return false;
+      };
+      for (const [px, py] of tips) {
+        const tx = X(px);
+        const ty = Y(py);
+        if (near(tx, ty)) continue;
+        const k = `${Math.floor(tx / gap)},${Math.floor(ty / gap)}`;
+        taken.set(k, [...(taken.get(k) || []), [tx, ty]]);
+        d += `M${f(tx - r)} ${f(ty)}a${f(r)} ${f(r)} 0 1 0 ${f(2 * r)} 0a${f(r)} ${f(r)} 0 1 0 ${f(-2 * r)} 0`;
       }
       if (d) pen.path(d, { fill: p.paper, width: f(0.6 * p.strokeWidth) });
     }
