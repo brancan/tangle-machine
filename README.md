@@ -73,7 +73,10 @@ Shaded Ribbons, Hatched Pinwheel, Warped Grid, Pebble Cells, Arc Scales, Radial
 Sampler, Pattern Hills, Pattern Peaks, Rainbow Petals, Ribbon Arcs,
 Logarithmic Spiral, L-System Tree, Reaction Diffusion, Schotter,
 Interruptions, (Des)Ordres, Wall Drawing, Movement in Squares, Printemps,
-Crescent Moon, Static, Cadent, Harmonograph, Hilbert Curve and Moiré.
+Crescent Moon, Static, Cadent, Harmonograph, Hilbert Curve, Moiré, Composition
+(after Mondrian), Composition (after Kandinsky), Suprematist Composition (after
+Malevich), Golden Mosaic (after Klimt), Great Wave (after Hokusai), Color Fields
+and Impossible Tiling.
 
 ## Public gallery and comments
 

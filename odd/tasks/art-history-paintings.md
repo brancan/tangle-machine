@@ -24,6 +24,9 @@ tangles still missing, and three mathematical pieces (two may animate).
 - [x] T3 Mathematical: harmonograph (animated), hilbert-curve, moire (animated) — route: delegated (writer)
 - [x] T4 README painting list — route: delegated (writer), may ride with T3
 
+- [x] T5 Modern masters: mondrian, kandinsky, suprematism, klimt-mosaic, great-wave, color-fields (style only, no Rothko), impossible-tiling (style only, no Escher) — route: delegated (writer)
+- [ ] T6 Old masters and patterns: bosch-garden, mandala, dynamism, scream-sky, impression-sunrise, babel-tower, metamorphosis-tiling (no Escher), woven-modules (no Albers) — route: delegated (writer)
+
 Route evidence: 12 new non-trivial files → writer trigger.
 
 ## Delivery
@@ -53,5 +56,11 @@ with the user's approval.
   wall-drawing instructions rewritten because placeholders cannot nest inside
   `{flag?a:b}`). harmonograph and moire are tagged animated and change with p.time.
 
+- T5 done in the commit `feat(web): add seven paintings after modern masters`:
+  `npm test` 64/64 pass; snapshots only added 7 new keys; screenshots checked
+  (mondrian forced to split large cells and keep big planes white; great-wave
+  reshaped so the curl reads; impossible-tiling got paper seams between tiles).
+  No Rothko or Escher names anywhere; path strings checked for M L H V Q C A Z only.
+
 ## Next step
-T5.
+T6.
