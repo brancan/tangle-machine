@@ -1,4 +1,6 @@
-// Pure helpers that turn "Show and tell" Discussions into showcase.json entries. No network here.
+// Pure helpers that turn "Show and tell" Discussions into showcase.json entries and giscus
+// comment threads into likes.json. No network here.
+import { createHash } from "node:crypto";
 
 export const SITE = "https://brancan.github.io/tangle-machine/";
 
@@ -64,6 +66,7 @@ export function parseShowcaseEntry(discussion, knownIds) {
     title: capTitle(discussion.title),
     author: author(discussion.author),
     createdAt,
+    likes: countLikes(discussion.reactionGroups),
     ...parsed,
     link,
   };
@@ -87,8 +90,79 @@ export function reuseShowcase(previous, knownIds) {
   if (!Array.isArray(previous)) return [];
   const discussions = previous
     .filter((entry) => entry && typeof entry === "object")
-    .map((entry) => ({ ...entry, body: entry.link, locked: false, labels: { nodes: [] } }));
+    .map((entry) => ({
+      ...entry,
+      body: entry.link,
+      locked: false,
+      labels: { nodes: [] },
+      reactionGroups: isCount(entry.likes) ? [{ content: "HEART", reactors: { totalCount: entry.likes } }] : [],
+    }));
   return buildShowcase(discussions, knownIds);
+}
+
+// ---------- Likes (GitHub reactions) ----------
+
+// Reactions that read as "I like it"; thumbs down, confused, laugh and eyes do not count.
+const POSITIVE = new Set(["THUMBS_UP", "HEART", "HOORAY", "ROCKET"]);
+const isCount = (value) => Number.isInteger(value) && value >= 0;
+const isDiscussionUrl = (url) => typeof url === "string" && url.startsWith("https://github.com/");
+
+// GraphQL `reactionGroups { content reactors { totalCount } }` -> number of positive reactions.
+export function countLikes(groups) {
+  if (!Array.isArray(groups)) return 0;
+  let total = 0;
+  for (const group of groups) {
+    const count = group?.reactors?.totalCount;
+    if (POSITIVE.has(group?.content) && isCount(count)) total += count;
+  }
+  return total;
+}
+
+const sha1 = (text) => createHash("sha1").update(text).digest("hex");
+const TERM = /(?:^|[^A-Za-z0-9:_-])painting:([a-z0-9][a-z0-9-]{0,63})(?![A-Za-z0-9_-])/g;
+
+// Which painting a giscus thread belongs to. giscus ("specific" mapping) titles the Discussion with
+// the term and appends "<!-- sha1: <digest(term)> -->" to its body, so the exact title wins, then
+// that hash (the title was edited), then the term as a whole token in the body.
+function threadPainting(thread, knownIds, idByHash) {
+  const title = String(thread.title || "").trim();
+  if (title.startsWith("painting:") && knownIds.has(title.slice(9))) return title.slice(9);
+  const body = String(thread.body || "");
+  for (const match of body.matchAll(/<!--\s*sha1:\s*([0-9a-f]{40})\s*-->/g)) {
+    if (idByHash.has(match[1])) return idByHash.get(match[1]);
+  }
+  for (const match of body.matchAll(TERM)) {
+    if (knownIds.has(match[1])) return match[1];
+  }
+  return null;
+}
+
+// Comment threads -> { <painting id>: { likes, url } }. With two threads for one painting, the
+// one with more likes wins.
+export function buildLikes(threads, knownIds) {
+  const likes = {};
+  if (!Array.isArray(threads)) return likes;
+  const idByHash = new Map([...knownIds].map((id) => [sha1(`painting:${id}`), id]));
+  for (const thread of threads) {
+    if (!thread || typeof thread !== "object" || !isDiscussionUrl(thread.url)) continue;
+    const id = threadPainting(thread, knownIds, idByHash);
+    if (!id) continue;
+    const count = countLikes(thread.reactionGroups);
+    if (!likes[id] || count > likes[id].likes) likes[id] = { likes: count, url: thread.url };
+  }
+  return likes;
+}
+
+// A previously published likes.json -> the entries that still pass validation.
+export function reuseLikes(previous, knownIds) {
+  const likes = {};
+  if (!previous || typeof previous !== "object" || Array.isArray(previous)) return likes;
+  for (const id of knownIds) {
+    if (!Object.hasOwn(previous, id)) continue;
+    const entry = previous[id];
+    if (isCount(entry?.likes) && isDiscussionUrl(entry?.url)) likes[id] = { likes: entry.likes, url: entry.url };
+  }
+  return likes;
 }
 
 // Painting ids declared in a painting script: Gallery.register({ id: "..." }).

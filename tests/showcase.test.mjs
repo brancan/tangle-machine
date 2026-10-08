@@ -31,6 +31,7 @@ test("a valid gallery post becomes a showcase entry", () => {
     title: "Paradox variant",
     author: { login: "octocat", avatarUrl: "https://avatars.githubusercontent.com/u/583231?v=4" },
     createdAt: "2026-10-01T12:00:00Z",
+    likes: 0,
     paintingId: "paradox",
     params: { n: "3", ink: "#ff0000" },
     hasCode: false,
