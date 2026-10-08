@@ -16,7 +16,7 @@ paintings, and remove the Python CLI.
 - [x] T3 Edited code in share links (compressed, confirm-before-run) — route: inline
 - [x] T4 Lazy gallery thumbnails (IntersectionObserver) + CodeMirror loaded only in the studio — route: inline. Measured in Chrome: DOMContentLoaded 551 ms -> 97 ms; the CDN editor (~400 ms per file) was the real bottleneck, thumbnails cost ~200 ms for all 19.
 - [x] T5 Color palettes: Polar Checker, Quarter Arcs, Truchet Tiles, Scales — route: inline
-- [ ] T6 New paintings: Star Checker (photo 12), Tube Network (photo 17) — route: inline
+- [x] T6 New paintings: Star Checker (photo 12), Tube Network (photo 17) — route: inline
 
 Route note: inline; parent holds the full gallery API context from previous features.
 
