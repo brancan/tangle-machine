@@ -106,7 +106,8 @@ Everything runs on GitHub; there is no backend and no extra login.
 `hidden` and it disappears from the public gallery on the next build (label
 and lock events trigger one). Comments are moderated like any Discussion.
 Drips, Ripples, Flow Field, Star Checker, Tube Network, Shaded Ribbons,
-Hatched Pinwheel, Warped Grid and Pebble Cells.
+Hatched Pinwheel, Arc Scales, Radial Sampler, Pattern Hills, Warped Grid,
+Pebble Cells and Pattern Peaks.
 
 ## Tests
 
