@@ -141,6 +141,44 @@ Everything runs on GitHub; there is no backend and no extra login.
 `hidden` and it disappears from the public gallery on the next build (label
 and lock events trigger one). Comments are moderated like any Discussion.
 
+## Search engines
+
+Paintings live behind hash routes (`index.html#/<id>`), which search engines
+ignore, so the deploy workflow runs `node scripts/build-pages.mjs` to publish a
+crawlable page for each one. It generates, without committing anything:
+
+- `web/p/<id>.html`: one static page per painting with its title, description,
+  instruction filled with the default values, the default drawing as inline SVG,
+  prev/next links, an *Open in studio* link and `VisualArtwork` JSON-LD;
+- the *All paintings* index inside `web/index.html`, between the
+  `paintings-index` markers (the committed file holds a small fallback);
+- `web/sitemap.xml` (home, about, showcase and every painting page, `lastmod`
+  from `git log`) and `web/llms.txt`.
+
+The pure generators live in `scripts/pages-lib.mjs` and are tested in
+`tests/pages.test.mjs`. Unlike the showcase build, any error fails the deploy.
+To preview locally (the script rewrites `web/index.html` in place):
+
+```sh
+node scripts/build-pages.mjs
+python -m http.server -d web 8000   # http://localhost:8000/p/schotter.html
+git checkout web/index.html         # drop the injected index
+```
+
+`web/p/`, `web/sitemap.xml` and `web/llms.txt` are gitignored.
+
+### Google Search Console (repository owner)
+
+A project page cannot serve `robots.txt` (it would have to live at the root of
+`brancan.github.io`, another repository), so the sitemap is submitted by hand:
+
+1. In [Search Console](https://search.google.com/search-console), add a
+   **URL prefix** property for `https://brancan.github.io/tangle-machine/`.
+2. Choose **HTML tag** verification and share the `content` token of the
+   `google-site-verification` meta tag, so it can be added to `web/index.html`;
+   deploy, then press **Verify**.
+3. Under **Sitemaps**, submit `sitemap.xml`.
+
 ## Brand
 
 `brand/` holds the Instagram assets. `brand/profile.py` draws the profile
