@@ -155,6 +155,12 @@ test("publish link asks for a pasted link when the code was edited or the link i
   }
 });
 
+test("showcase.html loads the same painting scripts as index.html", () => {
+  const html = readFileSync(join(WEB, "showcase.html"), "utf8");
+  const scripts = [...html.matchAll(/<script src="(paintings\/[^"]+)"/g)].map((m) => m[1]).sort();
+  assert.deepEqual(scripts, scriptsFromIndex().filter((s) => s.startsWith("paintings/")).sort());
+});
+
 test("the committed showcase.json is a JSON array", () => {
   assert.ok(Array.isArray(JSON.parse(readFileSync(join(WEB, "showcase.json"), "utf8"))));
 });

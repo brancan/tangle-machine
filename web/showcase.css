@@ -1,0 +1,54 @@
+/* Public gallery page (showcase.html). Builds on the .card and .frame styles in styles.css. */
+
+.showcase-state {
+  color: var(--muted);
+  font-family: var(--serif);
+  font-size: 1.1rem;
+}
+
+.showcase-state[hidden] {
+  display: none;
+}
+
+.showcase-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.showcase-card .thumb {
+  display: block;
+}
+
+.showcase-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.4rem 0 0.6rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.showcase-meta img {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+}
+
+.showcase-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  font-size: 0.9rem;
+}
+
+.showcase-badge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.05rem 0.45rem;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  color: var(--accent);
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  vertical-align: middle;
+}
