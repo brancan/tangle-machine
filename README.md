@@ -12,7 +12,7 @@ project, not created, endorsed or licensed by Zentangle, Inc.
 
 ## Web gallery
 
-Live at **https://brancan.github.io/zentangles/** (deployed by GitHub Actions on every push to `main` that touches `web/`).
+Live at **https://brancan.github.io/tangle-machine/** (deployed by GitHub Actions on every push to `main` that touches `web/`).
 
 `web/` is an interactive gallery: pick a painting, tweak its variables with a
 live preview, and read or edit its drawing code in the browser. No build step —

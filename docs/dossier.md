@@ -19,8 +19,8 @@ makes tangles. "Tangle" is the untrademarked word for a structured pattern
 drawing; the project was first called "Zentangles" and was renamed to respect
 the Zentangle® trademark.
 
-- Live: https://brancan.github.io/zentangles/
-- Source: https://github.com/brancan/zentangles
+- Live: https://brancan.github.io/tangle-machine/
+- Source: https://github.com/brancan/tangle-machine
 
 ## 2. Conceptual frame
 
@@ -110,8 +110,9 @@ Three principles follow from that frame:
 1. ~~**Name and trademark.**~~ *Resolved:* renamed from "Zentangles" to
    **Tangle Machine**, because Zentangle, Inc.'s guidelines ask not to use
    "Zentangle" in a product name without written permission. The site still
-   credits the trademark and states it is independent. The GitHub repository
-   (and therefore the Pages URL) still uses the old slug.
+   credits the trademark and states it is independent. The repository was
+   renamed to `tangle-machine`; the old Pages URL (`/zentangles/`) no longer
+   serves the site.
 2. **Visitor's role.** Draftsman or co-author? It changes the copy of the
    About page and how shared links are credited.
 3. **Language.** The site is in English; this dossier can be translated.
