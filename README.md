@@ -1,6 +1,6 @@
-# zentangles
+# Tangle Machine
 
-Drawings made with code: an interactive gallery of generative zentangles,
+Drawings made with code: an interactive gallery of generative tangles,
 written in plain JavaScript and rendered as SVG.
 
 The project takes Sol LeWitt's conceptual art as its compass: each piece is an

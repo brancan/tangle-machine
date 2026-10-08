@@ -8,12 +8,16 @@
 
 ## 1. Summary
 
-Zentangles is a public, interactive gallery of drawings made with code. Every
+Tangle Machine is a public, interactive gallery of drawings made with code. Every
 piece is a small JavaScript function that draws SVG. Visitors can move its
 variables, read its code, rewrite it, and share the exact result as a link.
 
 The project takes Sol LeWitt's conceptual art as its compass: the work is the
-instruction, and each rendering is one execution of it.
+instruction, and each rendering is one execution of it. The name comes from
+his line "the idea becomes a machine that makes the art": here the machine
+makes tangles. "Tangle" is the untrademarked word for a structured pattern
+drawing; the project was first called "Zentangles" and was renamed to respect
+the Zentangle® trademark.
 
 - Live: https://brancan.github.io/zentangles/
 - Source: https://github.com/brancan/zentangles
@@ -22,9 +26,9 @@ instruction, and each rendering is one execution of it.
 
 LeWitt's *Wall Drawings* exist as written instructions. Draftsmen carry them
 out on a wall, and every installation differs a little, because hands differ.
-Zentangles maps that system onto code almost one to one:
+Tangle Machine maps that system onto code almost one to one:
 
-| Sol LeWitt | Zentangles |
+| Sol LeWitt | Tangle Machine |
 | --- | --- |
 | The idea, written as an instruction | The painting's `draw(p, pen)` function |
 | Choices the instruction leaves open | The painting's variables (`p`) |
@@ -103,11 +107,11 @@ Three principles follow from that frame:
 
 ## 6. Open questions
 
-1. **Name and trademark.** "Zentangle" is a registered trademark of
-   Zentangle, Inc., whose guidelines ask not to use it as part of a product
-   name without written permission. The site currently credits the trademark
-   and states it is independent, but the project name itself should be
-   reconsidered.
+1. ~~**Name and trademark.**~~ *Resolved:* renamed from "Zentangles" to
+   **Tangle Machine**, because Zentangle, Inc.'s guidelines ask not to use
+   "Zentangle" in a product name without written permission. The site still
+   credits the trademark and states it is independent. The GitHub repository
+   (and therefore the Pages URL) still uses the old slug.
 2. **Visitor's role.** Draftsman or co-author? It changes the copy of the
    About page and how shared links are credited.
 3. **Language.** The site is in English; this dossier can be translated.

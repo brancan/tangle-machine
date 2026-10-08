@@ -4,6 +4,7 @@
   const $ = (selector) => document.querySelector(selector);
 
   const storage = {
+    // Kept from the project's former name so visitors keep their saved edits.
     key: (id) => `zentangles:code:${id}`,
     get(id) {
       try {
@@ -46,7 +47,7 @@
   function showGallery() {
     $("#studio").hidden = true;
     $("#gallery").hidden = false;
-    document.title = "Zentangles";
+    document.title = "Tangle Machine";
     $("#gallery-count").textContent = `${Gallery.paintings.length} paintings`;
     $("#gallery-grid").innerHTML = Gallery.paintings
       .map(
@@ -315,7 +316,7 @@
   function showStudio(painting, query) {
     $("#gallery").hidden = true;
     $("#studio").hidden = false;
-    document.title = `${painting.title} · Zentangles`;
+    document.title = `${painting.title} · Tangle Machine`;
     $("#studio-title").textContent = painting.title;
     $("#studio-description").textContent = painting.description;
 
