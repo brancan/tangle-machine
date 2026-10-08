@@ -16,32 +16,72 @@
     return list.map(([x, y]) => `${fmt(x)},${fmt(y)}`).join(" ");
   }
 
+  // Optional per-shape style: { fill, stroke, width }.
+  function attrs(style) {
+    if (!style) return "";
+    let out = "";
+    if (style.fill) out += ` fill="${style.fill}"`;
+    if (style.stroke) out += ` stroke="${style.stroke}"`;
+    if (style.width != null) out += ` stroke-width="${style.width}"`;
+    return out;
+  }
+
+  // Deterministic PRNG (mulberry32): same seed, same drawing.
+  function random(seed = 1) {
+    let a = seed >>> 0;
+    return function () {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
   function createPen(width, height) {
     const shapes = [];
     return {
       width,
       height,
       shapes,
-      polygon(list) {
-        shapes.push(`<polygon points="${points(list)}"/>`);
+      random,
+      polygon(list, style) {
+        shapes.push(`<polygon points="${points(list)}"${attrs(style)}/>`);
       },
-      polyline(list) {
-        shapes.push(`<polyline points="${points(list)}"/>`);
+      polyline(list, style) {
+        shapes.push(`<polyline points="${points(list)}"${attrs(style)}/>`);
       },
-      line(x1, y1, x2, y2) {
-        shapes.push(`<line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}"/>`);
+      line(x1, y1, x2, y2, style) {
+        shapes.push(`<line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}"${attrs(style)}/>`);
       },
-      circle(cx, cy, r) {
-        shapes.push(`<circle cx="${fmt(cx)}" cy="${fmt(cy)}" r="${fmt(r)}"/>`);
+      circle(cx, cy, r, style) {
+        shapes.push(`<circle cx="${fmt(cx)}" cy="${fmt(cy)}" r="${fmt(r)}"${attrs(style)}/>`);
       },
-      path(d) {
-        shapes.push(`<path d="${d}"/>`);
+      // Arc of a circle from angle a0 to a1 (radians, clockwise on screen when a1 > a0).
+      arc(cx, cy, r, a0, a1, style) {
+        const large = Math.abs(a1 - a0) > Math.PI ? 1 : 0;
+        const sweep = a1 > a0 ? 1 : 0;
+        const x0 = cx + r * Math.cos(a0);
+        const y0 = cy + r * Math.sin(a0);
+        const x1 = cx + r * Math.cos(a1);
+        const y1 = cy + r * Math.sin(a1);
+        shapes.push(
+          `<path d="M${fmt(x0)} ${fmt(y0)}A${fmt(r)} ${fmt(r)} 0 ${large} ${sweep} ${fmt(x1)} ${fmt(y1)}"${attrs(style)}/>`
+        );
+      },
+      path(d, style) {
+        shapes.push(`<path d="${d}"${attrs(style)}/>`);
       },
     };
   }
 
   function defaults(params) {
     return Object.fromEntries(params.map((param) => [param.name, param.value]));
+  }
+
+  // Starting values for a painting: shared style, its style overrides, its own params.
+  function initialValues(painting) {
+    return { ...defaults(STYLE_PARAMS), ...(painting.style || {}), ...defaults(painting.params) };
   }
 
   // Runs a draw function and returns a standalone SVG document string.
@@ -51,7 +91,7 @@
     return (
       `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">` +
       `<rect width="100%" height="100%" fill="${values.paper}"/>` +
-      `<g fill="none" stroke="${values.ink}" stroke-width="${values.strokeWidth}" stroke-linejoin="round">` +
+      `<g fill="none" stroke="${values.ink}" stroke-width="${values.strokeWidth}" stroke-linejoin="round" stroke-linecap="round">` +
       pen.shapes.join("") +
       `</g></svg>`
     );
@@ -73,7 +113,7 @@
     find(id) {
       return paintings.find((painting) => painting.id === id);
     },
-    defaults,
+    initialValues,
     render,
     compile,
   };

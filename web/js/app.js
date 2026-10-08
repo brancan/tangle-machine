@@ -34,12 +34,11 @@
     $("#studio").hidden = true;
     $("#gallery").hidden = false;
     document.title = "Zentangles";
-    const values = (painting) => ({ ...Gallery.defaults(STYLE_PARAMS), ...Gallery.defaults(painting.params) });
     $("#gallery-grid").innerHTML = Gallery.paintings
       .map(
         (painting) => `
         <a class="card" href="#/${painting.id}">
-          <div class="frame">${Gallery.render(painting.draw, values(painting))}</div>
+          <div class="frame">${Gallery.render(painting.draw, Gallery.initialValues(painting))}</div>
           <h2>${painting.title}</h2>
           <p>${painting.description}</p>
         </a>`
@@ -87,21 +86,21 @@
     };
   }
 
-  function controlHtml(param) {
+  function controlHtml(param, value) {
     const id = `param-${param.name}`;
     if (param.type === "checkbox") {
       return `<label class="control check" for="${id}">
-        <input type="checkbox" id="${id}" data-param="${param.name}" ${param.value ? "checked" : ""}>
+        <input type="checkbox" id="${id}" data-param="${param.name}" ${value ? "checked" : ""}>
         <span>${param.label}</span></label>`;
     }
     if (param.type === "color") {
       return `<label class="control color" for="${id}"><span>${param.label}</span>
-        <input type="color" id="${id}" data-param="${param.name}" value="${param.value}"></label>`;
+        <input type="color" id="${id}" data-param="${param.name}" value="${value}"></label>`;
     }
     return `<label class="control" for="${id}">
-      <span>${param.label}<output data-for="${param.name}">${param.value}</output></span>
+      <span>${param.label}<output data-for="${param.name}">${value}</output></span>
       <input type="range" id="${id}" data-param="${param.name}"
-        min="${param.min}" max="${param.max}" step="${param.step}" value="${param.value}"></label>`;
+        min="${param.min}" max="${param.max}" step="${param.step}" value="${value}"></label>`;
   }
 
   function readControl(input) {
@@ -110,9 +109,10 @@
     return input.value;
   }
 
-  function buildControls(painting) {
-    $("#controls-painting").innerHTML = painting.params.map(controlHtml).join("");
-    $("#controls-style").innerHTML = STYLE_PARAMS.map(controlHtml).join("");
+  function buildControls(painting, values) {
+    const html = (param) => controlHtml(param, values[param.name]);
+    $("#controls-painting").innerHTML = painting.params.map(html).join("");
+    $("#controls-style").innerHTML = STYLE_PARAMS.map(html).join("");
   }
 
   function setStatus(message, isError = false) {
@@ -148,8 +148,8 @@
   }
 
   function resetParams() {
-    state.values = { ...Gallery.defaults(STYLE_PARAMS), ...Gallery.defaults(state.painting.params) };
-    buildControls(state.painting);
+    state.values = Gallery.initialValues(state.painting);
+    buildControls(state.painting, state.values);
     draw();
   }
 
@@ -175,9 +175,9 @@
       painting,
       original,
       draw: painting.draw,
-      values: { ...Gallery.defaults(STYLE_PARAMS), ...Gallery.defaults(painting.params) },
+      values: Gallery.initialValues(painting),
     };
-    buildControls(painting);
+    buildControls(painting, state.values);
     editor.set(saved ?? original);
     editor.refresh();
     if (saved) runCode();
