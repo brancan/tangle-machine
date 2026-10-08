@@ -24,7 +24,7 @@ curated set of variants to open the public gallery.
   - `#/harmonograph?fx=2&fy=3&detune=0.3&phase=1.57&damping=6&beats=60`
   - `#/klimt-mosaic?density=480&spirals=0.8&seed=9`
   - `#/impression-sunrise?marks=4200&sunHeight=0.32&seed=64`
-- [ ] T5 Verify the posts appear in showcase.json after the user publishes — route: inline (parent)
+- [x] T5 Verify the posts appear in showcase.json after the user publishes — route: inline (parent) — verified 2026-10-08: the live `showcase.json` lists 6 entries, Discussions #2–#7
 
 Route evidence: 3 non-trivial painting edits → writer trigger.
 
@@ -44,4 +44,4 @@ Instructions of crescent-moon, mandala and suprematism were reworded; every
 placeholder still names an existing param.
 
 ## Next step
-User publishes the six variants; then T5.
+None: feature complete.
