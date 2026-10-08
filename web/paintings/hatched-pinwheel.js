@@ -4,6 +4,11 @@ Gallery.register({
   description:
     "Rings of triangles turn a little more with every step outwards, spinning a vortex " +
     "around a small empty eye. Every triangle is filled with fine parallel hatching.",
+  instruction:
+    "Around a point near the middle, draw {rings} rings of {blades} points each, every ring " +
+    "larger than the last and turned {twist%} of a step further, with {jitter%} of disorder. " +
+    "Join each band of two rings into triangles. Fill every triangle with parallel lines " +
+    "{spacing} px apart, running along one of its two longer sides, and outline it in heavy ink.",
   params: [
     { name: "blades", label: "Blades", type: "range", min: 3, max: 12, step: 1, value: 7 },
     { name: "rings", label: "Rings", type: "range", min: 2, max: 14, step: 1, value: 7 },

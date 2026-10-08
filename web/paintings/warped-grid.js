@@ -4,6 +4,10 @@ Gallery.register({
   description:
     "A grid bent by slow waves, drawn in heavy ink. Every cell is filled with fine lines " +
     "that follow the curve of its walls, switching direction from cell to cell.",
+  instruction:
+    "Bend a grid of {cols} columns and {rows} rows with slow waves of strength {warp}. Draw " +
+    "its lines in heavy ink. In every cell draw {density} fine lines that follow the curve of " +
+    "its walls, lengthwise and crosswise in alternating cells, like a checkerboard.",
   params: [
     { name: "cols", label: "Columns", type: "range", min: 2, max: 16, step: 1, value: 7 },
     { name: "rows", label: "Rows", type: "range", min: 2, max: 16, step: 1, value: 8 },

@@ -4,6 +4,11 @@ Gallery.register({
   description:
     "Thick wavy lines run from top to bottom and cross each other. The lens-shaped cells " +
     "between neighbours are shaded with soft graphite along one of their edges.",
+  instruction:
+    "Draw {lines} thick lines from top to bottom, {thickness} px wide, each one a sum of two " +
+    "slow waves swinging up to {waviness} times the space between lines, so neighbours cross. " +
+    "Between each pair of neighbouring lines, until they cross, shade one side of the cell " +
+    "with soft graphite reaching {shading%} of the way across; leave about one cell in five bare.",
   params: [
     { name: "lines", label: "Lines", type: "range", min: 2, max: 14, step: 1, value: 7 },
     { name: "waviness", label: "Waviness", type: "range", min: 0, max: 2, step: 0.01, value: 1.1 },
