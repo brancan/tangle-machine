@@ -105,6 +105,8 @@ Everything runs on GitHub; there is no backend and no extra login.
 **Moderation**: delete a Show and tell Discussion, lock it, or add the label
 `hidden` and it disappears from the public gallery on the next build (label
 and lock events trigger one). Comments are moderated like any Discussion.
+Drips, Ripples, Flow Field, Star Checker, Tube Network, Shaded Ribbons,
+Hatched Pinwheel, Warped Grid and Pebble Cells.
 
 ## Tests
 
