@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import vm from "node:vm";
 import { WEB, scriptsFromIndex } from "./load-gallery.mjs";
-import { buildShowcase, extractPaintingIds, parseShowcaseEntry } from "../scripts/showcase-lib.mjs";
+import { buildShowcase, extractPaintingIds, parseShowcaseEntry, reuseShowcase } from "../scripts/showcase-lib.mjs";
 
 const KNOWN = new Set(["paradox", "ripples"]);
 const SITE = "https://brancan.github.io/tangle-machine/";
@@ -167,4 +167,18 @@ test("showcase.html loads the same painting scripts as index.html", () => {
 
 test("the committed showcase.json is a JSON array", () => {
   assert.ok(Array.isArray(JSON.parse(readFileSync(join(WEB, "showcase.json"), "utf8"))));
+});
+
+test("a previously published showcase is reused and re-validated", () => {
+  const previous = buildShowcase([discussion(), discussion({ number: 8, createdAt: "2026-10-02T12:00:00Z" })], KNOWN);
+  assert.deepEqual(reuseShowcase(previous, KNOWN), previous);
+  const tampered = [...previous, { ...previous[0], number: 9, link: "https://evil.example/#/paradox?n=3" }];
+  assert.deepEqual(reuseShowcase(tampered, KNOWN), previous);
+  assert.deepEqual(reuseShowcase(previous, new Set(["ripples"])), []);
+});
+
+test("an unusable previous showcase falls back to an empty gallery", () => {
+  for (const previous of [null, undefined, {}, "[]", [null, 3, "x"]]) {
+    assert.deepEqual(reuseShowcase(previous, KNOWN), []);
+  }
 });

@@ -81,6 +81,16 @@ export function buildShowcase(discussions, knownIds) {
   );
 }
 
+// A previously published showcase.json -> entries that still pass validation.
+// Used when GitHub cannot be reached, so a transient failure keeps the gallery instead of wiping it.
+export function reuseShowcase(previous, knownIds) {
+  if (!Array.isArray(previous)) return [];
+  const discussions = previous
+    .filter((entry) => entry && typeof entry === "object")
+    .map((entry) => ({ ...entry, body: entry.link, locked: false, labels: { nodes: [] } }));
+  return buildShowcase(discussions, knownIds);
+}
+
 // Painting ids declared in a painting script: Gallery.register({ id: "..." }).
 export function extractPaintingIds(source) {
   return [...source.matchAll(/Gallery\.register\(\s*\{\s*id:\s*["']([a-z0-9-]+)["']/g)].map((m) => m[1]);

@@ -1,14 +1,17 @@
 // Builds web/showcase.json from the "Gallery" Discussions category at deploy time.
-// It never fails the deploy: without a token, a category or the network it writes [] and exits 0.
+// It never fails the deploy: when GitHub cannot be reached it reuses the published showcase.json
+// (re-validated), and only falls back to [] when that is unavailable too. It always exits 0.
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { buildShowcase, extractPaintingIds } from "./showcase-lib.mjs";
+import { buildShowcase, extractPaintingIds, reuseShowcase } from "./showcase-lib.mjs";
 
 const WEB = new URL("../web/", import.meta.url).pathname;
 const OUT = join(WEB, "showcase.json");
 const CATEGORY = "gallery";
 const PAGE = 100;
 const MAX_PAGES = 5;
+const TIMEOUT_MS = 15000;
+const PUBLISHED = process.env.SHOWCASE_PUBLISHED_URL || "https://brancan.github.io/tangle-machine/showcase.json";
 
 function knownPaintingIds() {
   const dir = join(WEB, "paintings");
@@ -21,6 +24,7 @@ async function graphql(token, query, variables) {
     method: "POST",
     headers: { Authorization: `bearer ${token}`, "Content-Type": "application/json", "User-Agent": "tangle-machine-showcase" },
     body: JSON.stringify({ query, variables }),
+    signal: AbortSignal.timeout(TIMEOUT_MS),
   });
   if (!response.ok) throw new Error(`GitHub API answered ${response.status}`);
   const json = await response.json();
@@ -56,6 +60,7 @@ async function fetchDiscussions(token, owner, name) {
     const { nodes, pageInfo } = data.repository.discussions;
     all.push(...nodes);
     if (!pageInfo.hasNextPage) break;
+    if (page === MAX_PAGES - 1) console.warn(`showcase: stopped after ${MAX_PAGES * PAGE} discussions`);
     after = pageInfo.endCursor;
   }
   return all;
@@ -66,18 +71,32 @@ function write(entries) {
   console.log(`showcase: wrote ${entries.length} entries to web/showcase.json`);
 }
 
+async function fetchPublished(knownIds) {
+  try {
+    const response = await fetch(PUBLISHED, { signal: AbortSignal.timeout(TIMEOUT_MS) });
+    if (!response.ok) throw new Error(`answered ${response.status}`);
+    const entries = reuseShowcase(await response.json(), knownIds);
+    console.warn(`showcase: reusing ${entries.length} entries from ${PUBLISHED}`);
+    return entries;
+  } catch (error) {
+    console.warn(`showcase: published gallery unavailable (${error.message}); writing an empty gallery`);
+    return [];
+  }
+}
+
 async function main() {
   const token = process.env.GITHUB_TOKEN;
   const [owner, name] = (process.env.GITHUB_REPOSITORY || "brancan/tangle-machine").split("/");
+  const knownIds = knownPaintingIds();
   if (!token) {
-    console.warn("showcase: GITHUB_TOKEN is not set, writing an empty gallery");
-    return write([]);
+    console.warn("showcase: GITHUB_TOKEN is not set");
+    return write(await fetchPublished(knownIds));
   }
   try {
-    write(buildShowcase(await fetchDiscussions(token, owner, name), knownPaintingIds()));
+    write(buildShowcase(await fetchDiscussions(token, owner, name), knownIds));
   } catch (error) {
-    console.warn(`showcase: ${error.message}; writing an empty gallery`);
-    write([]);
+    console.warn(`showcase: ${error.message}`);
+    write(await fetchPublished(knownIds));
   }
 }
 

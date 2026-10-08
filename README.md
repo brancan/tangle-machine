@@ -72,8 +72,9 @@ Everything runs on GitHub; there is no backend and no extra login.
   kept. Thumbnails render the original painting with the link's variables;
   shared code is never run there (variants with code get a *custom code* badge
   and open behind the studio's **Run shared code** gate). The workflow
-  rebuilds on Discussion events and every six hours. Without a token, the
-  category or the network it writes `[]` and the deploy still succeeds.
+  rebuilds on Discussion events and every six hours. If GitHub cannot be
+  reached it keeps the currently published gallery (re-validated), writes `[]`
+  only when that is unavailable too, and the deploy always succeeds.
 
 ### One-time setup (repository owner)
 

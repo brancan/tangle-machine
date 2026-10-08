@@ -61,7 +61,8 @@ Route evidence: 5+ new non-trivial files across scripts/, web/, workflow → wri
 
 ## Review
 - Native review (risk high, granted): 4 lenses, approved, acknowledged (lineage review-07efbecd1a4e7fcc).
-- Non-blocking follow-ups: build writes `[]` on transient API failure (wipes the gallery) and has no fetch timeout; duplicated painting list in showcase.html; build script untested.
+- Non-blocking follow-ups: duplicated painting list in showcase.html; build script network path untested.
+- Fixed (user-approved follow-up): transient API failure now reuses the published showcase.json via `reuseShowcase` (re-validated), fetches time out after 15 s, truncation warns. RED: missing export; GREEN: `npm test` 35/35; e2e: 401 + local published fixture → reused 2 entries, exit 0; unreachable published URL → `[]`, exit 0. Route: inline (3 files, understood).
 - Engram mirror: pending (server unavailable).
 
 ## Next step
