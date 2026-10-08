@@ -4,6 +4,10 @@ Gallery.register({
   description:
     "Parallel zigzag lines march across the page, and a few of the gaps between them are " +
     "filled with ink, so solid lightning bolts flash through the stripes.",
+  instruction:
+    "At an angle of {angle}°, draw {lines} parallel zigzag lines {spacing} px apart, each " +
+    "zig {period} px long and {amplitude} px high. Fill {bolts} runs of {boltWidth} " +
+    "neighbouring gaps with ink, spread evenly between the lines.",
   params: [
     { name: "lines", label: "Lines", type: "range", min: 4, max: 160, step: 1, value: 96 },
     { name: "spacing", label: "Spacing", type: "range", min: 4, max: 40, step: 0.5, value: 13 },

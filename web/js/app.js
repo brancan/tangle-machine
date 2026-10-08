@@ -211,9 +211,28 @@
     draw();
   }
 
+  const escapeHtml = (text) =>
+    text.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+
+  // The written instruction, with its blanks filled by the current variables.
+  function showInstruction() {
+    const number = Gallery.paintings.indexOf(state.painting) + 1;
+    const parts = Instruction.render(state.painting.instruction || "", state.values);
+    $("#studio-instruction").innerHTML =
+      `<span class="instruction-label">Instruction #${number}</span> ` +
+      parts
+        .map(({ text, param, choice }) =>
+          param
+            ? `<span class="blank${choice ? " choice" : ""}" data-blank="${param}">${escapeHtml(text)}</span>`
+            : escapeHtml(text)
+        )
+        .join("");
+  }
+
   function applyValues(values) {
     state.values = values;
     buildControls(state.painting, state.values);
+    showInstruction();
     updateUrl();
     draw();
   }
@@ -334,6 +353,7 @@
     $("#next").textContent = `${neighbour(1).title} →`;
     $("#shared-code").hidden = true;
     buildControls(painting, state.values);
+    showInstruction();
     setSource(saved ?? original);
     if (saved) runCode(saved);
     else {
@@ -405,6 +425,7 @@
       if (!input) return;
       const value = readControl(input);
       state.values[input.dataset.param] = value;
+      showInstruction();
       const output = $(`output[data-for="${input.dataset.param}"]`);
       if (output) output.textContent = value;
       updateUrl();

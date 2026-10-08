@@ -4,6 +4,12 @@ Gallery.register({
   description:
     "Only straight lines, joining evenly spaced points on two edges of each cell. " +
     "Together they trace curves (parabolic envelopes) that hug the corners.",
+  instruction:
+    "Draw a {n} × {n} grid with a margin of {margin} px. In each square, take {corners} of " +
+    "its corners{rotate?, starting from a different corner in each square:}. Mark {lines} " +
+    "even points on the two sides that meet there and join them with straight lines, first " +
+    "to first, second to second, until the lines bend into a curve.{colors? Give each " +
+    "corner its own warm color.:}",
   params: [
     { name: "n", label: "Grid size", type: "range", min: 1, max: 8, step: 1, value: 3 },
     { name: "lines", label: "Strings per corner", type: "range", min: 4, max: 80, step: 1, value: 26 },

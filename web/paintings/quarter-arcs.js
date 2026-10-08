@@ -4,6 +4,12 @@ Gallery.register({
   description:
     "Every cell holds a fan of concentric quarter circles growing from one corner. " +
     "Which corner depends on the pattern, and the eye invents curves and waves across the grid.",
+  instruction:
+    "Draw a {n} × {n} grid with a margin of {margin} px. In each square, choose one corner " +
+    "by pattern {pattern} (0 spin, 1 mirror, 2 diagonal, 3 random, seed {seed}) and draw " +
+    "{bands} quarter circles around it, evenly spaced up to the far side.{core? Fill the " +
+    "smallest.:}{stripes? Fill every other band.:}{palette? Color the bands in three " +
+    "colors.:}",
   params: [
     { name: "n", label: "Grid size", type: "range", min: 2, max: 20, step: 1, value: 7 },
     { name: "bands", label: "Arcs per cell", type: "range", min: 2, max: 20, step: 1, value: 8 },

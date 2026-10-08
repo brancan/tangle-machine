@@ -4,6 +4,10 @@ Gallery.register({
   description:
     "A checkerboard pushed through a lens: the grid swells toward you (or sinks away) " +
     "while its border stays put. Op art in the style of Vasarely.",
+  instruction:
+    "Draw a {n} × {n} checkerboard with a margin of {margin} px and push it through a lens " +
+    "of strength {strength}: squares near the center swell while the border stays put. Fill " +
+    "every other square{color? with colors running from blue to green:}.",
   params: [
     { name: "n", label: "Squares per side", type: "range", min: 2, max: 40, step: 1, value: 16 },
     { name: "strength", label: "Bulge (negative = pinch)", type: "range", min: -0.5, max: 0.5, step: 0.01, value: 0.5 },

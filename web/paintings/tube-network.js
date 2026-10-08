@@ -4,6 +4,11 @@ Gallery.register({
   description:
     "Organic tubes branching between random nodes, striped with fine contour lines. " +
     "Each color is its own network, woven over the ones drawn before it.",
+  instruction:
+    "For each of {groups} colors, scatter {nodes} points (seed {seed}) and join each to its " +
+    "{links} nearest neighbours with tubes {tube} px wide, bent sideways by up to {bend%} " +
+    "of their length. Stripe every tube with {stripes} lines along its length. Draw each " +
+    "color over the ones before it.",
   params: [
     { name: "nodes", label: "Nodes per color", type: "range", min: 4, max: 60, step: 1, value: 26 },
     { name: "links", label: "Links per node", type: "range", min: 1, max: 4, step: 1, value: 2 },

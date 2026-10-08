@@ -4,6 +4,11 @@ Gallery.register({
   description:
     "Radial threads with sagging spiral rings that get denser toward the center. " +
     "White ink on black paper, like a chalk doodle.",
+  instruction:
+    "From a point {offsetX} px across and {offsetY} px down from the center, draw {spokes} " +
+    "straight threads to the edges, each straying a little ({jitter}) from even spacing. " +
+    "Between neighbouring threads, hang {rings} strands that crowd toward the center " +
+    "(growth {growth}), each sagging inward by {sag%}. White on black.",
   style: { ink: "#f4f1ea", paper: "#141414", strokeWidth: 2.4 },
   params: [
     { name: "spokes", label: "Spokes", type: "range", min: 5, max: 36, step: 1, value: 16 },

@@ -4,6 +4,11 @@ Gallery.register({
   description:
     "Columns of V-shaped stitches, each one two leaves leaning together, stacked so every " +
     "row tucks into the one above. Darken one leaf of each stitch for a ribbed knit.",
+  instruction:
+    "Divide the wall into {cols} columns and {rows} rows. In each cell, draw a stitch: two " +
+    "leaves, {swell%} as wide as they are long, leaning from a shared point at the bottom " +
+    "to the upper corners, with {veins} veins each{dark?; fill the left leaf with ink:}. " +
+    "Let each row overlap the one above.",
   params: [
     { name: "cols", label: "Columns", type: "range", min: 2, max: 20, step: 1, value: 7 },
     { name: "rows", label: "Rows", type: "range", min: 3, max: 30, step: 1, value: 11 },

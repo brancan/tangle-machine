@@ -4,6 +4,11 @@ Gallery.register({
   description:
     "Dots on a grid, joined by soft curved bands that bow alternately one way and the " +
     "other. The result reads as a woven fabric pinned at every crossing.",
+  instruction:
+    "Mark the points of a {n} × {n} grid, {margin} px from the edge, with " +
+    "{filled?solid:open} circles of {dot} px radius. Join every point to its neighbours " +
+    "with bands of {lines} lines, bowed by {bow%} of their length, alternately one way and " +
+    "the other.",
   params: [
     { name: "n", label: "Cells per side", type: "range", min: 2, max: 14, step: 1, value: 6 },
     { name: "dot", label: "Dot radius", type: "range", min: 3, max: 30, step: 0.5, value: 11 },

@@ -4,6 +4,10 @@ Gallery.register({
   description:
     "Pebbles dropped in still water. Rings spread out from every circle and fold into " +
     "sharp seams where two ripples meet. Traced with marching squares.",
+  instruction:
+    "Drop {count} circles (seed {seed}) between {minR} and {maxR} px in radius. Around " +
+    "them, draw rings every {spacing} px, each tracing the distance to the nearest circle, " +
+    "so the rings fold into seams where they meet.",
   params: [
     { name: "count", label: "Circles", type: "range", min: 1, max: 40, step: 1, value: 16 },
     { name: "maxR", label: "Largest radius", type: "range", min: 15, max: 180, step: 1, value: 70 },

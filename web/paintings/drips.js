@@ -4,6 +4,11 @@ Gallery.register({
   description:
     "Ink running down from the top of the page, with loose drops below. Every shape " +
     "is outlined with rainbow halos and catches a small highlight.",
+  instruction:
+    "Paint a band {band} px deep across the top. Let {drips} drips run down from it, up to " +
+    "{length} px long and about {width} px wide, and let {drops} loose drops fall below " +
+    "(seed {seed}). Outline every shape with {rainbow?rainbow:black} halos {halo} px wide " +
+    "and give each drip a highlight.",
   style: { ink: "#111111", paper: "#fbf8f0", strokeWidth: 1 },
   params: [
     { name: "drips", label: "Drips", type: "range", min: 2, max: 20, step: 1, value: 8 },

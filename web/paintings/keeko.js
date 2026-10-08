@@ -4,6 +4,10 @@ Gallery.register({
   description:
     "Basketweave from bundles of parallel lines: each cell turns its bundle a quarter " +
     "turn from its neighbours, and the checkerboard of directions reads as woven cane.",
+  instruction:
+    "Draw a {n} × {n} grid with a margin of {margin} px. In each square, draw {lines} " +
+    "parallel lines, inset {inset%} from the ends, horizontal and vertical by turns.{frame? " +
+    "Frame it.:}",
   params: [
     { name: "n", label: "Grid size", type: "range", min: 2, max: 24, step: 1, value: 8 },
     { name: "lines", label: "Lines per cell", type: "range", min: 2, max: 16, step: 1, value: 6 },

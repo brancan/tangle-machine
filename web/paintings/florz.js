@@ -4,6 +4,10 @@ Gallery.register({
   description:
     "A diagonal lattice with a solid diamond at every crossing and a small circle in " +
     "every cell. Simple, tidy and endlessly repeatable, like floor tiles.",
+  instruction:
+    "Draw a diagonal lattice {n} cells across, each line doubled {gap} px apart. Put a " +
+    "solid diamond {diamond%} of a cell wide at every crossing and a circle {circle%} of a " +
+    "cell wide in every cell. Frame it {margin} px from the edge.",
   params: [
     { name: "n", label: "Grid size", type: "range", min: 2, max: 20, step: 1, value: 8 },
     { name: "diamond", label: "Diamond size", type: "range", min: 0, max: 0.45, step: 0.01, value: 0.2 },

@@ -4,6 +4,10 @@ Gallery.register({
   description:
     "A two-color checkerboard where every other grid point becomes a star: rays fan out " +
     "from it across its four cells, crossed by nested squares that frame the burst.",
+  instruction:
+    "Draw a {n} × {n} checkerboard in two colors with a margin of {margin} px. At every " +
+    "other grid point, draw a star: {rays} rays into each square around it and {rings} " +
+    "nested squares around the point.{dots? Put a dot near the far corner of each square.:}",
   params: [
     { name: "n", label: "Grid size", type: "range", min: 2, max: 16, step: 1, value: 6 },
     { name: "rays", label: "Rays per cell", type: "range", min: 2, max: 40, step: 1, value: 14 },

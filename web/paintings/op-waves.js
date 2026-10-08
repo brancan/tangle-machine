@@ -4,6 +4,10 @@ Gallery.register({
   description:
     "A checkerboard whose columns and rows ripple like fabric. Optional color fringes " +
     "trail each column edge for a chromatic, vibrating look.",
+  instruction:
+    "Draw a checkerboard of {cols} columns and {rows} rows. Bend its columns {ampX} px and " +
+    "its rows {ampY} px along sine waves, {freq} waves across the wall. Fill every other " +
+    "cell.{fringe? Trail red, orange and blue lines beside every column edge.:}",
   params: [
     { name: "cols", label: "Columns", type: "range", min: 2, max: 24, step: 1, value: 8 },
     { name: "rows", label: "Rows", type: "range", min: 2, max: 30, step: 1, value: 11 },

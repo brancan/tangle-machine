@@ -4,6 +4,11 @@ Gallery.register({
   description:
     "Overlapping rows of half-discs filled with concentric arcs, like fish scales or roof " +
     "tiles. Each row hides the bottom of the one above it.",
+  instruction:
+    "Draw rows of half-discs, {cols} to a row, each row shifted by half a disc and set " +
+    "{overlap%} of a radius below the last, so it covers the bottom of the row above. " +
+    "Inside each half-disc, draw {lines} concentric arcs{core? and fill the " +
+    "smallest:}.{palette? Color the scales in three colors by turns.:}",
   params: [
     { name: "cols", label: "Scales per row", type: "range", min: 2, max: 16, step: 1, value: 6 },
     { name: "lines", label: "Arcs per scale", type: "range", min: 1, max: 20, step: 1, value: 8 },

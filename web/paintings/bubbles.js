@@ -4,6 +4,11 @@ Gallery.register({
   description:
     "Randomly packed bubbles on a dark ground. Each one gets a crescent of shadow away " +
     "from the light and a few nested rings that lean toward it.",
+  instruction:
+    "Scatter up to {count} circles (seed {seed}), from {maxR} px down to {minR} px in " +
+    "radius, never closer than {gap} px. In each, leave a dark crescent {shade%} of the " +
+    "radius wide on the side away from a light at {light}°, and draw {rings} rings that " +
+    "lean toward the light.",
   style: { ink: "#f6f3ec", paper: "#151515", strokeWidth: 1.4 },
   params: [
     { name: "count", label: "Bubbles", type: "range", min: 10, max: 500, step: 1, value: 160 },

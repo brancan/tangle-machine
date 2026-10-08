@@ -4,6 +4,12 @@ Gallery.register({
   description:
     "A checkerboard in polar coordinates fanning out from one corner, with rings that " +
     "widen as they move away. The corner itself is a black pool of dots.",
+  instruction:
+    "From the lower right corner, draw {rays} rays across the wall and arcs around the " +
+    "corner, the first {core} px out, each ring {growth} times as wide as the one inside " +
+    "it. Fill every other cell{palette?, ring by ring in three colors:}. Fill the quarter " +
+    "circle at the corner with ink and scatter light dots about {dot} px across inside it " +
+    "(seed {seed}).",
   params: [
     { name: "rays", label: "Rays", type: "range", min: 2, max: 30, step: 1, value: 9 },
     { name: "core", label: "Core radius", type: "range", min: 40, max: 400, step: 1, value: 170 },

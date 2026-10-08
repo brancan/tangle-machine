@@ -4,6 +4,10 @@ Gallery.register({
   description:
     "Logarithmic spiral arms swirl into the center, and the bands between them are " +
     "ribbed with bulging arcs, like a ribbed tunnel twisting away from you.",
+  instruction:
+    "From the center, draw {arms} spiral arms that open by {twist} each turn, " +
+    "{clockwise?clockwise:counterclockwise}. Across each band between two arms, draw {ribs} " +
+    "ribs per turn, bowed sideways by {bulge}.{fill? Fill every other band.:}",
   params: [
     { name: "arms", label: "Arms", type: "range", min: 3, max: 30, step: 1, value: 12 },
     { name: "twist", label: "Openness", type: "range", min: 0.06, max: 0.5, step: 0.01, value: 0.2 },

@@ -4,6 +4,10 @@ Gallery.register({
   description:
     "A field of isometric cubes, each with a white top, a solid side and a hatched side. " +
     "Three rhombi per hexagon, and the eye cannot decide which way the stairs go.",
+  instruction:
+    "Fill the wall with hexagons {size} px from center to corner. Split each into three " +
+    "rhombi meeting at its center: a white top, a {solid?black:white} side and a side " +
+    "hatched with {hatch} lines{flip?, the light coming from the other side:}.",
   params: [
     { name: "size", label: "Cube size", type: "range", min: 15, max: 140, step: 1, value: 52 },
     { name: "hatch", label: "Hatch lines", type: "range", min: 0, max: 24, step: 1, value: 8 },

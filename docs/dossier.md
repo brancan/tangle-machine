@@ -90,11 +90,14 @@ Three principles follow from that frame:
 
 - [x] **Phase 1 — Base**: gallery, studio, live code, variables, export, share
   links, hand-drawn strokes, tests and CI.
-- [ ] **Phase 2 — Instructions** *(proposed next)*: every painting gets a
-  LeWitt-style instruction in plain language shown beside its code, e.g.
+- [x] **Phase 2 — Instructions**: every painting has a numbered,
+  LeWitt-style instruction in plain language shown above its studio. Its
+  blanks are filled live by the variables (`{n}`, `{ratio%}`,
+  `{flag?text:text}`, see `web/js/instruction.js`), e.g.
   *"Within an n × n grid, in each square, draw lines from side to side, each
   beginning where the previous ended and landing a little further along the
-  next side."* This is what makes the LeWitt frame real rather than decorative.
+  next side."* Moving a slider rewrites the instruction: the variables are the
+  blanks the instruction leaves open.
 - [ ] **Phase 3 — Time and taxonomy**: a render loop that passes time to
   `draw` for animated pieces, with play/pause; tags such as geometric,
   organic, op art, tessellation, animated, with gallery filters.

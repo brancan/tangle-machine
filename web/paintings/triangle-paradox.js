@@ -4,6 +4,11 @@ Gallery.register({
   description:
     "The classic Paradox drawn in triangles: every grid cell is split by its diagonals " +
     "and each triangle spirals in, mirrored against its neighbours.",
+  instruction:
+    "Draw a {n} × {n} grid. Cut each square into {fourTriangles?four triangles along both " +
+    "diagonals:two triangles along one diagonal}. In each triangle, draw lines that start " +
+    "where the last one ended and land {ratio%} along the next side, {steps} times, turning " +
+    "the opposite way from the triangle beside it.",
   params: [
     { name: "n", label: "Grid size", type: "range", min: 1, max: 12, step: 1, value: 4 },
     { name: "steps", label: "Lines per triangle", type: "range", min: 1, max: 60, step: 1, value: 24 },

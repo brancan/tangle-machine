@@ -4,6 +4,10 @@ Gallery.register({
   description:
     "Hundreds of fine lines carried by invisible whirlpools. Each line follows the " +
     "current from a random starting point, and together they reveal the eddies.",
+  instruction:
+    "Place {vortices} whirlpools at random (seed {seed}), each about {core} px across, in a " +
+    "current drifting by {drift}. From {lines} random points, follow the current both ways " +
+    "for {length} steps and draw the path.",
   style: { ink: "#1c1c1c", paper: "#f2efe8", strokeWidth: 0.7 },
   params: [
     { name: "vortices", label: "Whirlpools", type: "range", min: 1, max: 14, step: 1, value: 6 },

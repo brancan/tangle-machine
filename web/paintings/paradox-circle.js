@@ -4,6 +4,12 @@ Gallery.register({
   description:
     "A disc cut into rings and wedges. The center wedges are triangles, the outer ones " +
     "are trapezoids, and each one spirals inward as a Paradox, alternating direction.",
+  instruction:
+    "Draw a circle and divide it into {rings} rings and {sectors} equal wedges: triangles " +
+    "at the center, four-sided pieces outside. Inside each piece, draw lines that start " +
+    "where the last one ended and land {ratio%} along the next side, {steps} times, turning " +
+    "{alternate?the opposite way in neighbouring pieces:the same way everywhere}.{outline? " +
+    "Trace the circle.:}",
   params: [
     { name: "sectors", label: "Wedges", type: "range", min: 3, max: 32, step: 1, value: 12 },
     { name: "rings", label: "Rings", type: "range", min: 1, max: 6, step: 1, value: 3 },

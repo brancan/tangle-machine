@@ -23,7 +23,9 @@ python -m http.server -d web 8000   # http://localhost:8000
 ```
 
 Each painting is one file in `web/paintings/` that calls `Gallery.register`
-with an `id`, `title`, `description`, a `params` schema (`range`, `checkbox`,
+with an `id`, `title`, `description`, an `instruction` (a LeWitt-style text
+whose `{param}`, `{param%}` and `{flag?yes:no}` blanks are filled live by the
+variables), a `params` schema (`range`, `checkbox`,
 `color`) and a `draw(p, pen)` function. Add a `<script>` tag for it in
 `web/index.html` and it shows up in the gallery. A painting may also set
 `style` (`ink`, `paper`, `strokeWidth`) to override the default look.

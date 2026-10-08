@@ -4,6 +4,11 @@ Gallery.register({
   description:
     "Bands laid one over another on a dark ground, like planks dropped in a pile. " +
     "Every new band hides the ones beneath it, so depth appears out of flat strips.",
+  instruction:
+    "Paint the wall black. Lay {bands} white bands across it one after another (seed " +
+    "{seed}), each between {minWidth} and {maxWidth} px wide, mostly horizontal or vertical " +
+    "but tilted up to {tilt}°, with {lines} lines along each. Each band covers what lies " +
+    "beneath it.",
   params: [
     { name: "bands", label: "Bands", type: "range", min: 2, max: 40, step: 1, value: 16 },
     { name: "minWidth", label: "Narrowest band", type: "range", min: 8, max: 80, step: 1, value: 22 },

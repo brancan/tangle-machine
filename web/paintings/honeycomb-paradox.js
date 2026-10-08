@@ -4,6 +4,11 @@ Gallery.register({
   description:
     "A honeycomb of hexagons, each one twisting inward like a Paradox. Split them into " +
     "six triangles for a starry, faceted version.",
+  instruction:
+    "Cover the wall with hexagons {radius} px from center to corner, {gap} px apart. " +
+    "{triangles?Cut each hexagon into six triangles from its center. In each piece:In each " +
+    "hexagon}, draw lines that start where the last one ended and land {ratio%} along the " +
+    "next side, {steps} times{alternate?, turning the other way in every other column:}.",
   params: [
     { name: "radius", label: "Hexagon size", type: "range", min: 25, max: 200, step: 1, value: 80 },
     { name: "steps", label: "Lines per piece", type: "range", min: 1, max: 60, step: 1, value: 20 },

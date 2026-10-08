@@ -5,6 +5,12 @@ Gallery.register({
     "A tessellation built from a single tile, two bundles of quarter circles in opposite " +
     "corners, placed in one of two orientations at random. The bands always connect " +
     "across tiles, so they form endless winding ribbons.",
+  instruction:
+    "Divide the wall into a {n} × {n} grid. In each square, draw {bands} quarter circles " +
+    "around two opposite corners, choosing at random (seed {seed}) which pair. Keep the " +
+    "arcs within {width%} of the square on either side of its middle, so every ribbon meets " +
+    "its neighbour.{palette? Color the stripes between the arcs.:}{grid? Show the " +
+    "squares.:}",
   params: [
     { name: "n", label: "Grid size", type: "range", min: 2, max: 24, step: 1, value: 8 },
     { name: "bands", label: "Lines per ribbon", type: "range", min: 1, max: 12, step: 1, value: 5 },

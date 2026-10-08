@@ -5,6 +5,12 @@ Gallery.register({
     "An n x n grid where every cell holds a Paradox tangle: each line starts where " +
     "the previous one ended and lands a little further along the next side. " +
     "Straight lines, curved illusion.",
+  instruction:
+    "On a square wall, draw a {n} × {n} grid with a margin of {margin} px. In each square, " +
+    "draw a line from one corner to a point {ratio%} of the way along the next side. From " +
+    "there, draw to a point {ratio%} along the following side, and keep going round, " +
+    "{steps} times. Turn {alternate?clockwise and counterclockwise in alternating " +
+    "squares:the same way in every square}.",
   params: [
     { name: "n", label: "Grid size", type: "range", min: 1, max: 16, step: 1, value: 6 },
     { name: "steps", label: "Lines per cell", type: "range", min: 1, max: 80, step: 1, value: 30 },

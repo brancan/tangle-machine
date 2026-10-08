@@ -4,6 +4,11 @@ Gallery.register({
   description:
     "A basket weave seen through a round window. Strands alternate between horizontal " +
     "and vertical, pinched where they tuck under their neighbours and hatched with ink.",
+  instruction:
+    "Inside a {window?circle:square} with a margin of {margin} px, weave {n} × {n} strands, " +
+    "horizontal and vertical by turns, each pinched by {pinch%} toward its ends, with gaps " +
+    "of {gap%} between them. Hatch every strand with {lines} lines along its length. Fill " +
+    "the gaps with ink.",
   params: [
     { name: "n", label: "Strands", type: "range", min: 3, max: 20, step: 1, value: 8 },
     { name: "lines", label: "Lines per strand", type: "range", min: 2, max: 24, step: 1, value: 12 },
