@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Rounded pebbles packed edge to edge, floating on black. Each one has a double outline " +
     "and is filled with parallel hatching at its own angle.",
+  tags: ["organic", "random"],
   instruction:
     "On a black square, scatter {cells} points and give each the region closest to it. " +
     "Pull every region back {gap} px from its neighbours and round its corners by {roundness%}. " +

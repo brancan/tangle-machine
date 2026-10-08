@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "A grid bent by slow waves, drawn in heavy ink. Every cell is filled with fine lines " +
     "that follow the curve of its walls, switching direction from cell to cell.",
+  tags: ["op-art", "tessellation"],
   instruction:
     "Bend a grid of {cols} columns and {rows} rows with slow waves of strength {warp}. Draw " +
     "its lines in heavy ink. In every cell draw {density} fine lines that follow the curve of " +

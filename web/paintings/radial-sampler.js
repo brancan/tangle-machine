@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Pie wedges fanning out from one off-centre point, each filled with a different tangle: " +
     "zigzags, beads, scales, checks, spirals, triangles, diamonds, loops and stripes.",
+  tags: ["geometric", "radial", "random"],
   instruction:
     "From a point {centerX%} across and {centerY%} down, draw {wedges} spokes to the edges. " +
     "Fill each wedge with a different tangle about {density} px to a motif — zigzags, a dotted " +

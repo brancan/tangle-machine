@@ -72,7 +72,7 @@ Three principles follow from that frame:
 
 ## 3. Current state (verified)
 
-- **29 paintings**, among them Paradox variations, op art (Bulge Checker, Op
+- **39 paintings**, among them Paradox variations, op art (Bulge Checker, Op
   Waves, Polar Checker), field-based pieces (Contour Lines, Ripples, Flow
   Field) and classic tangles (Hollibaugh, Florz, Huggins, Keeko, Knitting,
   Tumbling Blocks, Rhombus Star…).

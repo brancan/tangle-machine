@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "A landscape of rounded hills, the front ones overlapping those behind, each filled with " +
     "its own tangle under a big moon and a speckled sky.",
+  tags: ["organic", "random"],
   instruction:
     "Draw {layers} rows of {hills} rounded hills, each row lower on the wall and in front of " +
     "the last. Fill every hill with its own tangle about {size} px to a motif: zigzags, scales, " +

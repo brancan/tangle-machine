@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "An op-art flower: petals radiate from the centre, each built from nested U-shaped bands " +
     "that shrink towards the middle. Petals alternate black-and-white and rainbow stripes.",
+  tags: ["op-art", "radial", "color"],
   instruction:
     "Divide the wall into {petals} equal petals around its centre. In each petal draw {bands} " +
     "nested cones capped with a half-circle, each one smaller than the last as they near the " +

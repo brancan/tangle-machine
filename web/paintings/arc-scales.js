@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Rainbow bumps of nested half-circles, each with a black dot at its base, piled up " +
     "around an empty clearing. Every bump bulges towards the middle.",
+  tags: ["organic", "random", "color"],
   instruction:
     "Inside a frame with a margin of {margin} px, pile half-discs about {size} px across, each " +
     "bulging towards the centre and filled with {rings} nested arcs, with a black half-dot " +

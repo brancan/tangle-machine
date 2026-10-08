@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Rings of triangles turn a little more with every step outwards, spinning a vortex " +
     "around a small empty eye. Every triangle is filled with fine parallel hatching.",
+  tags: ["geometric", "radial"],
   instruction:
     "Around a point near the middle, draw {rings} rings of {blades} points each, every ring " +
     "larger than the last and turned {twist%} of a step further, with {jitter%} of disorder. " +

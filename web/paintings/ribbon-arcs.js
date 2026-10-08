@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "White striped ribbons arch and wave across a black ground. Each new ribbon is laid over " +
     "the ones before it, so they seem to weave over and under each other.",
+  tags: ["organic", "random"],
   instruction:
     "Paint a square black, leaving a white margin of {margin} px. On it lay {ribbons} white " +
     "ribbons, {width} px wide, each split lengthwise into {stripes} stripes by thin black lines. " +

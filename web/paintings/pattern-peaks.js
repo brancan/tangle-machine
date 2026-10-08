@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Overlapping triangular mountains inside a heavy frame, each one filled with a different " +
     "tangle, under a sky of chevron stripes that echo the summits.",
+  tags: ["geometric", "random"],
   instruction:
     "Inside a frame {border} px thick, draw {peaks} triangular mountains, tallest at the back. " +
     "Above the tallest, stack nested chevrons {stripe} px apart. Fill each mountain with a " +
