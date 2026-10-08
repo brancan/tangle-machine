@@ -7,15 +7,16 @@ const { Gallery } = loadGallery();
 // Huge SVGs are slow on phones and painful to plot, so every painting's output is bounded.
 const LIMIT = 1_000_000;
 
-// Paintings known to exceed the limit at extreme settings, with their largest size
-// measured by this sweep (bytes). They are bounded at that size instead, so they cannot
-// grow further; shrink them and drop their entry when they are reworked.
+// Paintings known to exceed the limit, with their largest size measured by this sweep
+// (bytes). They are bounded at that size instead, so they cannot grow further; shrink them
+// and drop their entry when they are reworked. All of them fit with a still hand: bent
+// strokes cannot share one path, and every bent stroke carries its own points.
 const ALLOWED = {
-  "truchet-tiles": 3_395_000, // all max + hand max: 24×24 tiles of 12 bands, bent arcs as polylines
-  "triangle-paradox": 3_097_000, // all max + hand max
-  "string-art": 2_242_000, // all max + hand max (1_352_000 without the hand)
-  "woven-circle": 2_185_000, // all max
-  paradox: 2_080_000, // all max + hand max (1_418_000 without the hand)
+  "triangle-paradox": 3_097_000, // all max + hand max (~862_000 without the hand)
+  "string-art": 2_242_000, // all max + hand max (~412_000 without the hand)
+  "woven-circle": 2_149_000, // all max + hand max (~765_000 without the hand)
+  paradox: 2_080_000, // all max + hand max (~712_000 without the hand)
+  "truchet-tiles": 1_669_000, // all max + hand max: 20×20 tiles of 12 bands (~936_000 without the hand)
   "star-checker": 1_240_000, // all max + hand max only: wobble and pressure on ~14600 strokes
   "paradox-circle": 1_158_000, // all max + hand max only: ~11700 bent strokes
 };
