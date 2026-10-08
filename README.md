@@ -71,7 +71,9 @@ Drips, Ripples, Flow Field, Star Checker, Tube Network, Tumbling Blocks,
 Hollibaugh, Huggins, Florz, Knitting, Keeko, Lightning Bolt, Rhombus Star,
 Shaded Ribbons, Hatched Pinwheel, Warped Grid, Pebble Cells, Arc Scales, Radial
 Sampler, Pattern Hills, Pattern Peaks, Rainbow Petals, Ribbon Arcs,
-Logarithmic Spiral, L-System Tree and Reaction Diffusion.
+Logarithmic Spiral, L-System Tree, Reaction Diffusion, Schotter,
+Interruptions, (Des)Ordres, Wall Drawing, Movement in Squares, Printemps,
+Crescent Moon, Static, Cadent, Harmonograph, Hilbert Curve and Moiré.
 
 ## Public gallery and comments
 

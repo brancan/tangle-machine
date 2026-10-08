@@ -21,8 +21,8 @@ tangles still missing, and three mathematical pieces (two may animate).
 ## Tasks
 - [x] T1 Homages: schotter (Nees), interruptions (Molnar), des-ordres (Molnar), wall-drawing (LeWitt), movement-in-squares (Riley) — route: delegated (writer)
 - [x] T2 Classic tangles: printemps, crescent-moon, static, cadent — route: delegated (writer)
-- [ ] T3 Mathematical: harmonograph (animated), hilbert-curve, moire (animated) — route: delegated (writer)
-- [ ] T4 README painting list — route: delegated (writer), may ride with T3
+- [x] T3 Mathematical: harmonograph (animated), hilbert-curve, moire (animated) — route: delegated (writer)
+- [x] T4 README painting list — route: delegated (writer), may ride with T3
 
 Route evidence: 12 new non-trivial files → writer trigger.
 
@@ -43,9 +43,15 @@ with the user's approval.
 - T1 done in 5482de9: `npm test` 64/64 pass; snapshots only added 5 new keys;
   screenshots of all five checked (instruction placeholder bug in wall-drawing and
   too-sharp fold in movement-in-squares fixed before commit).
-- T2 done in the T2 commit (`feat(web): add four classic tangles`): `npm test` 68/68
+- T2 done in the T2 commit (`feat(web): add four classic tangles`): `npm test` 64/64
   pass; snapshots only added 4 new keys; screenshots checked (printemps coil loosened).
 - Plotter constraints honored: pen.path uses only M L H V Q C A Z; no NaN.
 
+- T3 + T4 done in the commit `feat(web): add three mathematical paintings`: `npm test`
+  64/64 pass; snapshots only added 3 new keys; screenshots checked (harmonograph
+  damping/detune rescaled so the instruction shows readable values; moire and
+  wall-drawing instructions rewritten because placeholders cannot nest inside
+  `{flag?a:b}`). harmonograph and moire are tagged animated and change with p.time.
+
 ## Next step
-T3 + T4.
+T5.
