@@ -2,7 +2,24 @@
 
 Drawings made with code. Pure Python (stdlib only), output as SVG.
 
-## Paradox grid
+## Web gallery
+
+`web/` is an interactive gallery: pick a painting, tweak its variables with a
+live preview, and read or edit its drawing code in the browser. No build step —
+open `web/index.html` directly or serve the folder:
+
+```bash
+python -m http.server -d web 8000   # http://localhost:8000
+```
+
+Each painting is one file in `web/paintings/` that calls `Gallery.register`
+with an `id`, `title`, `description`, a `params` schema (`range`, `checkbox`,
+`color`) and a `draw(p, pen)` function. Add a `<script>` tag for it in
+`web/index.html` and it shows up in the gallery. The `pen` API offers
+`polygon`, `polyline`, `line`, `circle` and `path`. Code edits are saved in
+the browser (localStorage) and can be reset at any time.
+
+## Paradox grid (Python CLI)
 
 The canvas is split into an `n x n` grid and every cell gets a **Paradox**
 tangle: starting from the square, each new line begins where the previous one

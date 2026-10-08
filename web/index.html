@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zentangles</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#">Zentangles</a>
+      <span class="tagline">Drawings made with code</span>
+    </header>
+
+    <main>
+      <section id="gallery" hidden>
+        <div id="gallery-grid" class="gallery-grid"></div>
+      </section>
+
+      <section id="studio" hidden>
+        <div class="studio-head">
+          <a class="back" href="#">← Gallery</a>
+          <h1 id="studio-title"></h1>
+          <p id="studio-description"></p>
+        </div>
+
+        <div class="studio">
+          <aside id="controls" class="panel controls">
+            <h3>Variables</h3>
+            <div id="controls-painting"></div>
+            <h3>Style</h3>
+            <div id="controls-style"></div>
+            <div class="buttons">
+              <button id="reset-params" type="button">Reset variables</button>
+              <button id="download" type="button">Download SVG</button>
+            </div>
+          </aside>
+
+          <div class="stage">
+            <div id="canvas" class="frame"></div>
+            <p id="status" class="status" role="status"></p>
+          </div>
+
+          <section class="panel code-panel">
+            <div class="code-head">
+              <h3>Code <span id="code-edited" class="badge" hidden>edited</span></h3>
+              <div class="buttons">
+                <button id="reset-code" type="button">Reset code</button>
+                <button id="run" type="button" class="primary" title="Ctrl/Cmd + Enter">Run</button>
+              </div>
+            </div>
+            <textarea id="code" spellcheck="false"></textarea>
+            <p class="hint">
+              <code>p</code> holds the variables, <code>pen</code> draws:
+              <code>polygon</code>, <code>polyline</code>, <code>line</code>, <code>circle</code>,
+              <code>path</code>, plus <code>pen.width</code>/<code>pen.height</code>.
+              Edits re-run automatically and are kept in this browser.
+            </p>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+    <script src="js/gallery.js"></script>
+    <script src="paintings/paradox.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
