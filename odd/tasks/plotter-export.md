@@ -11,7 +11,8 @@ Dossier phase 4: export any painting as an SVG a pen plotter can draw.
 
 ## Checks
 - `npm test` 76 pass; RED observed before plotter.js (7 failing) and before hidden-line removal (1 failing).
-- Every painting exports in < 3 s without NaN (worst: rainbow-petals ~1.5 s, down from 32 s with the vector occlusion attempt).
+- Every painting (69 after rebasing) exports in < 3 s without NaN (worst: rainbow-petals ~1.1 s, down from 32 s with the vector occlusion attempt).
+- After rebasing, log-spiral took 3.5 s: CPU profile showed edge lookups over whole segment bounding boxes; fixed by walking only the crossed grid cells (Amanatides & Woo) and bucketing scanline edges. A capped loop guards against a hang seen on bad input.
 - Visual check of plotter output for woven-circle, scales, hollibaugh, radial-sampler, rainbow-petals, tumbling-blocks, bubbles, spider-web.
 - Chrome: button exports, status shows layers/strokes/pen travel, no JS errors.
 

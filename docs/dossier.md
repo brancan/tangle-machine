@@ -138,7 +138,7 @@ Three principles follow from that frame:
   paper are hatched in their color, each color is an Inkscape layer
   (`1 #1a1a1a`, `2 #c0392b`…) so pens can be swapped between layers, the plot
   is clipped to the 190 mm sheet, and a greedy nearest-neighbour ordering cuts
-  pen-up travel (about 2,360 m → 190 m over the 39 paintings, −92%).
+  pen-up travel (about 4,460 m → 735 m over the 69 paintings, −84%).
   Paintings on dark paper plot as light ink: use a white pen on black paper.
 - [ ] **Phase 5 — Studio tools**: presets per painting, `pen` API reference
   in the studio, global palettes, keyboard shortcuts. *In progress on a
