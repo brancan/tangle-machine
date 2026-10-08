@@ -15,9 +15,17 @@ python -m http.server -d web 8000   # http://localhost:8000
 Each painting is one file in `web/paintings/` that calls `Gallery.register`
 with an `id`, `title`, `description`, a `params` schema (`range`, `checkbox`,
 `color`) and a `draw(p, pen)` function. Add a `<script>` tag for it in
-`web/index.html` and it shows up in the gallery. The `pen` API offers
-`polygon`, `polyline`, `line`, `circle` and `path`. Code edits are saved in
-the browser (localStorage) and can be reset at any time.
+`web/index.html` and it shows up in the gallery. A painting may also set
+`style` (`ink`, `paper`, `strokeWidth`) to override the default look.
+
+The `pen` API offers `polygon`, `polyline`, `line`, `circle`, `arc` and `path`;
+each accepts an optional `{ fill, stroke, width }` style. `pen.random(seed)`
+returns a deterministic random generator. Code edits are saved in the browser
+(localStorage) and can be reset at any time.
+
+Current paintings: Paradox, Paradox Circle, Triangle Paradox, Honeycomb
+Paradox, Spider Web, Truchet Tiles, Scales, String Art, Bulge Checker, Polar
+Checker and Op Waves.
 
 ## Paradox grid (Python CLI)
 
