@@ -64,7 +64,9 @@ Current paintings: Paradox, Paradox Circle, Triangle Paradox, Honeycomb
 Paradox, Spider Web, Truchet Tiles, Scales, String Art, Bulge Checker, Polar
 Checker, Op Waves, Woven Circle, Quarter Arcs, Bubbles, Contour Lines, Vortex,
 Drips, Ripples, Flow Field, Star Checker, Tube Network, Tumbling Blocks,
-Hollibaugh, Huggins, Florz, Knitting, Keeko, Lightning Bolt and Rhombus Star.
+Hollibaugh, Huggins, Florz, Knitting, Keeko, Lightning Bolt, Rhombus Star,
+Shaded Ribbons, Hatched Pinwheel, Warped Grid, Pebble Cells, Arc Scales, Radial
+Sampler, Pattern Hills, Pattern Peaks, Rainbow Petals and Ribbon Arcs.
 
 ## Public gallery and comments
 
@@ -105,9 +107,6 @@ Everything runs on GitHub; there is no backend and no extra login.
 **Moderation**: delete a Show and tell Discussion, lock it, or add the label
 `hidden` and it disappears from the public gallery on the next build (label
 and lock events trigger one). Comments are moderated like any Discussion.
-Drips, Ripples, Flow Field, Star Checker, Tube Network, Shaded Ribbons,
-Hatched Pinwheel, Arc Scales, Radial Sampler, Rainbow Petals, Pattern Hills,
-Warped Grid, Ribbon Arcs, Pebble Cells and Pattern Peaks.
 
 ## Tests
 
