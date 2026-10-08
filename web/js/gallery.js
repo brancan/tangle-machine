@@ -238,6 +238,7 @@
       return paintings.find((painting) => painting.id === id);
     },
     initialValues,
+    random,
     render,
     compile,
   };

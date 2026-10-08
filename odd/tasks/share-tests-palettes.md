@@ -12,7 +12,7 @@ paintings, and remove the Python CLI.
 
 ## Tasks
 - [x] T1 Remove Python CLI, tests and examples; README without Python — route: inline
-- [ ] T2 Node test suite (snapshots of all paintings, param-name collisions, URL helpers) + CI workflow — route: inline
+- [x] T2 Node test suite (snapshots of all paintings, param-name collisions, URL helpers) + CI workflow — route: inline
 - [ ] T3 Edited code in share links (compressed, confirm-before-run) — route: inline
 - [ ] T4 Lazy gallery thumbnails (IntersectionObserver) — route: inline
 - [ ] T5 Color palettes: Polar Checker, Quarter Arcs, Truchet Tiles, Scales — route: inline

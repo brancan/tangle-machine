@@ -45,5 +45,11 @@ Drips, Ripples and Flow Field.
 ## Tests
 
 ```bash
-npm test
+npm test             # Node's built-in test runner, no dependencies
+npm run test:update  # accept intended visual changes
 ```
+
+The suite renders every painting with its default variables and compares a
+hash of the SVG against `tests/snapshots.json`, renders each one with random
+variables to catch `NaN`, and checks that no painting param shadows a shared
+style or hand-drawn param. CI runs it on every push and pull request.
