@@ -176,6 +176,28 @@ main {
   color: var(--muted);
 }
 
+.notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  margin-bottom: 1.25rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.notice[hidden] {
+  display: none;
+}
+
+.notice p {
+  margin: 0;
+  max-width: 70ch;
+}
+
 .studio {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr) minmax(0, 1fr);

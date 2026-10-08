@@ -11,7 +11,20 @@ export function scriptsFromIndex() {
 }
 
 export function loadGallery() {
-  const context = { window: {}, Math, console, URLSearchParams, TextEncoder, TextDecoder };
+  const context = {
+    window: {},
+    Math,
+    console,
+    URLSearchParams,
+    TextEncoder,
+    TextDecoder,
+    Blob,
+    Response,
+    CompressionStream,
+    DecompressionStream,
+    btoa,
+    atob,
+  };
   vm.createContext(context);
   // app.js wires the DOM; everything else is pure and runs headless.
   for (const file of scriptsFromIndex().filter((f) => f !== "js/app.js")) {

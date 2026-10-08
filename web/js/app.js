@@ -127,35 +127,9 @@
 
   const allParams = (painting) => [...painting.params, ...STYLE_PARAMS, ...HAND_PARAMS];
 
-  // Parses "n=6&ink=%23000" into typed, range-checked values for this painting.
-  function parseQuery(painting, query) {
-    const values = {};
-    const search = new URLSearchParams(query);
-    for (const param of allParams(painting)) {
-      const raw = search.get(param.name);
-      if (raw === null) continue;
-      if (param.type === "checkbox") values[param.name] = raw === "1";
-      else if (param.type === "color") {
-        if (/^#[0-9a-f]{6}$/i.test(raw)) values[param.name] = raw;
-      } else {
-        const n = Number(raw);
-        if (Number.isFinite(n)) values[param.name] = Math.min(param.max, Math.max(param.min, n));
-      }
-    }
-    return values;
-  }
-
-  // Encodes only the values that differ from the painting's starting values.
-  function buildQuery(painting, values) {
-    const initial = Gallery.initialValues(painting);
-    const search = new URLSearchParams();
-    for (const param of allParams(painting)) {
-      const value = values[param.name];
-      if (value === initial[param.name]) continue;
-      search.set(param.name, param.type === "checkbox" ? (value ? "1" : "0") : String(value));
-    }
-    return search.toString();
-  }
+  const parseQuery = (painting, query) => Share.parseQuery(allParams(painting), query);
+  const buildQuery = (painting, values) =>
+    Share.buildQuery(allParams(painting), values, Gallery.initialValues(painting));
 
   function updateUrl() {
     const query = buildQuery(state.painting, state.values);
@@ -251,13 +225,44 @@
     image.src = url;
   }
 
+  // The link carries the variables and, when the code was edited, the code itself.
   async function copyLink() {
+    const source = editor.get();
+    const search = new URLSearchParams(buildQuery(state.painting, state.values));
+    if (source !== state.original) search.set("code", await Share.encodeCode(source));
+    const query = search.toString();
+    const url = `${location.href.split("#")[0]}#/${state.painting.id}${query ? `?${query}` : ""}`;
     try {
-      await navigator.clipboard.writeText(location.href);
-      setStatus("Link copied to clipboard");
+      await navigator.clipboard.writeText(url);
+      setStatus(source !== state.original ? "Link with your code copied" : "Link copied to clipboard");
     } catch {
-      window.prompt("Copy this link:", location.href);
+      window.prompt("Copy this link:", url);
     }
+  }
+
+  // Code from a link is someone else's JavaScript: show it, but run it only on request.
+  async function offerSharedCode(painting, encoded) {
+    const source = await Share.decodeCode(encoded);
+    if (state.painting !== painting) return;
+    if (!source) {
+      setStatus("The shared code in this link is damaged", true);
+      return;
+    }
+    state.sharedCode = source;
+    $("#shared-code").hidden = false;
+  }
+
+  function acceptSharedCode() {
+    $("#shared-code").hidden = true;
+    editor.set(state.sharedCode);
+    state.sharedCode = null;
+    runCode();
+  }
+
+  function rejectSharedCode() {
+    $("#shared-code").hidden = true;
+    state.sharedCode = null;
+    updateUrl();
   }
 
   // Wraps around: the last painting's "next" is the first one.
@@ -286,6 +291,7 @@
     $("#prev").textContent = `← ${neighbour(-1).title}`;
     $("#next").href = `#/${neighbour(1).id}`;
     $("#next").textContent = `${neighbour(1).title} →`;
+    $("#shared-code").hidden = true;
     buildControls(painting, state.values);
     editor.set(saved ?? original);
     editor.refresh();
@@ -294,6 +300,8 @@
       $("#code-edited").hidden = true;
       draw();
     }
+    const shared = new URLSearchParams(query).get("code");
+    if (shared) offerSharedCode(painting, shared);
   }
 
   // ---------- Wiring ----------
@@ -332,6 +340,8 @@
     $("#reset-params").addEventListener("click", resetParams);
     $("#randomize").addEventListener("click", randomize);
     $("#copy-link").addEventListener("click", copyLink);
+    $("#accept-code").addEventListener("click", acceptSharedCode);
+    $("#reject-code").addEventListener("click", rejectSharedCode);
     $("#download-svg").addEventListener("click", downloadSvg);
     $("#download-png").addEventListener("click", () => downloadPng());
 

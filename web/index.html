@@ -38,6 +38,17 @@
           <p id="studio-description"></p>
         </div>
 
+        <div id="shared-code" class="notice" role="alert" hidden>
+          <p>
+            <strong>This link includes custom code.</strong> It was written by whoever shared the
+            link and will run in your browser. Only run it if you trust them.
+          </p>
+          <div class="buttons">
+            <button id="accept-code" type="button" class="primary">Run shared code</button>
+            <button id="reject-code" type="button">Keep original</button>
+          </div>
+        </div>
+
         <div class="studio">
           <aside id="controls" class="panel controls">
             <h3>Variables</h3>
@@ -88,6 +99,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
     <script src="js/gallery.js"></script>
+    <script src="js/share.js"></script>
     <script src="paintings/paradox.js"></script>
     <script src="paintings/paradox-circle.js"></script>
     <script src="paintings/triangle-paradox.js"></script>

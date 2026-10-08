@@ -35,7 +35,10 @@ fills) and `Hand seed`. All start at 0, so paintings look exact by default.
 
 The studio also offers Randomize, shareable links (the variables live in the
 URL hash, e.g. `#/paradox?n=3&alternate=0`), SVG/PNG export and arrow-key
-navigation between paintings.
+navigation between paintings. When the code was edited, **Copy link** also packs
+it into the link (`code=`, deflate + base64url). Whoever opens such a link sees
+the original painting and a notice; the shared code runs only after they click
+**Run shared code**.
 
 Current paintings: Paradox, Paradox Circle, Triangle Paradox, Honeycomb
 Paradox, Spider Web, Truchet Tiles, Scales, String Art, Bulge Checker, Polar
