@@ -14,7 +14,7 @@ Gallery.register({
     { name: "wedges", label: "Wedges", type: "range", min: 4, max: 20, step: 1, value: 12 },
     { name: "centerX", label: "Centre X", type: "range", min: 0.15, max: 0.85, step: 0.01, value: 0.47 },
     { name: "centerY", label: "Centre Y", type: "range", min: 0.15, max: 0.85, step: 0.01, value: 0.53 },
-    { name: "density", label: "Pattern size", type: "range", min: 12, max: 70, step: 1, value: 30 },
+    { name: "density", label: "Pattern size", type: "range", min: 18, max: 70, step: 1, value: 30 },
     { name: "seed", label: "Seed", type: "range", min: 1, max: 100, step: 1, value: 4 },
   ],
   draw: function draw(p, pen) {
@@ -29,18 +29,32 @@ Gallery.register({
     const solid = { fill: p.ink, stroke: "none" };
     // Set per wedge: is the local point (u, v) on the page and within a cell of the wedge?
     let near = () => true;
+    // A polyline through the points near the wedge only, broken wherever it leaves it.
+    const run = (pts, to) => {
+      let d = "";
+      let on = false;
+      for (const [u, v] of pts) {
+        const k = near(u, v);
+        if (k) d += (on ? "L" : "M") + to(u, v);
+        on = k;
+      }
+      return d;
+    };
 
     // Every pattern draws in a local frame: u runs out along the wedge, v across it.
     const patterns = {
       zigzag(box, to) {
         let bold = "";
         let fine = "";
-        for (let v = box.v0, k = 0; v <= box.v1 + s; v += s, k++) {
+        for (let v = box.v0; v <= box.v1 + s; v += s) {
+          const [top, bottom] = [[], []];
           for (let u = box.u0, i = 0; u <= box.u1 + s; u += s * 0.4, i++) {
             const z = i % 2 ? s * 0.22 : -s * 0.22;
-            bold += (i ? "L" : "M") + to(u, v + z);
-            fine += (i ? "L" : "M") + to(u, v + s / 2 + z);
+            top.push([u, v + z]);
+            bottom.push([u, v + s / 2 + z]);
           }
+          bold += run(top, to);
+          fine += run(bottom, to);
         }
         pen.path(bold, { width: f(s * 0.28) });
         pen.path(fine, thin);
@@ -52,8 +66,9 @@ Gallery.register({
         for (let j = Math.floor(box.v0 / h) - 1; j * h <= box.v1 + h; j++) {
           for (let u = box.u0 - s + (j % 2 ? s / 2 : 0); u <= box.u1 + s; u += s) {
             const v = j * h;
+            if (!near(u, v)) continue;
             d += `M${to(u, v)}L${to(u + s, v)}M${to(u, v)}L${to(u + s / 2, v + h)}M${to(u, v)}L${to(u - s / 2, v + h)}`;
-            if (near(u, v)) nodes.push([u, v]);
+            nodes.push([u, v]);
           }
         }
         pen.path(d, thin);
@@ -67,7 +82,9 @@ Gallery.register({
         let d = "";
         const step = s * 1.4;
         for (let v = box.v0; v <= box.v1 + step; v += step) {
-          for (let u = box.u0, i = 0; u <= box.u1; u += s * 0.2, i++) d += (i ? "L" : "M") + to(u, v + s * 0.3 * Math.sin(u / s));
+          const pts = [];
+          for (let u = box.u0; u <= box.u1; u += s * 0.2) pts.push([u, v + s * 0.3 * Math.sin(u / s)]);
+          d += run(pts, to);
         }
         pen.path(d, { width: f(s * 0.2) });
         for (let v = box.v0; v <= box.v1 + step; v += step) {
@@ -88,8 +105,8 @@ Gallery.register({
         for (let u = box.u1 + r, row = 0; u >= box.u0 - r; u -= r * 0.75, row++) {
           for (let v = box.v0 - s + (row % 2 ? r : 0); v <= box.v1 + s; v += s) {
             if (!near(u, v)) continue;
-            pen.path(half(u, v, r) + "Z", { fill: p.paper, width: thin.width });
-            pen.path(half(u, v, r * 0.6), thin);
+            // One element per scale: the inner arc lies within the paper-filled outer one.
+            pen.path(half(u, v, r) + "Z" + half(u, v, r * 0.6), { fill: p.paper, width: thin.width });
           }
         }
       },
@@ -111,7 +128,8 @@ Gallery.register({
             const [x, y] = to(u, v, true);
             pen.circle(x, y, s * 0.55, { fill: p.paper, width: f(1.4 * p.strokeWidth) });
             const pts = [];
-            for (let t = 0; t <= 1; t += 0.03) pts.push([x + s * 0.45 * t * Math.cos(t * 6 * Math.PI), y + s * 0.45 * t * Math.sin(t * 6 * Math.PI)]);
+            // Small spirals need fewer points to stay round.
+            for (let t = 0; t <= 1; t += 0.03 * Math.max(1, 24 / s)) pts.push([x + s * 0.45 * t * Math.cos(t * 6 * Math.PI), y + s * 0.45 * t * Math.sin(t * 6 * Math.PI)]);
             pen.polyline(pts, thin, true);
           }
         }

@@ -7,11 +7,11 @@ Gallery.register({
   tags: ["organic", "random", "color"],
   instruction:
     "Inside a frame with a margin of {margin} px, pile half-discs about {size} px across, each " +
-    "bulging towards the centre and filled with {rings} nested arcs, with a black half-dot " +
+    "bulging towards the centre and filled with {rings} nested arcs (never closer than 2 px), with a black half-dot " +
     "{dot%} of its size at the base. Start from the middle and work outwards, so every new " +
     "bump hides the base of the last. Leave a clearing of {clearing} px in the middle.",
   params: [
-    { name: "size", label: "Bump size", type: "range", min: 20, max: 160, step: 1, value: 72 },
+    { name: "size", label: "Bump size", type: "range", min: 28, max: 160, step: 1, value: 72 },
     { name: "rings", label: "Arcs per bump", type: "range", min: 1, max: 20, step: 1, value: 9 },
     { name: "dot", label: "Dot size", type: "range", min: 0, max: 0.6, step: 0.01, value: 0.2 },
     { name: "clearing", label: "Clearing", type: "range", min: 0, max: 300, step: 1, value: 120 },
@@ -38,6 +38,10 @@ Gallery.register({
         if (dist < p.clearing + r * 0.3) continue;
         // The dome faces the centre; a little noise keeps the pile from looking radial.
         const a = Math.atan2(cy - by, cx - bx) + (rand() - 0.5) * 0.8;
+        // Bumps that cannot reach into the frame would be clipped away entirely (checked after
+        // the last draw from rand, so the bumps that remain keep their place).
+        const out = Math.hypot(Math.max(p.margin - bx, 0, bx - (W - p.margin)), Math.max(p.margin - by, 0, by - (H - p.margin)));
+        if (out >= r) continue;
         bumps.push({ x: bx, y: by, r, a, dist });
       }
     }
@@ -56,7 +60,15 @@ Gallery.register({
     pen.clip(frame, () => {
       for (const b of bumps) {
         pen.path(halfDisc(b, b.r) + "Z", { fill: p.paper, width: f(1.4 * p.strokeWidth) });
-        for (let k = 1; k < p.rings; k++) pen.path(halfDisc(b, b.r * (1 - k / p.rings)));
+        // Nested arcs never closer than 2 px (tighter ones merge into solid ink anyway), and
+        // none hidden under the dot.
+        const rings = Math.min(p.rings, Math.max(1, Math.floor(b.r / 2)));
+        let arcs = "";
+        for (let k = 1; k < rings; k++) {
+          const rr = b.r * (1 - k / rings);
+          if (rr > b.r * p.dot) arcs += halfDisc(b, rr);
+        }
+        if (arcs) pen.path(arcs);
         if (p.dot > 0) pen.path(halfDisc(b, b.r * p.dot) + "Z", { fill: p.ink });
       }
     });

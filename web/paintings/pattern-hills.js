@@ -14,7 +14,7 @@ Gallery.register({
     { name: "hills", label: "Hills per layer", type: "range", min: 1, max: 6, step: 1, value: 3 },
     { name: "layers", label: "Layers", type: "range", min: 1, max: 6, step: 1, value: 4 },
     { name: "moon", label: "Moon size", type: "range", min: 0, max: 200, step: 1, value: 80 },
-    { name: "size", label: "Pattern size", type: "range", min: 8, max: 40, step: 1, value: 18 },
+    { name: "size", label: "Pattern size", type: "range", min: 10, max: 40, step: 1, value: 18 },
     { name: "colored", label: "Colors", type: "checkbox", value: true },
     { name: "sky", label: "Sky", type: "color", value: "#8fb8e8" },
     { name: "seed", label: "Seed", type: "range", min: 1, max: 100, step: 1, value: 7 },

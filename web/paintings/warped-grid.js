@@ -34,13 +34,22 @@ Gallery.register({
       u + ax * (Math.sin(v * wx.k + wx.ph) * 0.8 + Math.sin((u + v) * wx.k2 + wx.ph2) * 0.4),
       v + ay * (Math.sin(u * wy.k + wy.ph) * 0.8 + Math.sin((u - v) * wy.k2 + wy.ph2) * 0.4),
     ];
+    // A warped straight line as path data in tenths of a pixel: an absolute start, then each
+    // point relative to the last. Lines wholly beyond one side of the sheet are left out.
+    const tenth = (n) => Math.round(n * 10);
     const trace = (u0, v0, u1, v1, steps) => {
-      let d = "";
-      for (let s = 0; s <= steps; s++) {
-        const [x, y] = map(u0 + ((u1 - u0) * s) / steps, v0 + ((v1 - v0) * s) / steps);
-        d += `${s ? "L" : "M"}${f(x)} ${f(y)}`;
+      const pts = [];
+      for (let s = 0; s <= steps; s++) pts.push(map(u0 + ((u1 - u0) * s) / steps, v0 + ((v1 - v0) * s) / steps));
+      const off = (test) => pts.every(test);
+      if (off(([x]) => x < 0) || off(([x]) => x > W) || off(([, y]) => y < 0) || off(([, y]) => y > H)) return "";
+      let [px, py] = pts[0].map(tenth);
+      let d = `M${px / 10} ${py / 10}l`;
+      for (const pt of pts.slice(1)) {
+        const [x, y] = pt.map(tenth);
+        d += `${(x - px) / 10} ${(y - py) / 10} `;
+        [px, py] = [x, y];
       }
-      return d;
+      return d.trimEnd();
     };
 
     // Fine lines: checkerboard of cells hatched along one family or the other.
