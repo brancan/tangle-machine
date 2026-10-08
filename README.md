@@ -71,7 +71,7 @@ Drips, Ripples, Flow Field, Star Checker, Tube Network, Tumbling Blocks,
 Hollibaugh, Huggins, Florz, Knitting, Keeko, Lightning Bolt, Rhombus Star,
 Shaded Ribbons, Hatched Pinwheel, Warped Grid, Pebble Cells, Arc Scales, Radial
 Sampler, Pattern Hills, Pattern Peaks, Rainbow Petals, Ribbon Arcs,
-Logarithmic Spiral and L-System Tree.
+Logarithmic Spiral, L-System Tree and Reaction Diffusion.
 
 ## Public gallery and comments
 
