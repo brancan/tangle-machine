@@ -66,14 +66,19 @@
             <h3>Share</h3>
             <div class="buttons">
               <button id="copy-link" type="button">Copy link</button>
-              <button id="download-svg" type="button">SVG</button>
+              <button id="download-svg" type="button" title="Download SVG (Ctrl/Cmd + S)">SVG</button>
               <button id="download-png" type="button">PNG</button>
             </div>
           </aside>
 
           <div class="stage">
             <div id="canvas" class="frame"></div>
-            <p id="status" class="status" role="status"></p>
+            <div class="stage-bar">
+              <p id="status" class="status" role="status"></p>
+              <div class="buttons">
+                <button id="focus" type="button" title="Focus mode: canvas only (F, Esc to exit)" aria-pressed="false">Focus</button>
+              </div>
+            </div>
           </div>
 
           <section class="panel code-panel">
@@ -112,6 +117,7 @@
     <script src="js/gallery.js"></script>
     <script src="js/share.js"></script>
     <script src="js/instruction.js"></script>
+    <script src="js/studio-tools.js"></script>
     <script src="paintings/paradox.js"></script>
     <script src="paintings/paradox-circle.js"></script>
     <script src="paintings/triangle-paradox.js"></script>

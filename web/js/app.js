@@ -47,6 +47,7 @@
   function showGallery() {
     $("#studio").hidden = true;
     $("#gallery").hidden = false;
+    toggleFocus(false);
     document.title = "Tangle Machine";
     $("#gallery-count").textContent = `${Gallery.paintings.length} paintings`;
     $("#gallery-grid").innerHTML = Gallery.paintings
@@ -96,11 +97,21 @@
         viewportMargin: Infinity,
         extraKeys: { "Ctrl-Enter": () => runCode(), "Cmd-Enter": () => runCode() },
       });
+      let marked = null;
       return {
         get: () => cm.getValue(),
         set: (value) => cm.setValue(value),
         onChange: (fn) => cm.on("change", fn),
         refresh: () => cm.refresh(),
+        markError(line) {
+          this.clearError();
+          if (line > cm.lineCount()) return;
+          marked = cm.addLineClass(line - 1, "background", "cm-error-line");
+        },
+        clearError() {
+          if (marked) cm.removeLineClass(marked, "background", "cm-error-line");
+          marked = null;
+        },
       };
     }
     // Fallback when the CDN is unreachable: a plain textarea.
@@ -116,6 +127,9 @@
       set: (value) => (textarea.value = value),
       onChange: (fn) => textarea.addEventListener("input", fn),
       refresh: () => {},
+      // The textarea cannot highlight a line; the status bar names it instead.
+      markError: () => {},
+      clearError: () => {},
     };
   }
 
@@ -177,7 +191,15 @@
     });
   }
 
+  // Shows a code error and, when the stack tells, marks its line in the editor.
+  function reportError(kind, error) {
+    const line = state.draw === state.painting.draw ? null : StudioTools.errorLine(error);
+    setStatus(`${kind}: ${error.message}${line ? ` (line ${line})` : ""}`, true);
+    if (line) editor?.markError(line);
+  }
+
   function draw() {
+    editor?.clearError();
     try {
       const started = performance.now();
       $("#canvas").innerHTML = Gallery.render(state.draw, state.values);
@@ -185,7 +207,7 @@
       const shapes = $("#canvas").querySelectorAll("g > *").length;
       setStatus(`${shapes.toLocaleString()} shapes · ${ms} ms`);
     } catch (error) {
-      setStatus(`Runtime error: ${error.message}`, true);
+      reportError("Runtime error", error);
     }
   }
 
@@ -202,7 +224,8 @@
     try {
       state.draw = Gallery.compile(source);
     } catch (error) {
-      setStatus(`Syntax error: ${error.message}`, true);
+      editor?.clearError();
+      reportError("Syntax error", error);
       return;
     }
     if (source === state.original) storage.clear(state.painting.id);
@@ -369,6 +392,12 @@
     if (shared) offerSharedCode(painting, shared);
   }
 
+  // Focus mode hides the panels so the canvas fills the window.
+  function toggleFocus(on = !document.body.classList.contains("focus")) {
+    document.body.classList.toggle("focus", on);
+    $("#focus").setAttribute("aria-pressed", String(on));
+  }
+
   // ---------- Wiring ----------
 
   function route() {
@@ -444,13 +473,29 @@
     $("#reject-code").addEventListener("click", rejectSharedCode);
     $("#download-svg").addEventListener("click", downloadSvg);
     $("#download-png").addEventListener("click", () => downloadPng());
+    $("#focus").addEventListener("click", () => toggleFocus());
+
+    // Capture phase, so the shortcut wins over the code editor's own key handling.
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if ($("#studio").hidden) return;
+        if ((event.ctrlKey || event.metaKey) && !event.altKey && event.key.toLowerCase() === "s") {
+          event.preventDefault();
+          downloadSvg();
+        }
+      },
+      true
+    );
 
     // Arrow keys browse paintings, unless the user is typing or sliding.
     document.addEventListener("keydown", (event) => {
       if ($("#studio").hidden || event.altKey || event.ctrlKey || event.metaKey) return;
-      if (event.target.closest("input, textarea, .CodeMirror")) return;
+      if (event.key === "Escape" && document.body.classList.contains("focus")) toggleFocus(false);
+      if (event.target.closest("input, textarea, select, .CodeMirror")) return;
       if (event.key === "ArrowLeft") location.hash = `#/${neighbour(-1).id}`;
       if (event.key === "ArrowRight") location.hash = `#/${neighbour(1).id}`;
+      if (event.key === "f" || event.key === "F") toggleFocus();
     });
 
     window.addEventListener("hashchange", route);

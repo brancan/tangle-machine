@@ -313,8 +313,26 @@ button.primary {
   top: 1rem;
 }
 
+.stage-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem 1rem;
+  margin-top: 0.5rem;
+}
+
+.stage-bar .buttons button {
+  padding: 0.2rem 0.6rem;
+}
+
+button[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .status {
-  margin: 0.5rem 0 0;
+  margin: 0.2rem 0 0;
   font-family: var(--mono);
   font-size: 0.82rem;
   color: var(--muted);
@@ -386,6 +404,34 @@ button.primary {
   .cm-s-default .cm-property { color: var(--text); }
   .cm-s-default .cm-number { color: #c5d67a; }
   .cm-s-default .cm-string { color: #e6b866; }
+}
+
+.cm-error-line {
+  background: rgb(179 38 30 / 0.14);
+}
+
+/* Focus mode: only the canvas, as large as the window allows. */
+body.focus .site-header,
+body.focus .studio-head,
+body.focus .notice,
+body.focus .controls,
+body.focus .code-panel {
+  display: none;
+}
+
+body.focus main {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+body.focus .studio {
+  grid-template-columns: 1fr;
+}
+
+body.focus .stage {
+  position: static;
+  width: min(100%, calc(100vh - 5.5rem));
+  margin: 0 auto;
 }
 
 .hint {
