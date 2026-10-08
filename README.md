@@ -155,6 +155,9 @@ crawlable page for each one. It generates, without committing anything:
 - `web/sitemap.xml` (home, about, showcase and every painting page, `lastmod`
   from `git log`) and `web/llms.txt`.
 
+The home page itself carries a visible `<h1>`, `WebSite` JSON-LD and an SVG
+favicon (`web/favicon.svg`, shared by every page).
+
 The pure generators live in `scripts/pages-lib.mjs` and are tested in
 `tests/pages.test.mjs`. Unlike the showcase build, any error fails the deploy.
 To preview locally (the script rewrites `web/index.html` in place):
@@ -170,22 +173,23 @@ git checkout web/index.html         # drop the injected index
 ### Google Search Console (repository owner)
 
 A project page cannot serve `robots.txt` (it would have to live at the root of
-`brancan.github.io`, another repository), so the sitemap is submitted by hand:
+`brancan.github.io`, another repository), so the sitemap is submitted by hand.
 
-1. In [Search Console](https://search.google.com/search-console), add a
-   **URL prefix** property for `https://brancan.github.io/tangle-machine/`.
-2. Choose **HTML tag** verification and share the `content` token of the
-   `google-site-verification` meta tag, so it can be added to `web/index.html`;
-   deploy, then press **Verify**.
-3. Under **Sitemaps**, submit `sitemap.xml`.
+The site is verified as a **URL prefix** property for
+`https://brancan.github.io/tangle-machine/` through the HTML file
+`web/google096cbab84ea046ac.html`. Keep that file: deleting it drops the
+verification. Then, under **Sitemaps** in
+[Search Console](https://search.google.com/search-console), submit
+`sitemap.xml`.
 
 ## Brand
 
-`brand/` holds the Instagram assets. `brand/profile.py` draws the profile
-picture: eleven hand-trembled concentric squares whose disorder grows toward
-the center (after Vera Molnar's "1% de désordre"), seeded with 1967, the year
-of LeWitt's *Paragraphs on Conceptual Art*. Regenerate it with Python and
-Pillow:
+`brand/` holds the Instagram assets: the profile picture and the first posts
+(`brand/posts/`). `brand/profile.py` draws the profile picture: eleven
+hand-trembled concentric squares whose disorder grows toward the center (after
+Vera Molnar's "1% de désordre"), light ink on dark paper with one acid-green
+ring, seeded with 1967, the year of LeWitt's *Paragraphs on Conceptual Art*.
+Regenerate it with Python and Pillow:
 
 ```bash
 cd brand && python profile.py   # writes instagram-profile-1080.png and preview.png
@@ -200,5 +204,7 @@ npm run test:update  # accept intended visual changes
 
 The suite renders every painting with its default variables and compares a
 hash of the SVG against `tests/snapshots.json`, renders each one with random
-variables to catch `NaN`, and checks that no painting param shadows a shared
-style or hand-drawn param. CI runs it on every push and pull request.
+variables to catch `NaN`, keeps every painting's SVG under 1 MB, and checks
+that no painting param shadows a shared style or hand-drawn param. It also
+covers the plotter export, share links, the showcase and likes builds, and the
+search engine pages. CI runs it on every push and pull request.
