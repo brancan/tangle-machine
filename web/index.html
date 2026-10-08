@@ -67,7 +67,10 @@
             <div class="buttons">
               <button id="copy-link" type="button">Copy link</button>
               <button id="download-svg" type="button" title="Download SVG (Ctrl/Cmd + S)">SVG</button>
-              <button id="download-png" type="button">PNG</button>
+              <span class="png-export">
+                <button id="download-png" type="button">PNG</button>
+                <select id="png-size" aria-label="PNG size"></select>
+              </span>
             </div>
           </aside>
 
@@ -76,6 +79,7 @@
             <div class="stage-bar">
               <p id="status" class="status" role="status"></p>
               <div class="buttons">
+                <button id="replay" type="button" title="Watch the drawing being drawn again" aria-pressed="false">Replay</button>
                 <button id="focus" type="button" title="Focus mode: canvas only (F, Esc to exit)" aria-pressed="false">Focus</button>
               </div>
             </div>

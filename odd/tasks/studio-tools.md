@@ -16,7 +16,8 @@ per-painting presets and an on-screen pen API reference.
 ## Tasks
 - [x] T1 Hotkeys: Ctrl/Cmd+S downloads SVG, `F` toggles a full-canvas focus mode, editor marks the error line — route: delegated
   - Evidence: `tests/studio-tools.test.mjs` errorLine RED then GREEN; headless Chrome: Ctrl+S downloads `scales.svg` (also inside CodeMirror), runtime error marks line 3 and clears on Reset code, F/Esc toggle focus.
-- [ ] T2 Export: PNG size selector (1x 800, 2x, 4x, A4 300 DPI = 3508 px) and a Replay button that animates strokes — route: delegated
+- [x] T2 Export: PNG size selector (1x 800, 2x, 4x, A4 300 DPI = 3508 px) and a Replay button that animates strokes — route: delegated
+  - Evidence: PNG_SIZES/replaySchedule tests RED then GREEN; headless Chrome: 1x export is an 800x800 PNG, Replay runs Web Animations without touching the SVG markup, a second click cancels, it ends on its own after ~4 s, reduced motion skips it.
 - [ ] T3 Global style: palette presets applied to ink/paper/color params, paper textures (plain, dark, kraft, grain) — route: delegated
 - [ ] T4 Presets per painting saved in localStorage + pen API help panel — route: delegated
 

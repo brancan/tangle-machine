@@ -34,3 +34,21 @@ test("errorLine reads Firefox-style Function frames", () => {
   assert.equal(typeof firefox, "number");
   assert.equal(firefox, chrome);
 });
+
+test("PNG sizes default to 2x and include A4 at 300 DPI", () => {
+  const sizes = [...StudioTools.PNG_SIZES.map((s) => s.size)];
+  assert.deepEqual(sizes, [800, 1600, 3200, 3508]);
+  assert.equal(StudioTools.PNG_SIZES.find((s) => s.default).size, 1600);
+});
+
+test("replaySchedule spreads any number of strokes over the same total time", () => {
+  for (const count of [1, 7, 500, 20000]) {
+    const { delay, duration } = StudioTools.replaySchedule(count, 4000);
+    assert.equal(delay(0), 0);
+    const end = delay(count - 1) + duration;
+    assert.ok(end <= 4000 + 1e-9 && end >= 3000, `${count} strokes end at ${end}`);
+    assert.ok(duration > 0);
+  }
+  const { delay } = StudioTools.replaySchedule(10, 4000);
+  assert.ok(delay(5) > delay(4));
+});

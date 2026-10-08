@@ -199,6 +199,7 @@
   }
 
   function draw() {
+    stopReplay();
     editor?.clearError();
     try {
       const started = performance.now();
@@ -290,7 +291,7 @@
     save(new Blob([$("#canvas").innerHTML], { type: "image/svg+xml" }), "svg");
   }
 
-  function downloadPng(size = 2000) {
+  function downloadPng(size = Number($("#png-size").value)) {
     const url = URL.createObjectURL(new Blob([$("#canvas").innerHTML], { type: "image/svg+xml" }));
     const image = new Image();
     image.onload = () => {
@@ -305,6 +306,61 @@
       setStatus("Could not export PNG", true);
     };
     image.src = url;
+  }
+
+  // ---------- Replay ----------
+
+  // Running stroke animations; cancelling them shows the finished drawing again.
+  let replay = null;
+
+  function stopReplay() {
+    if (!replay) return;
+    const running = replay;
+    replay = null;
+    running.forEach((animation) => animation.cancel());
+    $("#replay").setAttribute("aria-pressed", "false");
+  }
+
+  // Draws the current picture again, stroke by stroke. Only the on-screen elements are
+  // animated (Web Animations), so the exported SVG never changes.
+  function startReplay() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setStatus("Replay is off because your system prefers reduced motion");
+      return;
+    }
+    const shapes = [...$("#canvas").querySelectorAll("path, polyline, polygon, line, circle")].filter(
+      (el) => !el.closest("clipPath")
+    );
+    if (!shapes.length) return;
+    const { delay, duration } = StudioTools.replaySchedule(shapes.length);
+    replay = shapes.map((el, index) => {
+      let length = 0;
+      try {
+        length = el.getTotalLength();
+      } catch {
+        /* not measurable: it only fades in */
+      }
+      const dash = length > 0 ? `${length} ${length}` : "none";
+      return el.animate(
+        [
+          { strokeDasharray: dash, strokeDashoffset: length, fillOpacity: 0 },
+          { strokeDasharray: dash, strokeDashoffset: 0, fillOpacity: 1 },
+        ],
+        { duration, delay: delay(index), easing: "ease-in-out", fill: "backwards" }
+      );
+    });
+    $("#replay").setAttribute("aria-pressed", "true");
+    const current = replay;
+    current[current.length - 1].finished
+      .then(() => {
+        if (replay === current) stopReplay();
+      })
+      .catch(() => {});
+  }
+
+  function toggleReplay() {
+    if (replay) stopReplay();
+    else startReplay();
   }
 
   // The link carries the variables and, when the code was edited, the code itself.
@@ -474,6 +530,10 @@
     $("#download-svg").addEventListener("click", downloadSvg);
     $("#download-png").addEventListener("click", () => downloadPng());
     $("#focus").addEventListener("click", () => toggleFocus());
+    $("#replay").addEventListener("click", toggleReplay);
+    $("#png-size").innerHTML = StudioTools.PNG_SIZES.map(
+      (s) => `<option value="${s.size}"${s.default ? " selected" : ""}>${s.label}</option>`
+    ).join("");
 
     // Capture phase, so the shortcut wins over the code editor's own key handling.
     document.addEventListener(

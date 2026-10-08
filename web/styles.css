@@ -308,6 +308,25 @@ button.primary {
   color: var(--accent-text);
 }
 
+select {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.png-export {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+.png-export select {
+  max-width: 7.5rem;
+}
+
 .stage {
   position: sticky;
   top: 1rem;
