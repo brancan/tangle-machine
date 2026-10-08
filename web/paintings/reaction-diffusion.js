@@ -17,7 +17,7 @@ Gallery.register({
       type: "select",
       value: "maze",
       options: [
-        { value: "coral", label: "Coral (feed 0.0545, kill 0.062)" },
+        { value: "coral", label: "Coral (feed 0.044, kill 0.0625)" },
         { value: "maze", label: "Maze (feed 0.029, kill 0.057)" },
         { value: "spots", label: "Spots (feed 0.035, kill 0.065)" },
         { value: "fingerprint", label: "Fingerprint (feed 0.037, kill 0.06)" },
@@ -35,7 +35,7 @@ Gallery.register({
     const M = 24;
     const f = (n) => n.toFixed(1);
     const RATES = {
-      coral: [0.0545, 0.062],
+      coral: [0.044, 0.0625],
       maze: [0.029, 0.057],
       spots: [0.035, 0.065],
       fingerprint: [0.037, 0.06],
@@ -98,9 +98,17 @@ Gallery.register({
       [b, b2] = [b2, b];
     }
 
-    // Marching squares over B, padded with zeros so every outline closes at the border.
+    // Marching squares over B. The grid wraps, so its edge is not empty: a ring copying the edge
+    // values sits on the frame, and a ring of zeros just outside it closes every outline beyond the
+    // frame, where the clip trims it. Shapes run cleanly off the sheet instead of leaving slivers.
     const cell = (W - 2 * M) / (N + 1);
-    const value = (x, y) => (x < 0 || y < 0 || x >= N || y >= N ? 0 : b[y * N + x]);
+    const P = N + 4;
+    const padded = new Float32Array(P * P);
+    for (let y = -1; y <= N; y++) {
+      const row = Math.min(N - 1, Math.max(0, y)) * N;
+      for (let x = -1; x <= N; x++) padded[(y + 2) * P + x + 2] = b[row + Math.min(N - 1, Math.max(0, x))];
+    }
+    const value = (x, y) => padded[(y + 2) * P + x + 2];
     const contours = (t) => {
       // Crossing point on the grid edge from corner (x0, y0) to its right (h) or lower (v) neighbour.
       const cross = (x0, y0, horizontal) => {
@@ -111,11 +119,11 @@ Gallery.register({
         const s = (t - v0) / (v1 - v0);
         return [x0 + (x1 - x0) * s, y0 + (y1 - y0) * s];
       };
-      const key = (x0, y0, horizontal) => ((y0 + 1) * (N + 2) + (x0 + 1)) * 2 + (horizontal ? 0 : 1);
+      const key = (x0, y0, horizontal) => ((y0 + 2) * P + (x0 + 2)) * 2 + (horizontal ? 0 : 1);
       const next = new Map();
       const where = new Map();
-      for (let y = -1; y < N; y++) {
-        for (let x = -1; x < N; x++) {
+      for (let y = -2; y <= N; y++) {
+        for (let x = -2; x <= N; x++) {
           const tl = value(x, y) >= t;
           const tr = value(x + 1, y) >= t;
           const br = value(x + 1, y + 1) >= t;
@@ -170,15 +178,18 @@ Gallery.register({
     // Outlines evenly spaced between no B and its peak; the innermost one can be filled.
     let peak = 0;
     for (let i = 0; i < size; i++) peak = Math.max(peak, b[i]);
+    const frame = `M${M} ${M}H${W - M}V${W - M}H${M}Z`;
     if (peak > 1e-3) {
-      for (let level = 1; level <= p.levels; level++) {
-        const d = contours((peak * level) / (p.levels + 1));
-        if (!d) continue;
-        const innermost = level === p.levels;
-        if (p.fill && innermost) pen.path(d, { fill: p.ink, width: f(0.5 * p.strokeWidth) });
-        else pen.path(d, { width: f(p.strokeWidth * (innermost ? 1 : 0.7)) });
-      }
+      pen.clip(frame, () => {
+        for (let level = 1; level <= p.levels; level++) {
+          const d = contours((peak * level) / (p.levels + 1));
+          if (!d) continue;
+          const innermost = level === p.levels;
+          if (p.fill && innermost) pen.path(d, { fill: p.ink, width: f(0.5 * p.strokeWidth) });
+          else pen.path(d, { width: f(p.strokeWidth * (innermost ? 1 : 0.7)) });
+        }
+      });
     }
-    pen.path(`M${M} ${M}H${W - M}V${W - M}H${M}Z`, { width: f(1.5 * p.strokeWidth) });
+    pen.path(frame, { width: f(1.5 * p.strokeWidth) });
   },
 });
