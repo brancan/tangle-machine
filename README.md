@@ -21,7 +21,8 @@ with an `id`, `title`, `description`, a `params` schema (`range`, `checkbox`,
 `style` (`ink`, `paper`, `strokeWidth`) to override the default look.
 
 The `pen` API offers `polygon`, `polyline`, `line`, `circle`, `arc` and `path`;
-each accepts an optional `{ fill, stroke, width }` style. `pen.random(seed)`
+each accepts an optional `{ fill, stroke, width }` style. `pen.clip(d, fn)` clips everything drawn inside `fn` to
+the SVG path `d`. `pen.random(seed)`
 returns a deterministic random generator. Code edits are saved in the browser
 (localStorage) and can be reset at any time.
 
@@ -31,7 +32,8 @@ navigation between paintings.
 
 Current paintings: Paradox, Paradox Circle, Triangle Paradox, Honeycomb
 Paradox, Spider Web, Truchet Tiles, Scales, String Art, Bulge Checker, Polar
-Checker and Op Waves.
+Checker, Op Waves, Woven Circle, Quarter Arcs, Bubbles, Contour Lines, Vortex,
+Drips, Ripples and Flow Field.
 
 ## Paradox grid (Python CLI)
 

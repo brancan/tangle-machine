@@ -1,6 +1,8 @@
 // Painting registry and the pen API that drawing code uses to emit SVG.
 (function () {
   const paintings = [];
+  // Clip ids must be unique across every SVG on the page (gallery thumbnails share the DOM).
+  let clipCounter = 0;
 
   const STYLE_PARAMS = [
     { name: "ink", label: "Ink", type: "color", value: "#1a1a1a" },
@@ -71,6 +73,16 @@
       },
       path(d, style) {
         shapes.push(`<path d="${d}"${attrs(style)}/>`);
+      },
+      // Everything drawn inside fn is clipped to the path d.
+      clip(d, fn) {
+        const id = `clip-${++clipCounter}`;
+        shapes.push(`<clipPath id="${id}"><path d="${d}"/></clipPath><g clip-path="url(#${id})">`);
+        try {
+          fn();
+        } finally {
+          shapes.push("</g>");
+        }
       },
     };
   }

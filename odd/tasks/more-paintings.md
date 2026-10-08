@@ -21,9 +21,11 @@ a circle, tessellations, honeycomb paradox, spider web) and reference photos in
 Route note: inline because the parent already holds the full design context of
 the gallery API; each painting is an isolated file.
 
+- [x] T6 Eight more from the remaining reference photos (02, 04, 08, 11, 13, 14, 15/18, 16): Woven Circle, Quarter Arcs, Bubbles, Contour Lines, Vortex, Drips, Ripples, Flow Field; adds `pen.clip` — route: inline
+
 ## Checks
 - Headless Chrome screenshot of every painting at default params (montage review).
 - Python unit tests unchanged.
 
 ## Progress
-- Branch `feat/more-paintings`.
+- Branch `feat/more-paintings` (merged). T6 on `feat/bandeja-paintings`; all 8 rendered via node + Chrome; Vortex rib geometry fixed after visual check.
