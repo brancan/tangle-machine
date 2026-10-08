@@ -1,0 +1,8 @@
+"The idea becomes a machine that makes the art." Sol LeWitt wrote that in 1967.
+Tangle Machine takes him at his word.
+Every drawing is a short instruction written as code.
+Your browser is the draftsman that carries it out.
+Change the seed and a new hand draws the same idea.
+Run it yourself: link in bio.
+
+#GenerativeArt #ConceptualArt #SolLeWitt #CreativeCoding #CodeArt #AlgorithmicArt #JavaScriptArt #GeometricArt #PlotterArt #MathArt

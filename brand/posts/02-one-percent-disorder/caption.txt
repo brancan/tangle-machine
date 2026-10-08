@@ -1,0 +1,8 @@
+How much disorder does a perfect grid need?
+Vera Molnár called the idea "1% de désordre."
+Here, every corner of every square moves by a share of the gap between squares.
+It settles to perfect order, then 1%: barely visible. At 150% the grid comes apart.
+Same seed, same instruction, only the disorder changes.
+Set your own amount: link in bio.
+
+#GenerativeArt #VeraMolnar #ConceptualArt #CreativeCoding #AlgorithmicArt #CodeArt #GeometricArt #JavaScriptArt #MathArt #PlotterArt

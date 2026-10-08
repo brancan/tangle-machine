@@ -3,7 +3,7 @@ from PIL import Image, ImageDraw
 
 S, SS = 1080, 4                      # output size, supersampling
 W = S * SS
-PAPER, INK, ACCENT = (244, 241, 234), (29, 28, 26), (181, 72, 47)
+PAPER, INK, ACCENT = (18, 18, 18), (236, 236, 236), (182, 242, 58)
 rng = random.Random(1967)            # LeWitt, "Paragraphs on Conceptual Art"
 
 img = Image.new("RGB", (W, W), PAPER)

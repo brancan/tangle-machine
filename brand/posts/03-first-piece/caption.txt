@@ -1,0 +1,7 @@
+About 1,650 short lines, each turned at random, and a few patches left empty.
+Interruptions, after Vera Molnár's series from 1968–69. An interpretation, not the original.
+The rule fits in a sentence. The browser draws it in a blink.
+Change the seed and the gaps open somewhere else.
+Draw your own: link in bio.
+
+#GenerativeArt #VeraMolnar #AlgorithmicArt #CreativeCoding #CodeArt #JavaScriptArt #GeometricArt #PlotterArt #ConceptualArt #MathArt

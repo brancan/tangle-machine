@@ -1,0 +1,9 @@
+Slide 1: Near-black background with a large serif quotation: "The idea becomes a machine that makes the art." Attributed to Sol LeWitt, Paragraphs on Conceptual Art, Artforum, Summer 1967.
+
+Slide 2: Title "The instruction → the code. A wall drawing is a set of words. Here, the words are a function." Below, an italic instruction written in the style of LeWitt (labelled as not his text): divide the wall into a 4 by 4 grid and fill each square with a random combination of vertical, horizontal and diagonal lines. Under it, six lines of JavaScript from the project's wall-drawing.js that pick a combination and draw the vertical and horizontal lines.
+
+Slide 3: Title "The draftsman → your browser. LeWitt's instructions were carried out by draftsmen. Here, your browser holds the pen." Below, an outline of a browser window showing a grid of squares filled with fine line hatching, stopped part-way through so the last squares are still empty.
+
+Slide 4: Title "The hand → hand-drawn parameters. The tremble of a hand is computed, too. Same instruction, same seed." Two versions of the same four hatched squares side by side: on the left, perfectly straight ruled lines (hand-drawn off); on the right, the same lines slightly wavy and uneven, as if drawn freehand (hand-drawn on, with wobble 3.5, jitter 1.8, pressure 0.4, roughness 1.2).
+
+Slide 5: Title "Same instruction, different hands." A two by two grid of four drawings, each a 4 by 4 grid of hand-drawn hatched squares with a different mix of line directions, labelled seed 3, 17, 42 and 88. Below: "Run it yourself. Link in bio."
