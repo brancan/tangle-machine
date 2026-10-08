@@ -74,6 +74,19 @@ test("a painting becomes layered, fill-free SVG in millimetres", () => {
   assert.ok(stats.travelAfter < stats.travelBefore);
 });
 
+test("shapes drawn on top hide the strokes beneath them", () => {
+  const values = Gallery.initialValues({ params: [] });
+  const draw = (p, pen) => {
+    pen.line(0, 50, 300, 50);
+    pen.polygon([[100, 0], [200, 0], [200, 100], [100, 100]], { fill: p.paper });
+  };
+  const strokes = Plotter.build(Gallery.trace(draw, values), values).layers.flatMap((l) => l.strokes);
+  const onLine = strokes.filter((s) => s.points.every(([, y]) => Math.abs(y - 50) < 1e-9));
+  assert.equal(onLine.length, 2, "the line is split around the square");
+  // Hidden-line removal works on a pixel grid, so cuts land within a pixel of the edge.
+  assert.ok(onLine.every((s) => s.points.every(([x]) => x <= 101 || x >= 199)));
+});
+
 test("filled curved paths are hatched too", () => {
   const values = Gallery.initialValues({ params: [] });
   const draw = (p, pen) => pen.path("M0 50A50 50 0 1 1 100 50A50 50 0 1 1 0 50Z", { fill: p.ink });

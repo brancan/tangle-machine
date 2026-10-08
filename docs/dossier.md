@@ -129,9 +129,17 @@ Three principles follow from that frame:
   tags from a fixed vocabulary (geometric, organic, paradox, op-art,
   tessellation, radial, random, color, animated), with filters in the gallery
   and the active tag in the URL (`#/?tag=op-art`).
-- [ ] **Phase 4 — Plotter**: SVG export with one layer per color and
-  optimized stroke order, for AxiDraw-style plotters, closing the loop between
-  instruction and physical execution.
+- [x] **Phase 4 — Plotter**: the studio's **Plotter** button exports the
+  current frame as an SVG for pen plotters (AxiDraw and similar), closing the
+  loop between instruction and physical execution. Everything becomes
+  polylines (curves and arcs are flattened), clip regions are applied, hidden
+  lines are removed with a visibility buffer (what a filled shape covers on
+  screen is cut away, since a pen cannot cover anything), fills other than the
+  paper are hatched in their color, each color is an Inkscape layer
+  (`1 #1a1a1a`, `2 #c0392b`…) so pens can be swapped between layers, the plot
+  is clipped to the 190 mm sheet, and a greedy nearest-neighbour ordering cuts
+  pen-up travel (about 2,360 m → 190 m over the 39 paintings, −92%).
+  Paintings on dark paper plot as light ink: use a white pen on black paper.
 - [ ] **Phase 5 — Studio tools**: presets per painting, `pen` API reference
   in the studio, global palettes, keyboard shortcuts. *In progress on a
   parallel branch.*

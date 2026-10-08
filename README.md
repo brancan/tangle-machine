@@ -46,6 +46,11 @@ The studio has a **player**: Play (or Space) swings any variable between its
 limits, and paintings that read `p.time` (tagged `animated`) move on their own.
 The gallery filters by tag (`#/?tag=op-art`).
 
+The **Plotter** button exports the current frame for pen plotters (AxiDraw
+and similar): strokes only, one Inkscape layer per color, fills hatched,
+clip regions applied, hidden lines removed and stroke order optimized for
+minimal pen-up travel, at 190 mm (`web/js/plotter.js`).
+
 The studio also offers Randomize, shareable links (the variables live in the
 URL hash, e.g. `#/paradox?n=3&alternate=0`), SVG/PNG export and arrow-key
 navigation between paintings. When the code was edited, **Copy link** also packs

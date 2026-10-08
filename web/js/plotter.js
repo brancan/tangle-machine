@@ -139,47 +139,87 @@
 
   // ---------- Regions ----------
 
-  // Even-odd point in polygon over several rings (holes and multiple shapes work).
-  function inside(rings, [px, py]) {
-    let result = false;
+  // A clip or occlusion region: its rings plus a fine grid of edges, so crossing and
+  // inside tests only look at the edges near the query instead of all of them.
+  const EDGE_CELL = 12;
+
+  function region(rings) {
+    const edges = [];
+    const box = [Infinity, Infinity, -Infinity, -Infinity];
     for (const ring of rings) {
-      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-        const [xi, yi] = ring[i];
-        const [xj, yj] = ring[j];
-        if (yi > py !== yj > py && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) result = !result;
+      for (let i = 0; i < ring.length; i++) {
+        const [x1, y1] = ring[i];
+        const [x2, y2] = ring[(i + 1) % ring.length];
+        edges.push([x1, y1, x2, y2]);
+        box[0] = Math.min(box[0], x1);
+        box[1] = Math.min(box[1], y1);
+        box[2] = Math.max(box[2], x1);
+        box[3] = Math.max(box[3], y1);
       }
     }
+    const grid = new Map();
+    edges.forEach(([x1, y1, x2, y2], id) => {
+      for (let gx = Math.floor(Math.min(x1, x2) / EDGE_CELL); gx <= Math.floor(Math.max(x1, x2) / EDGE_CELL); gx++) {
+        for (let gy = Math.floor(Math.min(y1, y2) / EDGE_CELL); gy <= Math.floor(Math.max(y1, y2) / EDGE_CELL); gy++) {
+          const key = gx * 100003 + gy;
+          if (!grid.has(key)) grid.set(key, []);
+          grid.get(key).push(id);
+        }
+      }
+    });
+    return { rings, edges, box, grid, seen: new Uint32Array(edges.length), stamp: 0 };
+  }
+
+  // Calls visit once per edge stored in the cells covering [x0, x1] x [y0, y1].
+  function edgesIn(r, x0, y0, x1, y1, visit) {
+    r.stamp++;
+    for (let gx = Math.floor(x0 / EDGE_CELL); gx <= Math.floor(x1 / EDGE_CELL); gx++) {
+      for (let gy = Math.floor(y0 / EDGE_CELL); gy <= Math.floor(y1 / EDGE_CELL); gy++) {
+        for (const id of r.grid.get(gx * 100003 + gy) || []) {
+          if (r.seen[id] === r.stamp) continue;
+          r.seen[id] = r.stamp;
+          visit(r.edges[id]);
+        }
+      }
+    }
+  }
+
+  // Even-odd point in region: cast a ray to the right and count edge crossings.
+  function inside(r, [px, py]) {
+    if (px < r.box[0] || px > r.box[2] || py < r.box[1] || py > r.box[3]) return false;
+    let result = false;
+    edgesIn(r, px, py, r.box[2], py, ([xi, yi, xj, yj]) => {
+      if (yi > py !== yj > py && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) result = !result;
+    });
     return result;
   }
 
-  // Parameters t in (0, 1) where segment a-b crosses any ring edge.
-  function crossings([ax, ay], [bx, by], rings) {
+  // Parameters t in (0, 1) where segment a-b crosses a region edge.
+  function crossings([ax, ay], [bx, by], r) {
     const ts = [];
-    for (const ring of rings) {
-      for (let i = 0; i < ring.length; i++) {
-        const [cx, cy] = ring[i];
-        const [dx, dy] = ring[(i + 1) % ring.length];
-        const denominator = (bx - ax) * (dy - cy) - (by - ay) * (dx - cx);
-        if (denominator === 0) continue;
-        const t = ((cx - ax) * (dy - cy) - (cy - ay) * (dx - cx)) / denominator;
-        const u = ((cx - ax) * (by - ay) - (cy - ay) * (bx - ax)) / denominator;
-        if (t > 0 && t < 1 && u >= 0 && u <= 1) ts.push(t);
-      }
-    }
+    edgesIn(r, Math.min(ax, bx), Math.min(ay, by), Math.max(ax, bx), Math.max(ay, by), ([cx, cy, dx, dy]) => {
+      const denominator = (bx - ax) * (dy - cy) - (by - ay) * (dx - cx);
+      if (denominator === 0) return;
+      const t = ((cx - ax) * (dy - cy) - (cy - ay) * (dx - cx)) / denominator;
+      const u = ((cx - ax) * (by - ay) - (cy - ay) * (bx - ax)) / denominator;
+      if (t > 0 && t < 1 && u >= 0 && u <= 1) ts.push(t);
+    });
     return ts.sort((a, b) => a - b);
   }
 
-  // Splits a polyline at the region boundary and keeps the pieces inside it.
-  function clipPolyline(points, rings) {
+  // Splits a polyline at the region boundary and keeps the pieces inside it
+  // (or outside it, to erase what a shape on top hides). Accepts rings or a region.
+  function clipPolyline(points, rings, keepInside = true) {
+    const r = Array.isArray(rings) ? region(rings) : rings;
     const pieces = [];
     let piece = [];
     const at = ([ax, ay], [bx, by], t) => [ax + (bx - ax) * t, ay + (by - ay) * t];
     for (let i = 0; i + 1 < points.length; i++) {
       const [a, b] = [points[i], points[i + 1]];
-      const ts = [0, ...crossings(a, b, rings), 1];
+      const ts = [0, ...crossings(a, b, r), 1];
       for (let k = 0; k + 1 < ts.length; k++) {
         const [p, q] = [at(a, b, ts[k]), at(a, b, ts[k + 1])];
-        if (inside(rings, at(a, b, (ts[k] + ts[k + 1]) / 2))) {
+        if (inside(r, at(a, b, (ts[k] + ts[k + 1]) / 2)) === keepInside) {
           if (!piece.length) piece.push(p);
           piece.push(q);
         } else if (piece.length) {
@@ -227,38 +267,126 @@
 
   // ---------- Layers ----------
 
-  // Groups traced shapes into color layers. Outlines use the stroke color; fills other than
-  // the paper color are hatched in the fill color (paper fills only hide things on screen,
-  // and a plotter cannot hide anything). Clip regions are applied to every stroke inside them.
-  function build(shapes, values) {
-    const layers = new Map();
-    const clips = [];
-    const add = (color, points) => {
-      let pieces = [points];
-      for (const rings of clips) pieces = pieces.flatMap((piece) => clipPolyline(piece, rings));
-      if (!layers.has(color)) layers.set(color, []);
-      for (const piece of pieces) if (piece.length > 1) layers.get(color).push({ points: piece });
-    };
+  // Even-odd scanline spans of a set of rings on the pixel grid: calls fill(y, x0, x1).
+  function spans(rings, width, height, fill) {
+    let minY = Infinity;
+    let maxY = -Infinity;
+    for (const ring of rings) for (const [, y] of ring) [minY, maxY] = [Math.min(minY, y), Math.max(maxY, y)];
+    for (let y = Math.max(0, Math.floor(minY)); y <= Math.min(height - 1, Math.ceil(maxY)); y++) {
+      const cy = y + 0.5;
+      const xs = [];
+      for (const ring of rings) {
+        for (let i = 0; i < ring.length; i++) {
+          const [ax, ay] = ring[i];
+          const [bx, by] = ring[(i + 1) % ring.length];
+          if ((ay <= cy && by > cy) || (by <= cy && ay > cy)) xs.push(ax + ((cy - ay) * (bx - ax)) / (by - ay));
+        }
+      }
+      xs.sort((a, b) => a - b);
+      for (let k = 0; k + 1 < xs.length; k += 2) {
+        const x0 = Math.max(0, Math.ceil(xs[k] - 0.5));
+        const x1 = Math.min(width - 1, Math.floor(xs[k + 1] - 0.5));
+        if (x0 <= x1) fill(y, x0, x1);
+      }
+    }
+  }
 
+  // Groups traced shapes into color layers. Outlines use the stroke color; fills other than
+  // the paper color are hatched in the fill color. Clip regions are applied exactly. Hidden
+  // lines are removed with a visibility buffer: every filled shape paints its draw-order
+  // number into a pixel grid, and a stroke stays only where no later shape covers it. On
+  // screen a filled shape hides what was drawn before it; a plotter cannot hide anything.
+  function build(shapes, values) {
+    const W = CANVAS;
+    const H = CANVAS;
+    const clips = [];
+    const items = [];
     for (const shape of shapes) {
-      if (shape.kind === "clip") clips.push(flattenPath(shape.d).map((s) => s.points));
+      if (shape.kind === "clip") clips.push(region(flattenPath(shape.d).map((s) => s.points)));
       if (shape.kind === "unclip") clips.pop();
       if (shape.kind !== "poly" && shape.kind !== "path") continue;
+      const outlines = shape.kind === "poly" ? [{ points: shape.points, closed: shape.closed }] : flattenPath(shape.d);
+      items.push({ shape, clips: [...clips], outlines, rings: outlines.map((o) => o.points).filter((r) => r.length >= 3) });
+    }
+
+    // Pixel masks of clip regions, so clipped fills only cover what they show on screen.
+    const masks = new Map();
+    const maskOf = (r) => {
+      if (!masks.has(r)) {
+        const mask = new Uint8Array(W * H);
+        spans(r.rings, W, H, (y, x0, x1) => mask.fill(1, y * W + x0, y * W + x1 + 1));
+        masks.set(r, mask);
+      }
+      return masks.get(r);
+    };
+    const cover = new Int32Array(W * H).fill(-1);
+    items.forEach(({ shape, clips: regions, rings }, n) => {
+      if (!(shape.style && shape.style.fill && shape.style.fill !== "none") || !rings.length) return;
+      const clipMasks = regions.map(maskOf);
+      spans(rings, W, H, (y, x0, x1) => {
+        for (let x = x0; x <= x1; x++) {
+          const i = y * W + x;
+          if (clipMasks.every((m) => m[i])) cover[i] = n;
+        }
+      });
+    });
+
+    // Walks a polyline in ~1px steps and keeps the runs not covered by a later shape
+    // (pixels off the canvas count as hidden: the plot stays on the paper).
+    const visibleRuns = (points, n) => {
+      const visible = ([x, y]) => {
+        const px = Math.floor(x);
+        const py = Math.floor(y);
+        return px >= 0 && py >= 0 && px < W && py < H && cover[py * W + px] <= n;
+      };
+      // A run keeps the polyline's own vertices; between them only its moving end advances.
+      const runs = [];
+      let run = [];
+      let movingEnd = false;
+      const extend = (p, fixed) => {
+        if (movingEnd) run[run.length - 1] = p;
+        else run.push(p);
+        movingEnd = !fixed;
+      };
+      for (let i = 0; i + 1 < points.length; i++) {
+        const [a, b] = [points[i], points[i + 1]];
+        const steps = Math.max(1, Math.ceil(distance(a, b)));
+        for (let s = i === 0 ? 0 : 1; s <= steps; s++) {
+          const t = s / steps;
+          const p = [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+          if (visible(p)) {
+            extend(p, s === steps || s === 0 || run.length === 0);
+          } else if (run.length) {
+            if (run.length > 1) runs.push(run);
+            run = [];
+            movingEnd = false;
+          }
+        }
+      }
+      if (run.length > 1) runs.push(run);
+      return runs;
+    };
+
+    const layers = new Map();
+    items.forEach(({ shape, clips: regions, outlines, rings }, n) => {
       const style = shape.style || {};
-      const fill = style.fill && style.fill !== "none" && style.fill !== values.paper ? style.fill : null;
+      const fill = style.fill && style.fill !== "none" ? style.fill : null;
       const stroke = style.stroke === "none" ? null : style.stroke || values.ink;
-      const outlines =
-        shape.kind === "poly"
-          ? [{ points: shape.points, closed: shape.closed }]
-          : flattenPath(shape.d);
-      if (fill) {
-        const rings = outlines.map((o) => o.points).filter((ring) => ring.length >= 3);
+      const add = (color, points) => {
+        let pieces = [points];
+        for (const r of regions) pieces = pieces.flatMap((piece) => clipPolyline(piece, r));
+        pieces = pieces.flatMap((piece) => visibleRuns(piece, n));
+        if (!layers.has(color)) layers.set(color, []);
+        for (const piece of pieces) layers.get(color).push({ points: piece });
+      };
+      // Paper fills only hide; any other fill is drawn as hatching in its color.
+      if (fill && fill !== values.paper) {
         for (const segment of hatchRings(rings, HATCH_SPACING, HATCH_ANGLE)) add(fill, segment);
       }
       if (stroke) {
         for (const { points, closed } of outlines) add(stroke, closed ? [...points, points[0]] : points);
       }
-    }
+    });
     return { layers: [...layers].map(([color, strokes]) => ({ color, strokes })).filter((l) => l.strokes.length) };
   }
 
