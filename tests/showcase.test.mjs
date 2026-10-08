@@ -159,10 +159,22 @@ test("comments.js loads headless without touching the DOM", () => {
   assert.doesNotThrow(() => loadScript("js/comments.js"));
 });
 
-test("showcase.html loads the same painting scripts as index.html", () => {
+test("showcase.html keeps no painting list of its own", () => {
   const html = readFileSync(join(WEB, "showcase.html"), "utf8");
-  const scripts = [...html.matchAll(/<script src="(paintings\/[^"]+)"/g)].map((m) => m[1]).sort();
-  assert.deepEqual(scripts, scriptsFromIndex().filter((s) => s.startsWith("paintings/")).sort());
+  assert.doesNotMatch(html, /<script src="paintings\//);
+});
+
+test("the showcase reads its painting scripts from index.html", () => {
+  const { Showcase } = loadScript("js/showcase.js");
+  const index = readFileSync(join(WEB, "index.html"), "utf8");
+  assert.deepEqual([...Showcase.paintingScripts(index)], scriptsFromIndex().filter((s) => s.startsWith("paintings/")));
+});
+
+test("only plain painting script paths are accepted from index.html", () => {
+  const { Showcase } = loadScript("js/showcase.js");
+  const html = `<script src="paintings/ok-1.js"></script><script src="paintings/../evil.js"></script>
+    <script src="https://evil.example/paintings/x.js"></script><script src="js/app.js"></script>`;
+  assert.deepEqual([...Showcase.paintingScripts(html)], ["paintings/ok-1.js"]);
 });
 
 test("the committed showcase.json is a JSON array", () => {

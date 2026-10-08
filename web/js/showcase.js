@@ -1,10 +1,33 @@
 // Public gallery: renders showcase.json (built from the "Show and tell" Discussions at deploy time).
 // Thumbnails always use the original registered painting with the entry's params; shared code
 // (code=) is never run here, the studio's "Run shared code" gate handles it.
+// The painting scripts are read from index.html, so the studio's list is the only one to maintain.
 (function () {
   const $ = (selector) => document.querySelector(selector);
   const SITE = "https://brancan.github.io/tangle-machine/";
   const AVATAR = /^https:\/\/([a-z0-9-]+\.)*(githubusercontent\.com|github\.com)\//;
+  const PAINTING_SCRIPT = /<script src="(paintings\/[a-z0-9-]+\.js)"/g;
+
+  // Painting script paths in index.html, in page order; anything but a plain local file is ignored.
+  function paintingScripts(html) {
+    return [...String(html).matchAll(PAINTING_SCRIPT)].map((m) => m[1]);
+  }
+
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = () => reject(new Error(`could not load ${src}`));
+      document.body.append(script);
+    });
+  }
+
+  async function loadPaintings() {
+    const response = await fetch("index.html", { cache: "no-cache" });
+    if (!response.ok) throw new Error(String(response.status));
+    for (const src of paintingScripts(await response.text())) await loadScript(src);
+  }
 
   function allParams(painting) {
     return [...Gallery.STYLE_PARAMS, ...Gallery.HAND_PARAMS, ...painting.params];
@@ -122,6 +145,7 @@
       if (!response.ok) throw new Error(String(response.status));
       entries = await response.json();
       if (!Array.isArray(entries)) throw new Error("not a list");
+      if (entries.length) await loadPaintings();
     } catch {
       setState("The gallery could not be loaded right now. Try again later.");
       return;
@@ -137,5 +161,7 @@
     renderLazily(cards.map((node) => node.querySelector(".thumb")));
   }
 
-  init();
+  window.Showcase = { paintingScripts };
+  // Headless (tests) there is no page to render.
+  if (typeof document !== "undefined") init();
 })();

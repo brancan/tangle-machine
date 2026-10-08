@@ -61,7 +61,8 @@ Route evidence: 5+ new non-trivial files across scripts/, web/, workflow → wri
 
 ## Review
 - Native review (risk high, granted): 4 lenses, approved, acknowledged (lineage review-07efbecd1a4e7fcc).
-- Non-blocking follow-ups: duplicated painting list in showcase.html; build script network path untested.
+- Non-blocking follow-up: build script network path untested.
+- Fixed (user-approved): showcase.html no longer duplicates the painting list; `showcase.js` reads the painting `<script>` paths from index.html (plain `paintings/<id>.js` only) and loads them before rendering. RED: 3 new tests failed; GREEN: `npm test` 64/64; headless render with a 2-entry fixture → "2 variants", 2 SVG thumbnails. Route: inline (3 files, understood).
 - Fixed (user-approved follow-up): transient API failure now reuses the published showcase.json via `reuseShowcase` (re-validated), fetches time out after 15 s, truncation warns. RED: missing export; GREEN: `npm test` 35/35; e2e: 401 + local published fixture → reused 2 entries, exit 0; unreachable published URL → `[]`, exit 0. Route: inline (3 files, understood).
 - Engram mirror: pending (server unavailable).
 
