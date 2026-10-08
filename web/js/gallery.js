@@ -148,7 +148,9 @@
     return { bends, stroke, style };
   }
 
-  function createPen(width, height, hand) {
+  // `record`, when given, receives every shape as data (points, style) as well, so the
+  // plotter export sees exactly the geometry the screen shows, hand-drawn bends included.
+  function createPen(width, height, hand, record = () => {}) {
     const shapes = [];
     const pen = {
       width,
@@ -158,18 +160,28 @@
       polygon(list, style, curve) {
         // A hand-drawn closed shape is an open stroke that ends near its start; fills still close.
         const tag = hand.bends ? "polyline" : "polygon";
-        shapes.push(`<${tag} points="${points(hand.stroke(list, true, curve))}"${attrs(hand.style(style))}/>`);
+        const stroked = hand.stroke(list, true, curve);
+        const styled = hand.style(style);
+        shapes.push(`<${tag} points="${points(stroked)}"${attrs(styled)}/>`);
+        record({ kind: "poly", points: stroked, closed: !hand.bends, style: styled });
       },
       polyline(list, style, curve) {
-        shapes.push(`<polyline points="${points(hand.stroke(list, false, curve))}"${attrs(hand.style(style))}/>`);
+        const stroked = hand.stroke(list, false, curve);
+        const styled = hand.style(style);
+        shapes.push(`<polyline points="${points(stroked)}"${attrs(styled)}/>`);
+        record({ kind: "poly", points: stroked, closed: false, style: styled });
       },
       line(x1, y1, x2, y2, style) {
         if (hand.bends) return pen.polyline([[x1, y1], [x2, y2]], style);
-        shapes.push(`<line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}"${attrs(hand.style(style))}/>`);
+        const styled = hand.style(style);
+        shapes.push(`<line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}"${attrs(styled)}/>`);
+        record({ kind: "poly", points: [[x1, y1], [x2, y2]], closed: false, style: styled });
       },
       circle(cx, cy, r, style) {
         if (hand.bends) return pen.polygon(arcPoints(cx, cy, r, 0, 2 * Math.PI).slice(0, -1), style, true);
-        shapes.push(`<circle cx="${fmt(cx)}" cy="${fmt(cy)}" r="${fmt(r)}"${attrs(hand.style(style))}/>`);
+        const styled = hand.style(style);
+        shapes.push(`<circle cx="${fmt(cx)}" cy="${fmt(cy)}" r="${fmt(r)}"${attrs(styled)}/>`);
+        record({ kind: "poly", points: arcPoints(cx, cy, r, 0, 2 * Math.PI).slice(0, -1), closed: true, style: styled });
       },
       // Arc of a circle from angle a0 to a1 (radians, clockwise on screen when a1 > a0).
       arc(cx, cy, r, a0, a1, style) {
@@ -180,22 +192,28 @@
         const y0 = cy + r * Math.sin(a0);
         const x1 = cx + r * Math.cos(a1);
         const y1 = cy + r * Math.sin(a1);
+        const styled = hand.style(style);
         shapes.push(
-          `<path d="M${fmt(x0)} ${fmt(y0)}A${fmt(r)} ${fmt(r)} 0 ${large} ${sweep} ${fmt(x1)} ${fmt(y1)}"${attrs(hand.style(style))}/>`
+          `<path d="M${fmt(x0)} ${fmt(y0)}A${fmt(r)} ${fmt(r)} 0 ${large} ${sweep} ${fmt(x1)} ${fmt(y1)}"${attrs(styled)}/>`
         );
+        record({ kind: "poly", points: arcPoints(cx, cy, r, a0, a1), closed: false, style: styled });
       },
       // Raw SVG paths keep their geometry (only the roughness filter bends them).
       path(d, style) {
-        shapes.push(`<path d="${d}"${attrs(hand.style(style))}/>`);
+        const styled = hand.style(style);
+        shapes.push(`<path d="${d}"${attrs(styled)}/>`);
+        record({ kind: "path", d, style: styled });
       },
       // Everything drawn inside fn is clipped to the path d.
       clip(d, fn) {
         const id = `clip-${++clipCounter}`;
         shapes.push(`<clipPath id="${id}"><path d="${d}"/></clipPath><g clip-path="url(#${id})">`);
+        record({ kind: "clip", d });
         try {
           fn();
         } finally {
           shapes.push("</g>");
+          record({ kind: "unclip" });
         }
       },
     };
@@ -261,6 +279,13 @@
     );
   }
 
+  // Runs a draw function and returns its shapes as data instead of SVG (see createPen).
+  function trace(draw, values, size = 800) {
+    const shapes = [];
+    draw(values, createPen(size, size, createHand(values), (shape) => shapes.push(shape)));
+    return shapes;
+  }
+
   // Turns edited source text back into a callable draw function.
   function compile(source) {
     const fn = new Function(`"use strict"; return (${source});`)();
@@ -281,6 +306,7 @@
     initialValues,
     random,
     render,
+    trace,
     compile,
   };
 })();

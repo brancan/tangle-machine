@@ -345,6 +345,21 @@
     setTimeout(() => URL.revokeObjectURL(link.href), 1000);
   }
 
+  // Pen plotter SVG of the current frame, with a summary of what the pen will do.
+  function downloadPlotter() {
+    try {
+      const { svg, stats } = Plotter.exportSvg(state.draw, { ...state.values, time: state.time || 0 });
+      save(new Blob([svg], { type: "image/svg+xml" }), "plotter.svg");
+      const m = (mm) => `${(mm / 1000).toFixed(1)} m`;
+      setStatus(
+        `Plotter SVG · ${stats.layers} layer${stats.layers === 1 ? "" : "s"} · ${stats.strokes.toLocaleString()} strokes · ` +
+          `pen down ${m(stats.penDown)} · pen up ${m(stats.travelBefore)} → ${m(stats.travelAfter)}`
+      );
+    } catch (error) {
+      reportError("Plotter export failed", error);
+    }
+  }
+
   function downloadSvg() {
     save(new Blob([$("#canvas").innerHTML], { type: "image/svg+xml" }), "svg");
   }
@@ -712,6 +727,7 @@
     $("#reject-code").addEventListener("click", rejectSharedCode);
     $("#download-svg").addEventListener("click", downloadSvg);
     $("#download-png").addEventListener("click", () => downloadPng());
+    $("#download-plotter").addEventListener("click", downloadPlotter);
     $("#focus").addEventListener("click", () => toggleFocus());
     $("#replay").addEventListener("click", toggleReplay);
     $("#play").addEventListener("click", togglePlay);
