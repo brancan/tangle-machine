@@ -26,6 +26,12 @@ the SVG path `d`. `pen.random(seed)`
 returns a deterministic random generator. Code edits are saved in the browser
 (localStorage) and can be reset at any time.
 
+Every painting also gets **Hand-drawn** variables that humanize the strokes:
+`Wobble` (slow drift along each stroke), `Jitter` (corners and endpoints miss
+slightly, closed shapes don't quite close), `Pressure` (stroke width varies per
+stroke), `Roughness` (an SVG displacement filter that also bends raw paths and
+fills) and `Hand seed`. All start at 0, so paintings look exact by default.
+
 The studio also offers Randomize, shareable links (the variables live in the
 URL hash, e.g. `#/paradox?n=3&alternate=0`), SVG/PNG export and arrow-key
 navigation between paintings.

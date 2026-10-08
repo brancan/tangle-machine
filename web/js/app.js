@@ -1,6 +1,6 @@
 // Gallery and studio views: pick a painting, tweak its params, edit its code.
 (function () {
-  const { STYLE_PARAMS } = Gallery;
+  const { STYLE_PARAMS, HAND_PARAMS } = Gallery;
   const $ = (selector) => document.querySelector(selector);
 
   const storage = {
@@ -114,6 +114,7 @@
     const html = (param) => controlHtml(param, values[param.name]);
     $("#controls-painting").innerHTML = painting.params.map(html).join("");
     $("#controls-style").innerHTML = STYLE_PARAMS.map(html).join("");
+    $("#controls-hand").innerHTML = HAND_PARAMS.map(html).join("");
   }
 
   function setStatus(message, isError = false) {
@@ -124,7 +125,7 @@
 
   // ---------- URL state ----------
 
-  const allParams = (painting) => [...painting.params, ...STYLE_PARAMS];
+  const allParams = (painting) => [...painting.params, ...STYLE_PARAMS, ...HAND_PARAMS];
 
   // Parses "n=6&ink=%23000" into typed, range-checked values for this painting.
   function parseQuery(painting, query) {

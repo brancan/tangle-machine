@@ -10,6 +10,15 @@
     { name: "strokeWidth", label: "Stroke width", type: "range", min: 0.2, max: 4, step: 0.1, value: 1 },
   ];
 
+  // Shared by every painting: make the strokes look drawn by hand.
+  const HAND_PARAMS = [
+    { name: "handWobble", label: "Wobble", type: "range", min: 0, max: 8, step: 0.1, value: 0 },
+    { name: "handJitter", label: "Jitter", type: "range", min: 0, max: 8, step: 0.1, value: 0 },
+    { name: "handPressure", label: "Pressure", type: "range", min: 0, max: 0.9, step: 0.01, value: 0 },
+    { name: "handRoughness", label: "Roughness", type: "range", min: 0, max: 6, step: 0.1, value: 0 },
+    { name: "handSeed", label: "Hand seed", type: "range", min: 1, max: 100, step: 1, value: 1 },
+  ];
+
   function fmt(n) {
     return Math.round(n * 100) / 100;
   }
@@ -40,27 +49,98 @@
     };
   }
 
-  function createPen(width, height) {
+  // Turns perfect geometry into hand-drawn strokes. Every value at 0 leaves shapes untouched.
+  function createHand({ handWobble: wobble = 0, handJitter: jitter = 0, handPressure: pressure = 0, handSeed = 1, strokeWidth = 1 }) {
+    const rand = random(handSeed * 7919 + 13);
+    const bends = wobble > 0 || jitter > 0;
+    const spread = (amount) => (rand() * 2 - 1) * amount;
+
+    // Low-frequency waves with random phases: a slow, continuous drift of the pen.
+    function drift() {
+      const waves = [1, 2, 3].map((k) => ({ f: (0.006 + rand() * 0.012) * k, x: rand() * 6.3, y: rand() * 6.3 }));
+      return (d) => {
+        let dx = 0;
+        let dy = 0;
+        for (const [i, w] of waves.entries()) {
+          dx += Math.sin(w.f * d + w.x) / (i + 1);
+          dy += Math.sin(w.f * d + w.y) / (i + 1);
+        }
+        return [(dx * wobble) / 1.83, (dy * wobble) / 1.83];
+      };
+    }
+
+    // Jitters the vertices, then resamples every ~6px and adds the drift along the way.
+    // Sampled curves (arcs, circles) move as a whole instead, or jitter would saw-tooth them.
+    function stroke(list, closed, curve = false) {
+      if (!bends || list.length < 2) return list;
+      let moved;
+      if (curve) {
+        const dx = spread(jitter);
+        const dy = spread(jitter);
+        moved = list.map(([x, y]) => [x + dx, y + dy]);
+      } else {
+        moved = list.map(([x, y]) => [x + spread(jitter), y + spread(jitter)]);
+      }
+      // A closing stroke ends near, not exactly on, its start: the hand never quite meets itself.
+      if (closed) moved.push([moved[0][0] + spread(jitter), moved[0][1] + spread(jitter)]);
+      if (wobble <= 0) return moved;
+      const offset = drift();
+      const out = [];
+      let travelled = 0;
+      for (let i = 0; i < moved.length - 1; i++) {
+        const [ax, ay] = moved[i];
+        const [bx, by] = moved[i + 1];
+        const length = Math.hypot(bx - ax, by - ay);
+        const steps = Math.max(1, Math.ceil(length / 6));
+        for (let s = 0; s < steps; s++) {
+          const t = s / steps;
+          const [ox, oy] = offset(travelled + t * length);
+          out.push([ax + (bx - ax) * t + ox, ay + (by - ay) * t + oy]);
+        }
+        travelled += length;
+      }
+      const [lx, ly] = moved[moved.length - 1];
+      const [ox, oy] = offset(travelled);
+      out.push([lx + ox, ly + oy]);
+      return out;
+    }
+
+    // Pressure: each stroke gets its own width around the nominal one.
+    function style(base) {
+      if (pressure <= 0) return base;
+      const width = (base && base.width != null ? base.width : strokeWidth) * Math.max(0.15, 1 + spread(pressure));
+      return { ...(base || {}), width: fmt(width) };
+    }
+
+    return { bends, stroke, style };
+  }
+
+  function createPen(width, height, hand) {
     const shapes = [];
-    return {
+    const pen = {
       width,
       height,
       shapes,
       random,
-      polygon(list, style) {
-        shapes.push(`<polygon points="${points(list)}"${attrs(style)}/>`);
+      polygon(list, style, curve) {
+        // A hand-drawn closed shape is an open stroke that ends near its start; fills still close.
+        const tag = hand.bends ? "polyline" : "polygon";
+        shapes.push(`<${tag} points="${points(hand.stroke(list, true, curve))}"${attrs(hand.style(style))}/>`);
       },
-      polyline(list, style) {
-        shapes.push(`<polyline points="${points(list)}"${attrs(style)}/>`);
+      polyline(list, style, curve) {
+        shapes.push(`<polyline points="${points(hand.stroke(list, false, curve))}"${attrs(hand.style(style))}/>`);
       },
       line(x1, y1, x2, y2, style) {
-        shapes.push(`<line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}"${attrs(style)}/>`);
+        if (hand.bends) return pen.polyline([[x1, y1], [x2, y2]], style);
+        shapes.push(`<line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}"${attrs(hand.style(style))}/>`);
       },
       circle(cx, cy, r, style) {
-        shapes.push(`<circle cx="${fmt(cx)}" cy="${fmt(cy)}" r="${fmt(r)}"${attrs(style)}/>`);
+        if (hand.bends) return pen.polygon(arcPoints(cx, cy, r, 0, 2 * Math.PI).slice(0, -1), style, true);
+        shapes.push(`<circle cx="${fmt(cx)}" cy="${fmt(cy)}" r="${fmt(r)}"${attrs(hand.style(style))}/>`);
       },
       // Arc of a circle from angle a0 to a1 (radians, clockwise on screen when a1 > a0).
       arc(cx, cy, r, a0, a1, style) {
+        if (hand.bends) return pen.polyline(arcPoints(cx, cy, r, a0, a1), style, true);
         const large = Math.abs(a1 - a0) > Math.PI ? 1 : 0;
         const sweep = a1 > a0 ? 1 : 0;
         const x0 = cx + r * Math.cos(a0);
@@ -68,11 +148,12 @@
         const x1 = cx + r * Math.cos(a1);
         const y1 = cy + r * Math.sin(a1);
         shapes.push(
-          `<path d="M${fmt(x0)} ${fmt(y0)}A${fmt(r)} ${fmt(r)} 0 ${large} ${sweep} ${fmt(x1)} ${fmt(y1)}"${attrs(style)}/>`
+          `<path d="M${fmt(x0)} ${fmt(y0)}A${fmt(r)} ${fmt(r)} 0 ${large} ${sweep} ${fmt(x1)} ${fmt(y1)}"${attrs(hand.style(style))}/>`
         );
       },
+      // Raw SVG paths keep their geometry (only the roughness filter bends them).
       path(d, style) {
-        shapes.push(`<path d="${d}"${attrs(style)}/>`);
+        shapes.push(`<path d="${d}"${attrs(hand.style(style))}/>`);
       },
       // Everything drawn inside fn is clipped to the path d.
       clip(d, fn) {
@@ -85,6 +166,18 @@
         }
       },
     };
+    return pen;
+  }
+
+  // Points along an arc, about every 6px.
+  function arcPoints(cx, cy, r, a0, a1) {
+    const steps = Math.max(8, Math.ceil((Math.abs(a1 - a0) * r) / 6));
+    const list = [];
+    for (let s = 0; s <= steps; s++) {
+      const a = a0 + ((a1 - a0) * s) / steps;
+      list.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
+    }
+    return list;
   }
 
   function defaults(params) {
@@ -93,17 +186,35 @@
 
   // Starting values for a painting: shared style, its style overrides, its own params.
   function initialValues(painting) {
-    return { ...defaults(STYLE_PARAMS), ...(painting.style || {}), ...defaults(painting.params) };
+    return {
+      ...defaults(STYLE_PARAMS),
+      ...defaults(HAND_PARAMS),
+      ...(painting.style || {}),
+      ...defaults(painting.params),
+    };
   }
 
   // Runs a draw function and returns a standalone SVG document string.
   function render(draw, values, size = 800) {
-    const pen = createPen(size, size);
+    const pen = createPen(size, size, createHand(values));
     draw(values, pen);
+    let filter = "";
+    let defs = "";
+    if (values.handRoughness > 0) {
+      // Displaces every pixel with fractal noise, so even raw paths and fills tremble.
+      const id = `rough-${++clipCounter}`;
+      defs =
+        `<defs><filter id="${id}" x="-5%" y="-5%" width="110%" height="110%">` +
+        `<feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="${values.handSeed || 1}"/>` +
+        `<feDisplacementMap in="SourceGraphic" scale="${values.handRoughness * 2}" xChannelSelector="R" yChannelSelector="G"/>` +
+        `</filter></defs>`;
+      filter = ` filter="url(#${id})"`;
+    }
     return (
       `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">` +
+      defs +
       `<rect width="100%" height="100%" fill="${values.paper}"/>` +
-      `<g fill="none" stroke="${values.ink}" stroke-width="${values.strokeWidth}" stroke-linejoin="round" stroke-linecap="round">` +
+      `<g fill="none" stroke="${values.ink}" stroke-width="${values.strokeWidth}" stroke-linejoin="round" stroke-linecap="round"${filter}>` +
       pen.shapes.join("") +
       `</g></svg>`
     );
@@ -118,6 +229,7 @@
 
   window.Gallery = {
     STYLE_PARAMS,
+    HAND_PARAMS,
     paintings,
     register(painting) {
       paintings.push(painting);
