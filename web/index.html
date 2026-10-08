@@ -15,12 +15,25 @@
 
     <main>
       <section id="gallery" hidden>
+        <div class="gallery-intro">
+          <p>
+            Every piece here is a small function that draws with code. Pick one to play with its
+            variables, read how it works, or rewrite it.
+          </p>
+          <span id="gallery-count" class="count"></span>
+        </div>
         <div id="gallery-grid" class="gallery-grid"></div>
       </section>
 
       <section id="studio" hidden>
         <div class="studio-head">
-          <a class="back" href="#">← Gallery</a>
+          <nav class="studio-nav">
+            <a class="back" href="#">Gallery</a>
+            <span class="pager">
+              <a id="prev" href="#"></a>
+              <a id="next" href="#"></a>
+            </span>
+          </nav>
           <h1 id="studio-title"></h1>
           <p id="studio-description"></p>
         </div>
@@ -32,8 +45,14 @@
             <h3>Style</h3>
             <div id="controls-style"></div>
             <div class="buttons">
-              <button id="reset-params" type="button">Reset variables</button>
-              <button id="download" type="button">Download SVG</button>
+              <button id="randomize" type="button" class="primary">Randomize</button>
+              <button id="reset-params" type="button">Reset</button>
+            </div>
+            <h3>Share</h3>
+            <div class="buttons">
+              <button id="copy-link" type="button">Copy link</button>
+              <button id="download-svg" type="button">SVG</button>
+              <button id="download-png" type="button">PNG</button>
             </div>
           </aside>
 

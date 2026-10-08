@@ -34,6 +34,7 @@
     $("#studio").hidden = true;
     $("#gallery").hidden = false;
     document.title = "Zentangles";
+    $("#gallery-count").textContent = `${Gallery.paintings.length} paintings`;
     $("#gallery-grid").innerHTML = Gallery.paintings
       .map(
         (painting) => `
@@ -121,6 +122,54 @@
     status.classList.toggle("error", isError);
   }
 
+  // ---------- URL state ----------
+
+  const allParams = (painting) => [...painting.params, ...STYLE_PARAMS];
+
+  // Parses "n=6&ink=%23000" into typed, range-checked values for this painting.
+  function parseQuery(painting, query) {
+    const values = {};
+    const search = new URLSearchParams(query);
+    for (const param of allParams(painting)) {
+      const raw = search.get(param.name);
+      if (raw === null) continue;
+      if (param.type === "checkbox") values[param.name] = raw === "1";
+      else if (param.type === "color") {
+        if (/^#[0-9a-f]{6}$/i.test(raw)) values[param.name] = raw;
+      } else {
+        const n = Number(raw);
+        if (Number.isFinite(n)) values[param.name] = Math.min(param.max, Math.max(param.min, n));
+      }
+    }
+    return values;
+  }
+
+  // Encodes only the values that differ from the painting's starting values.
+  function buildQuery(painting, values) {
+    const initial = Gallery.initialValues(painting);
+    const search = new URLSearchParams();
+    for (const param of allParams(painting)) {
+      const value = values[param.name];
+      if (value === initial[param.name]) continue;
+      search.set(param.name, param.type === "checkbox" ? (value ? "1" : "0") : String(value));
+    }
+    return search.toString();
+  }
+
+  function updateUrl() {
+    const query = buildQuery(state.painting, state.values);
+    history.replaceState(null, "", `#/${state.painting.id}${query ? `?${query}` : ""}`);
+  }
+
+  let frame = 0;
+  function scheduleDraw() {
+    if (frame) return;
+    frame = requestAnimationFrame(() => {
+      frame = 0;
+      draw();
+    });
+  }
+
   function draw() {
     try {
       const started = performance.now();
@@ -147,22 +196,77 @@
     draw();
   }
 
-  function resetParams() {
-    state.values = Gallery.initialValues(state.painting);
+  function applyValues(values) {
+    state.values = values;
     buildControls(state.painting, state.values);
+    updateUrl();
     draw();
   }
 
-  function download() {
-    const blob = new Blob([$("#canvas").innerHTML], { type: "image/svg+xml" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `${state.painting.id}.svg`;
-    link.click();
-    URL.revokeObjectURL(link.href);
+  function resetParams() {
+    applyValues(Gallery.initialValues(state.painting));
   }
 
-  function showStudio(painting) {
+  // Random value for every painting variable, snapped to its slider step.
+  function randomize() {
+    const values = { ...state.values };
+    for (const param of state.painting.params) {
+      if (param.type === "checkbox") values[param.name] = Math.random() < 0.5;
+      if (param.type === "range") {
+        const steps = Math.round((param.max - param.min) / param.step);
+        const value = param.min + Math.floor(Math.random() * (steps + 1)) * param.step;
+        values[param.name] = Number(value.toFixed(6));
+      }
+    }
+    applyValues(values);
+  }
+
+  function save(blob, extension) {
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${state.painting.id}.${extension}`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+  }
+
+  function downloadSvg() {
+    save(new Blob([$("#canvas").innerHTML], { type: "image/svg+xml" }), "svg");
+  }
+
+  function downloadPng(size = 2000) {
+    const url = URL.createObjectURL(new Blob([$("#canvas").innerHTML], { type: "image/svg+xml" }));
+    const image = new Image();
+    image.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = size;
+      canvas.getContext("2d").drawImage(image, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      canvas.toBlob((blob) => save(blob, "png"), "image/png");
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      setStatus("Could not export PNG", true);
+    };
+    image.src = url;
+  }
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(location.href);
+      setStatus("Link copied to clipboard");
+    } catch {
+      window.prompt("Copy this link:", location.href);
+    }
+  }
+
+  // Wraps around: the last painting's "next" is the first one.
+  function neighbour(offset) {
+    const list = Gallery.paintings;
+    const index = list.indexOf(state.painting);
+    return list[(index + offset + list.length) % list.length];
+  }
+
+  function showStudio(painting, query) {
     $("#gallery").hidden = true;
     $("#studio").hidden = false;
     document.title = `${painting.title} · Zentangles`;
@@ -175,8 +279,12 @@
       painting,
       original,
       draw: painting.draw,
-      values: Gallery.initialValues(painting),
+      values: { ...Gallery.initialValues(painting), ...parseQuery(painting, query) },
     };
+    $("#prev").href = `#/${neighbour(-1).id}`;
+    $("#prev").textContent = `← ${neighbour(-1).title}`;
+    $("#next").href = `#/${neighbour(1).id}`;
+    $("#next").textContent = `${neighbour(1).title} →`;
     buildControls(painting, state.values);
     editor.set(saved ?? original);
     editor.refresh();
@@ -190,9 +298,9 @@
   // ---------- Wiring ----------
 
   function route() {
-    const id = location.hash.replace(/^#\/?/, "");
+    const [id, query = ""] = location.hash.replace(/^#\/?/, "").split("?");
     const painting = id && Gallery.find(id);
-    if (painting) showStudio(painting);
+    if (painting) showStudio(painting, query);
     else showGallery();
     window.scrollTo(0, 0);
   }
@@ -211,7 +319,8 @@
       state.values[input.dataset.param] = value;
       const output = $(`output[data-for="${input.dataset.param}"]`);
       if (output) output.textContent = value;
-      draw();
+      updateUrl();
+      scheduleDraw();
     });
 
     $("#run").addEventListener("click", runCode);
@@ -220,7 +329,18 @@
       runCode();
     });
     $("#reset-params").addEventListener("click", resetParams);
-    $("#download").addEventListener("click", download);
+    $("#randomize").addEventListener("click", randomize);
+    $("#copy-link").addEventListener("click", copyLink);
+    $("#download-svg").addEventListener("click", downloadSvg);
+    $("#download-png").addEventListener("click", () => downloadPng());
+
+    // Arrow keys browse paintings, unless the user is typing or sliding.
+    document.addEventListener("keydown", (event) => {
+      if ($("#studio").hidden || event.altKey || event.ctrlKey || event.metaKey) return;
+      if (event.target.closest("input, textarea, .CodeMirror")) return;
+      if (event.key === "ArrowLeft") location.hash = `#/${neighbour(-1).id}`;
+      if (event.key === "ArrowRight") location.hash = `#/${neighbour(1).id}`;
+    });
 
     window.addEventListener("hashchange", route);
     route();

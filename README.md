@@ -23,6 +23,10 @@ each accepts an optional `{ fill, stroke, width }` style. `pen.random(seed)`
 returns a deterministic random generator. Code edits are saved in the browser
 (localStorage) and can be reset at any time.
 
+The studio also offers Randomize, shareable links (the variables live in the
+URL hash, e.g. `#/paradox?n=3&alternate=0`), SVG/PNG export and arrow-key
+navigation between paintings.
+
 Current paintings: Paradox, Paradox Circle, Triangle Paradox, Honeycomb
 Paradox, Spider Web, Truchet Tiles, Scales, String Art, Bulge Checker, Polar
 Checker and Op Waves.

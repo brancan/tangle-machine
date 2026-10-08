@@ -67,6 +67,27 @@ main {
 
 /* ---------- Gallery ---------- */
 
+.gallery-intro {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.gallery-intro p {
+  margin: 0;
+  max-width: 60ch;
+  font-family: var(--serif);
+  font-size: 1.15rem;
+}
+
+.count {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -117,9 +138,29 @@ main {
   margin-bottom: 1.25rem;
 }
 
-.back {
+.studio-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.studio-nav a {
   color: var(--muted);
   text-decoration: none;
+}
+
+.studio-nav a:hover {
+  color: var(--text);
+}
+
+.back::before {
+  content: "↑ ";
+}
+
+.pager {
+  display: flex;
+  gap: 1.25rem;
 }
 
 .studio-head h1 {
@@ -213,7 +254,11 @@ main {
 }
 
 .controls .buttons {
-  margin-top: 1rem;
+  margin: 0.25rem 0 1.25rem;
+}
+
+.controls .buttons:last-child {
+  margin-bottom: 0;
 }
 
 button {
