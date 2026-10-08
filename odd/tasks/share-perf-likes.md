@@ -28,12 +28,13 @@ thumbnails, and add likes to paintings and gallery variants.
   desktop 1280x800 no throttle: FCP 36–88 ms, DCL 88–145 ms, load 101–162 ms, 8 visible thumbnails drawn at 152–222 ms, no long tasks;
   desktop 4x CPU: FCP 116–160, load 259–434, visible thumbs 398–527 ms, long tasks max 181 ms;
   mobile 390x844 4x CPU: FCP 92–116, load 207–262, visible thumbs 210–265 ms, long tasks max 52 ms. All well under 1 s.
-- [ ] T3 Likes build: reaction counts per painting thread → `web/likes.json`; per variant → `likes` in showcase entries; tests — route: delegated (writer). PARTIAL (wip commit):
-  RED tests written in `tests/likes.test.mjs` (fail: `buildLikes`/`countLikes`/`reuseLikes` not exported yet); placeholder `web/likes.json` = `{}` added.
-  Left: implement in `scripts/showcase-lib.mjs` (countLikes over `reactionGroups { content reactors { totalCount } }`, positive = THUMBS_UP/HEART/HOORAY/ROCKET; `likes` in parseShowcaseEntry; reuseShowcase maps `likes` back; buildLikes matching title `painting:<id>`, or body `<!-- sha1: sha1("painting:<id>") -->`, or the term as a whole token in body; reuseLikes), then extend build-showcase.mjs (reactionGroups in DISCUSSIONS, Announcements slug `announcements` query, write likes.json with same never-fail fallback to published likes.json).
-  Verified: giscus `pages/api/discussions/index.ts` creates the discussion with title = term and appends `<!-- sha1: <digest(title)> -->` to the body.
-- [ ] T4 Likes UI: count on home cards / studio and on showcase cards, linking to GitHub to react — route: delegated (writer)
-- [ ] T5 README — route: delegated (writer)
+- [x] T3 Likes build: reaction counts per painting thread → `web/likes.json`; per variant → `likes` in showcase entries; tests — route: delegated (writer). RED tests in wip `595c110`, GREEN in `e3f104a`.
+  `scripts/showcase-lib.mjs`: `countLikes` (positive = THUMBS_UP/HEART/HOORAY/ROCKET), `buildLikes` (exact title `painting:<id>`, then giscus `<!-- sha1 -->`, then the term as a whole body token; more likes wins), `reuseLikes`; `likes` in `parseShowcaseEntry`/`reuseShowcase`.
+  `scripts/build-showcase.mjs`: one categories lookup, `reactionGroups` in the query, `show-and-tell` → showcase.json and `announcements` → likes.json, each with its own fallback (published copy via `SHOWCASE_PUBLISHED_URL`/`LIKES_PUBLISHED_URL`, then `[]`/`{}`), exit 0. Workflow unchanged.
+  Evidence: npm test 91/91; no token + unreachable published → exit 0, `[]` and `{}`; local fixture published likes → 1 valid entry reused, 2 tampered dropped; real API (read-only) → exit 0, 0 entries / 0 paintings (repo has only the "Welcome" Announcements discussion).
+- [x] T4 Likes UI: count on home cards / studio and on showcase cards, linking to GitHub to react — route: delegated (writer). Done in `dd2afd5`: app.js loads likes.json once (no-cache, silent failure), `♥ N` on cards with likes > 0, `window.Likes.get` + `likes-loaded` event; comments.js adds the `♥ N` link (title "Like it on GitHub") in the Comments heading and the reaction hint; showcase.js `♥ N` link per card; CSS appended to styles.css/showcase.css.
+  Evidence: headless Chrome screenshots with fixtures (home, studio of `paradox`, showcase) show the counts; placeholders restored. Showcase thumbnails are blank in headless `--screenshot` both before and after this change (lazy IntersectionObserver under virtual time), not a regression.
+- [x] T5 README — route: delegated (writer). Rode with T4 in `dd2afd5`: likes (which reactions count, refresh on deploy, fallback), share previews (`node scripts/og-image.mjs`), perf numbers; Brand section untouched.
 
 Route evidence: 6+ non-trivial files across web/, scripts/, tests → writer trigger.
 
@@ -46,4 +47,4 @@ Route evidence: 6+ non-trivial files across web/, scripts/, tests → writer tri
 - Engram mirror: pending (server unavailable this session).
 
 ## Next step
-T3: make `tests/likes.test.mjs` GREEN (npm test currently fails only there), then T4 UI and T5 README (keep README edits in the comments section; main gained a Brand section — parent rebases).
+Parent: native review of the slice (wip..dd2afd5), then push/PR is the user's decision. After deploy, react on a painting thread and check likes.json on the next scheduled build.
