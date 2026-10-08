@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Tangle Machine mark: nested hand-drawn squares with one accent ring (see brand/). -->
+  <rect width="32" height="32" rx="7" fill="#121212"/>
+  <g fill="none" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M5.2 5.4 L26.7 5.1 L26.9 26.8 L5.1 26.6 Z" stroke="#ececec" stroke-width="2"/>
+    <path d="M9.6 9.9 L22.3 9.4 L22.6 22.2 L9.8 22.6 Z" stroke="#b6f23a" stroke-width="2.6"/>
+    <path d="M13.6 13.8 L18.5 13.4 L18.6 18.4 L13.5 18.6 Z" stroke="#ececec" stroke-width="2"/>
+  </g>
+</svg>

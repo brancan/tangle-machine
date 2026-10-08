@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Tangle Machine</title>
-    <meta name="description" content="An interactive gallery of drawings made with code: pick a painting, play with its variables, read or rewrite its code." />
+    <title>Tangle Machine · Generative drawings made with code</title>
+    <meta name="description" content="An interactive gallery of generative drawings made with code: pick a painting, play with its variables, read or rewrite its code." />
     <link rel="canonical" href="https://brancan.github.io/tangle-machine/" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Tangle Machine" />
     <meta property="og:title" content="Tangle Machine" />
-    <meta property="og:description" content="An interactive gallery of drawings made with code: pick a painting, play with its variables, read or rewrite its code." />
+    <meta property="og:description" content="An interactive gallery of generative drawings made with code: pick a painting, play with its variables, read or rewrite its code." />
     <meta property="og:url" content="https://brancan.github.io/tangle-machine/" />
     <meta property="og:image" content="https://brancan.github.io/tangle-machine/og-image.png" />
     <meta property="og:image:width" content="1200" />
@@ -17,9 +17,20 @@
     <meta property="og:image:alt" content="Six Tangle Machine paintings side by side under the title Tangle Machine, drawings made with code" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Tangle Machine" />
-    <meta name="twitter:description" content="An interactive gallery of drawings made with code: pick a painting, play with its variables, read or rewrite its code." />
+    <meta name="twitter:description" content="An interactive gallery of generative drawings made with code: pick a painting, play with its variables, read or rewrite its code." />
     <meta name="twitter:image" content="https://brancan.github.io/tangle-machine/og-image.png" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Tangle Machine",
+        "url": "https://brancan.github.io/tangle-machine/",
+        "description": "An interactive gallery of generative drawings made with code: pick a painting, play with its variables, read or rewrite its code.",
+        "inLanguage": "en"
+      }
+    </script>
   </head>
   <body>
     <header class="site-header">
@@ -32,10 +43,13 @@
     <main>
       <section id="gallery" hidden>
         <div class="gallery-intro">
-          <p>
-            Every piece here is a small function that draws with code. Pick one to play with its
-            variables, read how it works, or rewrite it.
-          </p>
+          <div>
+            <h1 class="gallery-title">Generative drawings made with code</h1>
+            <p>
+              Every piece here is a small function that draws with code. Pick one to play with its
+              variables, read how it works, or rewrite it.
+            </p>
+          </div>
           <span id="gallery-count" class="count"></span>
         </div>
         <div id="tag-filters" class="tag-filters" role="group" aria-label="Filter by tag"></div>

@@ -714,3 +714,12 @@ body.focus .stage {
   color: var(--text);
   text-decoration: underline;
 }
+
+/* Home heading: the only h1 of the gallery view (the studio has its own, hidden here). */
+.gallery-title {
+  margin: 0 0 0.4rem;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+  line-height: 1.2;
+}

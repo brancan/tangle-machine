@@ -113,7 +113,7 @@
     $("#studio").hidden = true;
     $("#gallery").hidden = false;
     toggleFocus(false);
-    document.title = "Tangle Machine";
+    document.title = "Tangle Machine · Generative drawings made with code";
     const tag = Motion.TAGS.includes(new URLSearchParams(query).get("tag")) ? new URLSearchParams(query).get("tag") : "";
     const shown = Motion.filterByTag(Gallery.paintings, tag);
     renderTagFilters(tag);
