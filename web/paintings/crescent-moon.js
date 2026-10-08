@@ -6,9 +6,10 @@ Gallery.register({
     "outline ripples toward the middle, the classic Crescent Moon tangle.",
   tags: ["geometric", "radial"],
   instruction:
-    "Inside a square frame, draw {moons} half circles along each side, bulging inward" +
-    "{fill? and fill them in:}. Then trace the scalloped outline again and again, {gap} " +
-    "further in each time, {auras} times, letting each echo round off between the moons.",
+    "Inside a square frame, draw a quarter circle in each corner and {moons} half circles " +
+    "along each side between them, all bulging inward{fill? and filled in:}. Then trace the " +
+    "scalloped outline again and again, {gap} further in each time, {auras} times, letting " +
+    "each echo round off between the moons.",
   params: [
     { name: "moons", label: "Moons per side", type: "range", min: 2, max: 12, step: 1, value: 5 },
     { name: "auras", label: "Auras", type: "range", min: 1, max: 40, step: 1, value: 16 },
@@ -18,8 +19,7 @@ Gallery.register({
   draw: function draw(p, pen) {
     const margin = 40;
     const side = pen.width - 2 * margin;
-    const center = pen.width / 2;
-    const step = side / p.moons;
+    const step = side / (p.moons + 1);
     const r = step * 0.42;
     const f = (n) => n.toFixed(2);
 
@@ -30,44 +30,68 @@ Gallery.register({
       (t, d) => [margin + side - t, margin + side - d],
       (t, d) => [margin + d, margin + side - t],
     ];
-    const centers = Array.from({ length: p.moons }, (_, i) => (i + 0.5) * step);
+    // Moon centers along a side; the first and last sit on the corners, shared with the next side.
+    const centers = Array.from({ length: p.moons + 2 }, (_, i) => i * step);
     // Depth of the outline offset by `off` from the moons and the frame line.
     const depth = (t, off) => {
+      const R = r + off;
       let best = off;
       for (const c of centers) {
-        const R = r + off;
         if (Math.abs(t - c) < R) best = Math.max(best, Math.sqrt(R * R - (t - c) ** 2));
       }
       return best;
+    };
+    // Where an echo crosses the corner diagonal (depth = t), searching from the middle outward.
+    const diagonal = (off) => {
+      let t = side / 2;
+      if (depth(t, off) >= t) return null;
+      while (depth(t, off) < t) t -= 1;
+      let [lo, hi] = [t, t + 1];
+      for (let i = 0; i < 30; i++) {
+        const m = (lo + hi) / 2;
+        if (depth(m, off) >= m) lo = m;
+        else hi = m;
+      }
+      return (lo + hi) / 2;
     };
 
     pen.polygon([[margin, margin], [margin + side, margin], [margin + side, margin + side], [margin, margin + side]], {
       width: p.strokeWidth * 1.6,
     });
 
-    for (const at of sides) {
-      // Clip to the triangle between this side and the center, so the four sides meet on the diagonals.
-      const [a, b] = [at(0, 0), at(side, 0)];
-      const tri = `M${f(a[0])} ${f(a[1])}L${f(b[0])} ${f(b[1])}L${f(center)} ${f(center)}Z`;
-      pen.clip(tri, () => {
-        for (const c of centers) {
-          const [x, y] = at(c, 0);
-          const angle = Math.atan2(center - y, center - x);
-          // Half moon: the arc bulging inward from the frame line.
-          const ends = [at(c - r, 0), at(c + r, 0)];
-          const d =
-            `M${f(ends[0][0])} ${f(ends[0][1])}A${f(r)} ${f(r)} 0 0 0 ${f(ends[1][0])} ${f(ends[1][1])}Z`;
-          if (p.fill) pen.path(d, { fill: p.ink });
-          else pen.arc(x, y, r, angle - Math.PI / 2, angle + Math.PI / 2);
+    // Moons: a quarter circle in each corner and half circles along the sides, none overlapping.
+    sides.forEach((at, s) => {
+      const base = (s * Math.PI) / 2;
+      for (let i = 0; i <= p.moons; i++) {
+        const [x, y] = at(centers[i], 0);
+        const corner = i === 0;
+        const [a0, a1] = [base, base + (corner ? Math.PI / 2 : Math.PI)];
+        if (!p.fill) {
+          pen.arc(x, y, r, a0, a1);
+          continue;
         }
-        for (let k = 1; k <= p.auras; k++) {
-          const off = k * p.gap;
-          if (off > side / 2) break;
-          const points = [];
-          for (let t = -off; t <= side + off; t += 3) points.push(at(t, depth(t, off)));
-          pen.polyline(points);
-        }
-      });
+        const [sx, sy, ex, ey] = [x + r * Math.cos(a0), y + r * Math.sin(a0), x + r * Math.cos(a1), y + r * Math.sin(a1)];
+        const close = corner ? `L${f(x)} ${f(y)}Z` : "Z";
+        pen.path(`M${f(sx)} ${f(sy)}A${f(r)} ${f(r)} 0 0 1 ${f(ex)} ${f(ey)}${close}`, { fill: p.ink });
+      }
+    });
+
+    // Each echo is one closed loop whose four sides meet exactly on the diagonals.
+    for (let k = 1; k <= p.auras; k++) {
+      const off = k * p.gap;
+      const t0 = diagonal(off);
+      if (t0 === null) break;
+      // Sample evenly, plus the cusps halfway between moons so the points stay sharp.
+      const ts = [];
+      for (let t = t0; t < side - t0; t += 3) ts.push(t);
+      for (let i = 0; i + 1 < centers.length; i++) {
+        const cusp = centers[i] + step / 2;
+        if (cusp > t0 && cusp < side - t0) ts.push(cusp);
+      }
+      ts.sort((a, b) => a - b);
+      const points = [];
+      for (const at of sides) for (const t of ts) points.push(at(t, depth(t, off)));
+      pen.polygon(points);
     }
   },
 });
