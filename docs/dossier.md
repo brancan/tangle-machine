@@ -37,6 +37,27 @@ Tangle Machine maps that system onto code almost one to one:
 | The certificate and diagram that travel with the work | The share link: variables, and edited code, encoded in the URL |
 | The wall | The SVG canvas, 800 × 800 |
 
+### A second compass: Vera Molnar and "1% of disorder"
+
+Where LeWitt explains the instruction, Vera Molnar (1924–2023) explains the
+hand. A pioneer of computer art, she worked with computers from 1968 and, with
+François Molnar, wrote *Molnart* (1974), a program for composing with squares
+into which she deliberately injected a percentage of clumsiness. Her plotter
+work *1% de désordre* (1976) gave the idea its name: strict order, broken by a
+small, intentional amount of disorder, is what makes a pattern feel alive. In
+her words, "a small amount of disorder is necessary… one percent, for example."
+
+The **Hand-drawn** variables are a direct descendant of that idea. Every
+painting starts in perfect order (all at 0); wobble, jitter, pressure and
+roughness let the visitor dial in exactly how much disorder the instruction
+tolerates, and the hand seed decides *which* disorder.
+
+| Vera Molnar | Tangle Machine |
+| --- | --- |
+| Strict geometric system | The painting's instruction and `draw` function |
+| A percentage of clumsiness injected by the program | Wobble, jitter, pressure, roughness |
+| "1% of disorder" as an artistic choice | All hand-drawn values start at 0: disorder is opt-in and measured |
+
 Three principles follow from that frame:
 
 1. **The rule generates the variety.** A handful of primitives (`line`,
@@ -128,3 +149,6 @@ Three principles follow from that frame:
 - Many paintings follow tangles from the Zentangle® Method of pattern
   drawing; tangle names belong to their creators.
 - Quote: Sol LeWitt, *Paragraphs on Conceptual Art*, Artforum, Summer 1967.
+- Vera Molnar: *Molnart* (1974, with François Molnar) and *1% de désordre*
+  (1976), per the Centre Pompidou and the V&A collection; quote as cited by
+  Lohaus Sominsky (exhibition *1% of Disorder*).
