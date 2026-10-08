@@ -16,7 +16,6 @@ const ALLOWED = {
   "string-art": 2_242_000, // all max + hand max (1_352_000 without the hand)
   "woven-circle": 2_185_000, // all max
   paradox: 2_080_000, // all max + hand max (1_418_000 without the hand)
-  vortex: 1_553_000, // random mix with many arms and ribs
   "star-checker": 1_240_000, // all max + hand max only: wobble and pressure on ~14600 strokes
   "paradox-circle": 1_158_000, // all max + hand max only: ~11700 bent strokes
 };
