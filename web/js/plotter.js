@@ -184,6 +184,43 @@
     }
   }
 
+  // Calls visit once per edge stored in the cells the segment a-b passes through
+  // (grid traversal after Amanatides & Woo), instead of every cell of its bounding box.
+  function edgesAlong(r, [ax, ay], [bx, by], visit) {
+    r.stamp++;
+    const C = EDGE_CELL;
+    let gx = Math.floor(ax / C);
+    let gy = Math.floor(ay / C);
+    const [endX, endY] = [Math.floor(bx / C), Math.floor(by / C)];
+    const [dx, dy] = [bx - ax, by - ay];
+    const [stepX, stepY] = [dx > 0 ? 1 : -1, dy > 0 ? 1 : -1];
+    const tDeltaX = dx ? Math.abs(C / dx) : Infinity;
+    const tDeltaY = dy ? Math.abs(C / dy) : Infinity;
+    let tMaxX = dx ? (dx > 0 ? (gx + 1) * C - ax : ax - gx * C) / Math.abs(dx) : Infinity;
+    let tMaxY = dy ? (dy > 0 ? (gy + 1) * C - ay : ay - gy * C) / Math.abs(dy) : Infinity;
+    const visitCell = () => {
+      for (const id of r.grid.get(gx * 100003 + gy) || []) {
+        if (r.seen[id] === r.stamp) continue;
+        r.seen[id] = r.stamp;
+        visit(r.edges[id]);
+      }
+    };
+    visitCell();
+    // A segment crosses at most this many cells; the cap also stops a loop on bad input.
+    let budget = Math.abs(endX - gx) + Math.abs(endY - gy);
+    if (!Number.isFinite(budget)) return;
+    while ((gx !== endX || gy !== endY) && budget-- > 0) {
+      if (tMaxX < tMaxY) {
+        tMaxX += tDeltaX;
+        gx += stepX;
+      } else {
+        tMaxY += tDeltaY;
+        gy += stepY;
+      }
+      visitCell();
+    }
+  }
+
   // Even-odd point in region: cast a ray to the right and count edge crossings.
   function inside(r, [px, py]) {
     if (px < r.box[0] || px > r.box[2] || py < r.box[1] || py > r.box[3]) return false;
@@ -197,7 +234,7 @@
   // Parameters t in (0, 1) where segment a-b crosses a region edge.
   function crossings([ax, ay], [bx, by], r) {
     const ts = [];
-    edgesIn(r, Math.min(ax, bx), Math.min(ay, by), Math.max(ax, bx), Math.max(ay, by), ([cx, cy, dx, dy]) => {
+    edgesAlong(r, [ax, ay], [bx, by], ([cx, cy, dx, dy]) => {
       const denominator = (bx - ax) * (dy - cy) - (by - ay) * (dx - cx);
       if (denominator === 0) return;
       const t = ((cx - ax) * (dy - cy) - (cy - ay) * (dx - cx)) / denominator;
@@ -232,6 +269,29 @@
     return pieces;
   }
 
+  // For scanlines y = y0 + k * step (k = 0..count-1), the sorted x of every ring crossing.
+  // Each edge only visits the scanlines it spans, so long flattened curves stay cheap.
+  function scanlineCrossings(rings, y0, step, count) {
+    const rows = Array.from({ length: Math.max(0, count) }, () => []);
+    for (const ring of rings) {
+      for (let i = 0; i < ring.length; i++) {
+        const [ax, ay] = ring[i];
+        const [bx, by] = ring[(i + 1) % ring.length];
+        if (ay === by) continue;
+        const [lo, hi] = ay < by ? [ay, by] : [by, ay];
+        // Half-open rule [lo, hi) so a vertex shared by two edges is counted once.
+        const kFrom = Math.max(0, Math.ceil((lo - y0) / step));
+        const kTo = Math.min(count - 1, Math.ceil((hi - y0) / step) - 1);
+        for (let k = kFrom; k <= kTo; k++) {
+          const y = y0 + k * step;
+          if (y >= lo && y < hi) rows[k].push(ax + ((y - ay) * (bx - ax)) / (by - ay));
+        }
+      }
+    }
+    for (const row of rows) row.sort((a, b) => a - b);
+    return rows;
+  }
+
   // Scanline hatching over several rings (even-odd): rotate so hatch lines are horizontal,
   // intersect each scanline with every edge, pair the crossings, rotate back.
   function hatchRings(rings, spacing, angle) {
@@ -246,20 +306,14 @@
       }
     }
     const segments = [];
-    for (let y = minY + spacing / 2; y < maxY; y += spacing) {
-      const xs = [];
-      for (const ring of turned) {
-        for (let i = 0; i < ring.length; i++) {
-          const [ax, ay] = ring[i];
-          const [bx, by] = ring[(i + 1) % ring.length];
-          if ((ay <= y && by > y) || (by <= y && ay > y)) xs.push(ax + ((y - ay) * (bx - ax)) / (by - ay));
-        }
+    const y0 = minY + spacing / 2;
+    const rows = scanlineCrossings(turned, y0, spacing, Math.ceil((maxY - y0) / spacing));
+    rows.forEach((xs, k) => {
+      const y = y0 + k * spacing;
+      for (let j = 0; j + 1 < xs.length; j += 2) {
+        segments.push([rotate([xs[j], y], angle), rotate([xs[j + 1], y], angle)]);
       }
-      xs.sort((a, b) => a - b);
-      for (let k = 0; k + 1 < xs.length; k += 2) {
-        segments.push([rotate([xs[k], y], angle), rotate([xs[k + 1], y], angle)]);
-      }
-    }
+    });
     return segments;
   }
 
@@ -269,26 +323,14 @@
 
   // Even-odd scanline spans of a set of rings on the pixel grid: calls fill(y, x0, x1).
   function spans(rings, width, height, fill) {
-    let minY = Infinity;
-    let maxY = -Infinity;
-    for (const ring of rings) for (const [, y] of ring) [minY, maxY] = [Math.min(minY, y), Math.max(maxY, y)];
-    for (let y = Math.max(0, Math.floor(minY)); y <= Math.min(height - 1, Math.ceil(maxY)); y++) {
-      const cy = y + 0.5;
-      const xs = [];
-      for (const ring of rings) {
-        for (let i = 0; i < ring.length; i++) {
-          const [ax, ay] = ring[i];
-          const [bx, by] = ring[(i + 1) % ring.length];
-          if ((ay <= cy && by > cy) || (by <= cy && ay > cy)) xs.push(ax + ((cy - ay) * (bx - ax)) / (by - ay));
-        }
-      }
-      xs.sort((a, b) => a - b);
+    // Pixel row y is sampled at its center, y + 0.5.
+    scanlineCrossings(rings, 0.5, 1, height).forEach((xs, y) => {
       for (let k = 0; k + 1 < xs.length; k += 2) {
         const x0 = Math.max(0, Math.ceil(xs[k] - 0.5));
         const x1 = Math.min(width - 1, Math.floor(xs[k + 1] - 0.5));
         if (x0 <= x1) fill(y, x0, x1);
       }
-    }
+    });
   }
 
   // Groups traced shapes into color layers. Outlines use the stroke color; fills other than
