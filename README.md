@@ -90,20 +90,19 @@ Everything runs on GitHub; there is no backend and no extra login.
 ### One-time setup (repository owner)
 
 1. Settings → General → Features: enable **Discussions**.
-2. In Discussions, manage categories and create:
-   - **Gallery**, slug `gallery`, format *Open-ended discussion* (not
-     Announcement, so visitors can post).
-   - **Comments**, format *Announcement* (recommended, so only giscus creates
-     threads).
+2. The default categories are reused: **Show and tell** (slug
+   `show-and-tell`, open to visitors) holds gallery posts, and
+   **Announcements** (Announcement format, so only giscus and maintainers
+   create threads) holds the per-painting comment threads.
 3. Install the giscus app on the repository: https://github.com/apps/giscus.
-4. On https://giscus.app enter `brancan/tangle-machine`, pick the *Comments*
-   category, and copy `data-repo-id` and `data-category-id` into
-   `GISCUS_CONFIG` at the top of `web/js/comments.js`. Until then the studio
-   shows "Comments are not configured yet."
+   Until then the comment box does not load.
+4. `GISCUS_CONFIG` at the top of `web/js/comments.js` holds the repository and
+   *Announcements* category ids (from https://giscus.app). Empty ids make the
+   studio show "Comments are not configured yet."
 5. Run the *Deploy gallery to GitHub Pages* workflow once (or wait for the next
-   Gallery post) to publish `showcase.json`.
+   Show and tell post) to publish `showcase.json`.
 
-**Moderation**: delete a Gallery Discussion, lock it, or add the label
+**Moderation**: delete a Show and tell Discussion, lock it, or add the label
 `hidden` and it disappears from the public gallery on the next build (label
 and lock events trigger one). Comments are moderated like any Discussion.
 

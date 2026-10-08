@@ -12,7 +12,7 @@
   }
 
   function discussionUrl(title, body) {
-    const search = new URLSearchParams({ category: "gallery", title: `${title} variant`, body });
+    const search = new URLSearchParams({ category: "show-and-tell", title: `${title} variant`, body });
     return `${NEW_DISCUSSION}?${search}`;
   }
 

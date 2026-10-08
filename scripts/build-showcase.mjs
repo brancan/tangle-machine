@@ -1,4 +1,4 @@
-// Builds web/showcase.json from the "Gallery" Discussions category at deploy time.
+// Builds web/showcase.json from the "Show and tell" Discussions category at deploy time.
 // It never fails the deploy: when GitHub cannot be reached it reuses the published showcase.json
 // (re-validated), and only falls back to [] when that is unavailable too. It always exits 0.
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
@@ -7,7 +7,7 @@ import { buildShowcase, extractPaintingIds, reuseShowcase } from "./showcase-lib
 
 const WEB = new URL("../web/", import.meta.url).pathname;
 const OUT = join(WEB, "showcase.json");
-const CATEGORY = "gallery";
+const CATEGORY = "show-and-tell";
 const PAGE = 100;
 const MAX_PAGES = 5;
 const TIMEOUT_MS = 15000;

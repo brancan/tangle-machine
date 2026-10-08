@@ -1,4 +1,4 @@
-// Pure helpers that turn "Gallery" Discussions into showcase.json entries. No network here.
+// Pure helpers that turn "Show and tell" Discussions into showcase.json entries. No network here.
 
 export const SITE = "https://brancan.github.io/tangle-machine/";
 

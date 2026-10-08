@@ -6,9 +6,9 @@
   // Filled in once Discussions and the giscus app are set up (see README, "Public gallery and comments").
   const GISCUS_CONFIG = {
     repo: "brancan/tangle-machine",
-    repoId: "",
-    category: "Comments",
-    categoryId: "",
+    repoId: "R_kgDOVAPagg",
+    category: "Announcements",
+    categoryId: "DIC_kwDOVAPags4DHTj4",
   };
 
   const $ = (selector) => document.querySelector(selector);

@@ -132,7 +132,7 @@ test("publish link prefills a gallery discussion with the canonical share link",
   const { PublishLink } = loadScript("js/publish-link.js");
   const url = new URL(PublishLink.build({ href: "http://localhost:8000/index.html#/paradox?n=3", title: "Paradox" }));
   assert.equal(url.origin + url.pathname, "https://github.com/brancan/tangle-machine/discussions/new");
-  assert.equal(url.searchParams.get("category"), "gallery");
+  assert.equal(url.searchParams.get("category"), "show-and-tell");
   assert.equal(url.searchParams.get("title"), "Paradox variant");
   const lines = url.searchParams.get("body").split("\n");
   assert.ok(lines.includes(`${SITE}#/paradox?n=3`));

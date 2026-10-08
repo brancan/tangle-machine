@@ -1,4 +1,4 @@
-// Public gallery: renders showcase.json (built from the "Gallery" Discussions at deploy time).
+// Public gallery: renders showcase.json (built from the "Show and tell" Discussions at deploy time).
 // Thumbnails always use the original registered painting with the entry's params; shared code
 // (code=) is never run here, the studio's "Run shared code" gate handles it.
 (function () {
