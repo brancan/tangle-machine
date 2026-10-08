@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Radial threads with sagging spiral rings that get denser toward the center. " +
     "White ink on black paper, like a chalk doodle.",
+  tags: ["organic", "radial", "random"],
   instruction:
     "From a point {offsetX} px across and {offsetY} px down from the center, draw {spokes} " +
     "straight threads to the edges, each straying a little ({jitter}) from even spacing. " +

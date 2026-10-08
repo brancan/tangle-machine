@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Basketweave from bundles of parallel lines: each cell turns its bundle a quarter " +
     "turn from its neighbours, and the checkerboard of directions reads as woven cane.",
+  tags: ["tessellation"],
   instruction:
     "Draw a {n} × {n} grid with a margin of {margin} px. In each square, draw {lines} " +
     "parallel lines, inset {inset%} from the ends, horizontal and vertical by turns.{frame? " +

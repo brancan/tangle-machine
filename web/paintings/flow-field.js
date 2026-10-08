@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Hundreds of fine lines carried by invisible whirlpools. Each line follows the " +
     "current from a random starting point, and together they reveal the eddies.",
+  tags: ["organic", "random"],
   instruction:
     "Place {vortices} whirlpools at random (seed {seed}), each about {core} px across, in a " +
     "current drifting by {drift}. From {lines} random points, follow the current both ways " +

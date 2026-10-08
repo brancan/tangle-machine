@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Only straight lines, joining evenly spaced points on two edges of each cell. " +
     "Together they trace curves (parabolic envelopes) that hug the corners.",
+  tags: ["geometric", "color"],
   instruction:
     "Draw a {n} × {n} grid with a margin of {margin} px. In each square, take {corners} of " +
     "its corners{rotate?, starting from a different corner in each square:}. Mark {lines} " +

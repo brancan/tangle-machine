@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "A field of isometric cubes, each with a white top, a solid side and a hatched side. " +
     "Three rhombi per hexagon, and the eye cannot decide which way the stairs go.",
+  tags: ["tessellation", "op-art"],
   instruction:
     "Fill the wall with hexagons {size} px from center to corner. Split each into three " +
     "rhombi meeting at its center: a white top, a {solid?black:white} side and a side " +

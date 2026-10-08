@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Randomly packed bubbles on a dark ground. Each one gets a crescent of shadow away " +
     "from the light and a few nested rings that lean toward it.",
+  tags: ["organic", "random"],
   instruction:
     "Scatter up to {count} circles (seed {seed}), from {maxR} px down to {minR} px in " +
     "radius, never closer than {gap} px. In each, leave a dark crescent {shade%} of the " +

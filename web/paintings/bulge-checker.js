@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "A checkerboard pushed through a lens: the grid swells toward you (or sinks away) " +
     "while its border stays put. Op art in the style of Vasarely.",
+  tags: ["op-art", "color"],
   instruction:
     "Draw a {n} × {n} checkerboard with a margin of {margin} px and push it through a lens " +
     "of strength {strength}: squares near the center swell while the border stays put. Fill " +

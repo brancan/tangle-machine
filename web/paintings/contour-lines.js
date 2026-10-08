@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "A random landscape traced with evenly spaced height lines, like a topographic map " +
     "or a fingerprint. Built with the marching squares algorithm.",
+  tags: ["organic", "random", "color"],
   instruction:
     "Raise {hills} hills and hollows at random (seed {seed}), each about {spread%} of the " +
     "wall across. Measure the height on a {resolution} × {resolution} grid and draw " +

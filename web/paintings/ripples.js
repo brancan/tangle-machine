@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Pebbles dropped in still water. Rings spread out from every circle and fold into " +
     "sharp seams where two ripples meet. Traced with marching squares.",
+  tags: ["organic", "random"],
   instruction:
     "Drop {count} circles (seed {seed}) between {minR} and {maxR} px in radius. Around " +
     "them, draw rings every {spacing} px, each tracing the distance to the nearest circle, " +

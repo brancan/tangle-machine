@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Every cell holds a fan of concentric quarter circles growing from one corner. " +
     "Which corner depends on the pattern, and the eye invents curves and waves across the grid.",
+  tags: ["tessellation", "random", "color"],
   instruction:
     "Draw a {n} × {n} grid with a margin of {margin} px. In each square, choose one corner " +
     "by pattern {pattern} (0 spin, 1 mirror, 2 diagonal, 3 random, seed {seed}) and draw " +

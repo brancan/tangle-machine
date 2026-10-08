@@ -5,6 +5,7 @@ Gallery.register({
     "A tessellation built from a single tile, two bundles of quarter circles in opposite " +
     "corners, placed in one of two orientations at random. The bands always connect " +
     "across tiles, so they form endless winding ribbons.",
+  tags: ["tessellation", "random", "color"],
   instruction:
     "Divide the wall into a {n} × {n} grid. In each square, draw {bands} quarter circles " +
     "around two opposite corners, choosing at random (seed {seed}) which pair. Keep the " +

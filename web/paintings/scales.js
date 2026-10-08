@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Overlapping rows of half-discs filled with concentric arcs, like fish scales or roof " +
     "tiles. Each row hides the bottom of the one above it.",
+  tags: ["tessellation", "color"],
   instruction:
     "Draw rows of half-discs, {cols} to a row, each row shifted by half a disc and set " +
     "{overlap%} of a radius below the last, so it covers the bottom of the row above. " +

@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "A checkerboard whose columns and rows ripple like fabric. Optional color fringes " +
     "trail each column edge for a chromatic, vibrating look.",
+  tags: ["op-art", "color", "animated"],
   instruction:
     "Draw a checkerboard of {cols} columns and {rows} rows. Bend its columns {ampX} px and " +
     "its rows {ampY} px along sine waves, {freq} waves across the wall. Fill every other " +
@@ -24,9 +25,11 @@ Gallery.register({
     const res = 8;
     const tau = 2 * Math.PI;
 
+    // Time makes the waves travel (p.time is 0 when the studio is not playing).
+    const flow = (p.time || 0) * 1.2;
     const warp = (x, y) => [
-      x + p.ampX * Math.sin((tau * p.freq * y) / H),
-      y + p.ampY * Math.sin((tau * p.freq * x) / W + Math.PI / 3),
+      x + p.ampX * Math.sin((tau * p.freq * y) / H + flow),
+      y + p.ampY * Math.sin((tau * p.freq * x) / W + Math.PI / 3 + flow),
     ];
 
     // One extra row and column on each side so warped edges still cover the canvas.

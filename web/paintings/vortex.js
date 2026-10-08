@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Logarithmic spiral arms swirl into the center, and the bands between them are " +
     "ribbed with bulging arcs, like a ribbed tunnel twisting away from you.",
+  tags: ["op-art", "radial", "animated"],
   instruction:
     "From the center, draw {arms} spiral arms that open by {twist} each turn, " +
     "{clockwise?clockwise:counterclockwise}. Across each band between two arms, draw {ribs} " +
@@ -26,9 +27,11 @@ Gallery.register({
     const sector = (2 * Math.PI) / p.arms;
     const f = (n) => n.toFixed(2);
 
+    // Time turns the whole vortex (p.time is 0 when the studio is not playing).
+    const spin = (p.time || 0) * 0.5;
     const radius = (theta) => rMin * Math.exp(p.twist * theta);
     const point = (theta, arm) => {
-      const a = dir * (theta + arm * sector);
+      const a = dir * (theta + arm * sector) + spin;
       const r = radius(theta);
       return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
     };
@@ -43,7 +46,7 @@ Gallery.register({
         const [x0, y0] = point(theta, arm);
         const [x1, y1] = point(theta - sector, arm + 1);
         const r = (radius(theta) + radius(theta - sector)) / 2;
-        const a = dir * (theta + arm * sector + p.bulge * sector);
+        const a = dir * (theta + arm * sector + p.bulge * sector) + spin;
         const qx = cx + r * Math.cos(a);
         const qy = cy + r * Math.sin(a);
         const rib = `M${f(x0)} ${f(y0)}Q${f(qx)} ${f(qy)} ${f(x1)} ${f(y1)}`;

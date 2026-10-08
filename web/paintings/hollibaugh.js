@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Bands laid one over another on a dark ground, like planks dropped in a pile. " +
     "Every new band hides the ones beneath it, so depth appears out of flat strips.",
+  tags: ["geometric", "random"],
   instruction:
     "Paint the wall black. Lay {bands} white bands across it one after another (seed " +
     "{seed}), each between {minWidth} and {maxWidth} px wide, mostly horizontal or vertical " +

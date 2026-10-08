@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Organic tubes branching between random nodes, striped with fine contour lines. " +
     "Each color is its own network, woven over the ones drawn before it.",
+  tags: ["organic", "random", "color"],
   instruction:
     "For each of {groups} colors, scatter {nodes} points (seed {seed}) and join each to its " +
     "{links} nearest neighbours with tubes {tube} px wide, bent sideways by up to {bend%} " +

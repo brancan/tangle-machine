@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "A rosette built only from rhombi. Each ring is spanned by pairs of the star's edge " +
     "directions, and three tones turn the flat tiles into a faceted, folding star.",
+  tags: ["geometric", "radial"],
   instruction:
     "Around a center, draw {rings} rings of rhombi built from the {points} directions of a " +
     "{points}-pointed star, reaching {scale%} of the way to the edge. Fill the rhombi of " +

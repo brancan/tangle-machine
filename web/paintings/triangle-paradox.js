@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "The classic Paradox drawn in triangles: every grid cell is split by its diagonals " +
     "and each triangle spirals in, mirrored against its neighbours.",
+  tags: ["geometric", "paradox"],
   instruction:
     "Draw a {n} × {n} grid. Cut each square into {fourTriangles?four triangles along both " +
     "diagonals:two triangles along one diagonal}. In each triangle, draw lines that start " +

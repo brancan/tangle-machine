@@ -23,6 +23,7 @@
           </p>
           <span id="gallery-count" class="count"></span>
         </div>
+        <div id="tag-filters" class="tag-filters" role="group" aria-label="Filter by tag"></div>
         <div id="gallery-grid" class="gallery-grid"></div>
       </section>
 
@@ -91,6 +92,18 @@
                 <button id="focus" type="button" title="Focus mode: canvas only (F, Esc to exit)" aria-pressed="false">Focus</button>
               </div>
             </div>
+            <div class="player">
+              <button id="play" type="button" class="primary" aria-pressed="false" title="Animate (Space)">Play</button>
+              <label>Animate <select id="animate-param"></select></label>
+              <label>
+                Speed
+                <select id="animate-speed">
+                  <option value="12">Slow</option>
+                  <option value="6" selected>Medium</option>
+                  <option value="3">Fast</option>
+                </select>
+              </label>
+            </div>
           </div>
 
           <section class="panel code-panel">
@@ -131,6 +144,7 @@
     <script src="js/gallery.js"></script>
     <script src="js/share.js"></script>
     <script src="js/instruction.js"></script>
+    <script src="js/motion.js"></script>
     <script src="js/studio-tools.js"></script>
     <script src="paintings/paradox.js"></script>
     <script src="paintings/paradox-circle.js"></script>

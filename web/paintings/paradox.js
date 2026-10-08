@@ -5,6 +5,7 @@ Gallery.register({
     "An n x n grid where every cell holds a Paradox tangle: each line starts where " +
     "the previous one ended and lands a little further along the next side. " +
     "Straight lines, curved illusion.",
+  tags: ["geometric", "paradox"],
   instruction:
     "On a square wall, draw a {n} × {n} grid with a margin of {margin} px. In each square, " +
     "draw a line from one corner to a point {ratio%} of the way along the next side. From " +

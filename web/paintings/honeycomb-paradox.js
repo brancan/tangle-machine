@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "A honeycomb of hexagons, each one twisting inward like a Paradox. Split them into " +
     "six triangles for a starry, faceted version.",
+  tags: ["geometric", "paradox", "tessellation"],
   instruction:
     "Cover the wall with hexagons {radius} px from center to corner, {gap} px apart. " +
     "{triangles?Cut each hexagon into six triangles from its center. In each piece:In each " +

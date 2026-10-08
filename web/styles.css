@@ -575,3 +575,70 @@ body.focus .stage {
   font-family: inherit;
   font-size: inherit;
 }
+
+/* ---------- Animation and tags ---------- */
+
+.player {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-top: 0.5rem;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.player select {
+  margin-left: 0.3rem;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.2rem 0.3rem;
+}
+
+.player #play {
+  min-width: 5.5em;
+}
+
+.tag-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: -0.5rem 0 1.5rem;
+}
+
+.tag-filters button {
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+}
+
+.tag-filters button span {
+  color: var(--muted);
+  font-size: 0.8em;
+}
+
+.tag-filters button[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.tag-filters button[aria-pressed="true"] span {
+  color: inherit;
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.6rem !important;
+}
+
+.card-tags span {
+  padding: 0.05rem 0.45rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.75rem;
+}

@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "A checkerboard in polar coordinates fanning out from one corner, with rings that " +
     "widen as they move away. The corner itself is a black pool of dots.",
+  tags: ["op-art", "radial", "color", "animated"],
   instruction:
     "From the lower right corner, draw {rays} rays across the wall and arcs around the " +
     "corner, the first {core} px out, each ring {growth} times as wide as the one inside " +
@@ -32,18 +33,25 @@ Gallery.register({
     const at = (a, r) => `${f(ox + r * Math.cos(a))} ${f(oy + r * Math.sin(a))}`;
 
     // Annular sectors between consecutive rays and rings, filled like a checkerboard.
-    let r0 = p.core;
-    for (let j = 0; r0 < reach; j++) {
+    // Time makes the rings flow outward (p.time is 0 when the studio is not playing). Six rings
+    // make a full cycle, so checker parity and palette colors line up again seamlessly.
+    const drift = ((p.time || 0) * 0.4) % 6;
+    const mod = (a, b) => ((a % b) + b) % b;
+    let j = drift ? -6 : 0;
+    let r0 = drift ? p.core * Math.pow(p.growth, drift - 6) : p.core;
+    for (; r0 < reach; j++) {
       const r1 = r0 * p.growth;
-      for (let i = 0; i < p.rays; i++) {
+      // Rings still inside the core are skipped; the one crossing it is trimmed to the core.
+      const inner = Math.max(r0, p.core);
+      for (let i = 0; i < p.rays && r1 > p.core; i++) {
         const a0 = start + (span * i) / p.rays;
         const a1 = start + (span * (i + 1)) / p.rays;
         const d =
-          `M${at(a0, r0)}A${f(r0)} ${f(r0)} 0 0 1 ${at(a1, r0)}` +
+          `M${at(a0, inner)}A${f(inner)} ${f(inner)} 0 0 1 ${at(a1, inner)}` +
           `L${at(a1, r1)}A${f(r1)} ${f(r1)} 0 0 0 ${at(a0, r1)}Z`;
         // With the palette, each ring of dark cells takes the next color.
-        const color = p.palette ? [p.colorA, p.colorB, p.colorC][j % 3] : p.ink;
-        pen.path(d, (i + j) % 2 === 0 ? { fill: color } : undefined);
+        const color = p.palette ? [p.colorA, p.colorB, p.colorC][mod(j, 3)] : p.ink;
+        pen.path(d, mod(i + j, 2) === 0 ? { fill: color } : undefined);
       }
       r0 = r1;
     }

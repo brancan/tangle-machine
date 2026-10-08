@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Dots on a grid, joined by soft curved bands that bow alternately one way and the " +
     "other. The result reads as a woven fabric pinned at every crossing.",
+  tags: ["geometric", "tessellation"],
   instruction:
     "Mark the points of a {n} × {n} grid, {margin} px from the edge, with " +
     "{filled?solid:open} circles of {dot} px radius. Join every point to its neighbours " +

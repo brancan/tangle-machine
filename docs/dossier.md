@@ -119,9 +119,14 @@ Three principles follow from that frame:
   beginning where the previous ended and landing a little further along the
   next side."* Moving a slider rewrites the instruction: the variables are the
   blanks the instruction leaves open.
-- [ ] **Phase 3 — Time and taxonomy**: a render loop that passes time to
-  `draw` for animated pieces, with play/pause; tags such as geometric,
-  organic, op art, tessellation, animated, with gallery filters.
+- [x] **Phase 3 — Time and taxonomy**: a player under the canvas (Play/Pause,
+  Space) animates any painting by swinging one variable between its limits,
+  with the slider and the instruction following live. Paintings tagged
+  `animated` (Vortex, Op Waves, Polar Checker) also read `p.time` and move on
+  their own; at time 0 they draw exactly as before. Every painting carries
+  tags from a fixed vocabulary (geometric, organic, paradox, op-art,
+  tessellation, radial, random, color, animated), with filters in the gallery
+  and the active tag in the URL (`#/?tag=op-art`).
 - [ ] **Phase 4 — Plotter**: SVG export with one layer per color and
   optimized stroke order, for AxiDraw-style plotters, closing the loop between
   instruction and physical execution.

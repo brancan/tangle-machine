@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "A disc cut into rings and wedges. The center wedges are triangles, the outer ones " +
     "are trapezoids, and each one spirals inward as a Paradox, alternating direction.",
+  tags: ["geometric", "paradox", "radial"],
   instruction:
     "Draw a circle and divide it into {rings} rings and {sectors} equal wedges: triangles " +
     "at the center, four-sided pieces outside. Inside each piece, draw lines that start " +

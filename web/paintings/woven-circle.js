@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "A basket weave seen through a round window. Strands alternate between horizontal " +
     "and vertical, pinched where they tuck under their neighbours and hatched with ink.",
+  tags: ["geometric", "tessellation"],
   instruction:
     "Inside a {window?circle:square} with a margin of {margin} px, weave {n} × {n} strands, " +
     "horizontal and vertical by turns, each pinched by {pinch%} toward its ends, with gaps " +

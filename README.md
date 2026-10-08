@@ -23,7 +23,7 @@ python -m http.server -d web 8000   # http://localhost:8000
 ```
 
 Each painting is one file in `web/paintings/` that calls `Gallery.register`
-with an `id`, `title`, `description`, an `instruction` (a LeWitt-style text
+with an `id`, `title`, `description`, `tags` from the vocabulary in `web/js/motion.js`, an `instruction` (a LeWitt-style text
 whose `{param}`, `{param%}` and `{flag?yes:no}` blanks are filled live by the
 variables), a `params` schema (`range`, `checkbox`,
 `color`) and a `draw(p, pen)` function. Add a `<script>` tag for it in
@@ -41,6 +41,10 @@ Every painting also gets **Hand-drawn** variables that humanize the strokes:
 slightly, closed shapes don't quite close), `Pressure` (stroke width varies per
 stroke), `Roughness` (an SVG displacement filter that also bends raw paths and
 fills) and `Hand seed`. All start at 0, so paintings look exact by default.
+
+The studio has a **player**: Play (or Space) swings any variable between its
+limits, and paintings that read `p.time` (tagged `animated`) move on their own.
+The gallery filters by tag (`#/?tag=op-art`).
 
 The studio also offers Randomize, shareable links (the variables live in the
 URL hash, e.g. `#/paradox?n=3&alternate=0`), SVG/PNG export and arrow-key

@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Ink running down from the top of the page, with loose drops below. Every shape " +
     "is outlined with rainbow halos and catches a small highlight.",
+  tags: ["organic", "random", "color"],
   instruction:
     "Paint a band {band} px deep across the top. Let {drips} drips run down from it, up to " +
     "{length} px long and about {width} px wide, and let {drops} loose drops fall below " +

@@ -64,19 +64,35 @@
     frame.innerHTML = thumbnails.get(painting.id);
   }
 
-  function showGallery() {
+  // Tag buttons with counts; the active tag lives in the URL (#/?tag=op-art).
+  function renderTagFilters(active) {
+    const count = (tag) => Motion.filterByTag(Gallery.paintings, tag).length;
+    const button = (tag, label) =>
+      `<button type="button" data-tag="${tag}" aria-pressed="${tag === active}">${label} <span>${count(tag)}</span></button>`;
+    $("#tag-filters").innerHTML =
+      button("", "All") + Motion.TAGS.filter(count).map((tag) => button(tag, tag)).join("");
+  }
+
+  function showGallery(query = "") {
+    pause();
     $("#studio").hidden = true;
     $("#gallery").hidden = false;
     toggleFocus(false);
     document.title = "Tangle Machine";
-    $("#gallery-count").textContent = `${Gallery.paintings.length} paintings`;
-    $("#gallery-grid").innerHTML = Gallery.paintings
+    const tag = Motion.TAGS.includes(new URLSearchParams(query).get("tag")) ? new URLSearchParams(query).get("tag") : "";
+    const shown = Motion.filterByTag(Gallery.paintings, tag);
+    renderTagFilters(tag);
+    $("#gallery-count").textContent = tag
+      ? `${shown.length} of ${Gallery.paintings.length} paintings`
+      : `${Gallery.paintings.length} paintings`;
+    $("#gallery-grid").innerHTML = shown
       .map(
         (painting) => `
         <a class="card" href="#/${painting.id}">
           <div class="frame thumb" data-id="${painting.id}"></div>
           <h2>${painting.title}</h2>
           <p>${painting.description}</p>
+          <p class="card-tags">${(painting.tags || []).map((t) => `<span>${t}</span>`).join("")}</p>
         </a>`
       )
       .join("");
@@ -244,7 +260,8 @@
     editor?.clearError();
     try {
       const started = performance.now();
-      $("#canvas").innerHTML = Gallery.render(state.draw, state.values);
+      // p.time is the playback clock; it stays frozen (or 0) when the studio is paused.
+      $("#canvas").innerHTML = Gallery.render(state.draw, { ...state.values, time: state.time || 0 });
       const ms = Math.round(performance.now() - started);
       const shapes = $("#canvas").querySelectorAll("g > *").length;
       setStatus(`${shapes.toLocaleString()} shapes · ${ms} ms`);
@@ -507,7 +524,66 @@
     return list[(index + offset + list.length) % list.length];
   }
 
+  // ---------- Animation ----------
+
+  // While playing, either one variable swings between its limits or, for paintings that
+  // read p.time, only the clock runs. Each frame redraws and refreshes the instruction.
+  let playing = null;
+
+  function buildPlayer(painting) {
+    const ranges = painting.params.filter((p) => p.type === "range");
+    const timeOnly = painting.tags?.includes("animated");
+    $("#animate-param").innerHTML =
+      (timeOnly ? '<option value="">Time only</option>' : "") +
+      ranges.map((p) => `<option value="${p.name}">${p.label}</option>`).join("");
+    $("#play").disabled = !timeOnly && ranges.length === 0;
+  }
+
+  function tick(now) {
+    if (!playing) return;
+    const seconds = (now - playing.start) / 1000;
+    const period = Number($("#animate-speed").value);
+    // Time-driven paintings run at their own pace; Medium speed is real time.
+    state.time = (seconds * 6) / period;
+    const param = state.painting.params.find((p) => p.name === $("#animate-param").value);
+    if (param) {
+      const value = Motion.oscillate(param, seconds, period);
+      state.values[param.name] = value;
+      const input = $(`#controls [data-param="${param.name}"]`);
+      if (input) input.value = value;
+      const output = $(`output[data-for="${param.name}"]`);
+      if (output) output.textContent = value;
+    }
+    showInstruction();
+    draw();
+    playing.frame = requestAnimationFrame(tick);
+  }
+
+  function play() {
+    if (playing) return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setStatus("Animation is off because your system prefers reduced motion");
+      return;
+    }
+    playing = { start: performance.now() };
+    $("#play").textContent = "Pause";
+    $("#play").setAttribute("aria-pressed", "true");
+    playing.frame = requestAnimationFrame(tick);
+  }
+
+  function pause() {
+    if (!playing) return;
+    cancelAnimationFrame(playing.frame);
+    playing = null;
+    $("#play").textContent = "Play";
+    $("#play").setAttribute("aria-pressed", "false");
+    updateUrl();
+  }
+
+  const togglePlay = () => (playing ? pause() : play());
+
   function showStudio(painting, query) {
+    pause();
     $("#gallery").hidden = true;
     $("#studio").hidden = false;
     document.title = `${painting.title} · Tangle Machine`;
@@ -528,6 +604,7 @@
     $("#next").textContent = `${neighbour(1).title} →`;
     $("#shared-code").hidden = true;
     buildControls(painting, state.values);
+    buildPlayer(painting);
     showInstruction();
     renderPresets();
     setSource(saved ?? original);
@@ -557,7 +634,7 @@
     const [id, query = ""] = location.hash.replace(/^#\/?/, "").split("?");
     const painting = id && Gallery.find(id);
     if (painting) showStudio(painting, query);
-    else showGallery();
+    else showGallery(query);
     window.scrollTo(0, 0);
   }
 
@@ -637,6 +714,11 @@
     $("#download-png").addEventListener("click", () => downloadPng());
     $("#focus").addEventListener("click", () => toggleFocus());
     $("#replay").addEventListener("click", toggleReplay);
+    $("#play").addEventListener("click", togglePlay);
+    $("#tag-filters").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-tag]");
+      if (button) location.hash = button.dataset.tag ? `#/?tag=${button.dataset.tag}` : "#";
+    });
     $("#save-preset").addEventListener("click", savePreset);
     $("#delete-preset").addEventListener("click", deletePreset);
     $("#preset-list").addEventListener("change", (event) => loadPreset(event.target.value));
@@ -667,6 +749,10 @@
       if (event.key === "ArrowLeft") location.hash = `#/${neighbour(-1).id}`;
       if (event.key === "ArrowRight") location.hash = `#/${neighbour(1).id}`;
       if (event.key === "f" || event.key === "F") toggleFocus();
+      if (event.key === " " && !event.target.closest("button, a")) {
+        event.preventDefault();
+        togglePlay();
+      }
     });
 
     window.addEventListener("hashchange", route);

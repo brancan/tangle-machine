@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "A diagonal lattice with a solid diamond at every crossing and a small circle in " +
     "every cell. Simple, tidy and endlessly repeatable, like floor tiles.",
+  tags: ["geometric", "tessellation"],
   instruction:
     "Draw a diagonal lattice {n} cells across, each line doubled {gap} px apart. Put a " +
     "solid diamond {diamond%} of a cell wide at every crossing and a circle {circle%} of a " +

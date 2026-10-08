@@ -4,6 +4,7 @@ Gallery.register({
   description:
     "Columns of V-shaped stitches, each one two leaves leaning together, stacked so every " +
     "row tucks into the one above. Darken one leaf of each stitch for a ribbed knit.",
+  tags: ["tessellation"],
   instruction:
     "Divide the wall into {cols} columns and {rows} rows. In each cell, draw a stitch: two " +
     "leaves, {swell%} as wide as they are long, leaning from a shared point at the bottom " +
