@@ -107,6 +107,9 @@ Three principles follow from that frame:
 - [ ] **Phase 5 — Studio tools**: presets per painting, `pen` API reference
   in the studio, global palettes, keyboard shortcuts. *In progress on a
   parallel branch.*
+- [ ] **Phase 6 — Community** *(in progress on a parallel branch)*: Giscus
+  comments per painting and a public gallery of visitor variants, built from
+  GitHub Discussions at deploy time; no backend.
 
 ## 6. Open questions
 

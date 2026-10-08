@@ -55,6 +55,46 @@ Checker, Op Waves, Woven Circle, Quarter Arcs, Bubbles, Contour Lines, Vortex,
 Drips, Ripples, Flow Field, Star Checker, Tube Network, Tumbling Blocks,
 Hollibaugh, Huggins, Florz, Knitting, Keeko, Lightning Bolt and Rhombus Star.
 
+## Public gallery and comments
+
+Everything runs on GitHub; there is no backend and no extra login.
+
+- **Comments**: below each painting in the studio, a [Giscus](https://giscus.app)
+  thread (one GitHub Discussion per painting, term `painting:<id>`, category
+  *Comments*). Visitors sign in with GitHub to comment.
+- **Publish to gallery**: the button in that section opens a prefilled
+  Discussion in the *Gallery* category with the current share link. If the code
+  was edited, the post asks the visitor to paste the link from **Copy link**.
+- **Public gallery** (`web/showcase.html`): the Pages workflow runs
+  `scripts/build-showcase.mjs`, which reads the *Gallery* Discussions through
+  the GraphQL API and writes `web/showcase.json`. Only links to
+  `https://brancan.github.io/tangle-machine/` with a known painting id are
+  kept. Thumbnails render the original painting with the link's variables;
+  shared code is never run there (variants with code get a *custom code* badge
+  and open behind the studio's **Run shared code** gate). The workflow
+  rebuilds on Discussion events and every six hours. Without a token, the
+  category or the network it writes `[]` and the deploy still succeeds.
+
+### One-time setup (repository owner)
+
+1. Settings → General → Features: enable **Discussions**.
+2. In Discussions, manage categories and create:
+   - **Gallery**, slug `gallery`, format *Open-ended discussion* (not
+     Announcement, so visitors can post).
+   - **Comments**, format *Announcement* (recommended, so only giscus creates
+     threads).
+3. Install the giscus app on the repository: https://github.com/apps/giscus.
+4. On https://giscus.app enter `brancan/tangle-machine`, pick the *Comments*
+   category, and copy `data-repo-id` and `data-category-id` into
+   `GISCUS_CONFIG` at the top of `web/js/comments.js`. Until then the studio
+   shows "Comments are not configured yet."
+5. Run the *Deploy gallery to GitHub Pages* workflow once (or wait for the next
+   Gallery post) to publish `showcase.json`.
+
+**Moderation**: delete a Gallery Discussion, lock it, or add the label
+`hidden` and it disappears from the public gallery on the next build (label
+and lock events trigger one). Comments are moderated like any Discussion.
+
 ## Tests
 
 ```bash
