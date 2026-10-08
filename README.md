@@ -125,6 +125,18 @@ Everything runs on GitHub; there is no backend and no extra login.
 `hidden` and it disappears from the public gallery on the next build (label
 and lock events trigger one). Comments are moderated like any Discussion.
 
+## Brand
+
+`brand/` holds the Instagram assets. `brand/profile.py` draws the profile
+picture: eleven hand-trembled concentric squares whose disorder grows toward
+the center (after Vera Molnar's "1% de désordre"), seeded with 1967, the year
+of LeWitt's *Paragraphs on Conceptual Art*. Regenerate it with Python and
+Pillow:
+
+```bash
+cd brand && python profile.py   # writes instagram-profile-1080.png and preview.png
+```
+
 ## Tests
 
 ```bash
