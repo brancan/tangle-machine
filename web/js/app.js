@@ -64,6 +64,41 @@
     frame.innerHTML = thumbnails.get(painting.id);
   }
 
+  // Likes are GitHub reactions counted at deploy time (likes.json, see scripts/build-showcase.mjs).
+  // Loaded once; without it the cards simply show no count. comments.js reads them via window.Likes.
+  let likes = {};
+
+  function likesOf(id) {
+    const entry = Object.hasOwn(likes, id) ? likes[id] : null;
+    const valid = Number.isInteger(entry?.likes) && entry.likes > 0 && String(entry.url).startsWith("https://github.com/");
+    return valid ? { likes: entry.likes, url: entry.url } : null;
+  }
+
+  function showCardLikes() {
+    for (const card of document.querySelectorAll("#gallery-grid .card")) {
+      const entry = likesOf(card.querySelector(".thumb").dataset.id);
+      if (!entry || card.querySelector(".card-likes")) continue;
+      const badge = document.createElement("span");
+      badge.className = "card-likes";
+      badge.textContent = `\u2665 ${entry.likes}`;
+      badge.title = `${entry.likes} ${entry.likes === 1 ? "like" : "likes"} on GitHub`;
+      card.querySelector("h2").append(badge);
+    }
+  }
+
+  function loadLikes() {
+    fetch("likes.json", { cache: "no-cache" })
+      .then((response) => (response.ok ? response.json() : {}))
+      .then((data) => {
+        likes = data && typeof data === "object" && !Array.isArray(data) ? data : {};
+        showCardLikes();
+        window.dispatchEvent(new Event("likes-loaded"));
+      })
+      .catch(() => {});
+  }
+
+  window.Likes = { get: likesOf };
+
   // Tag buttons with counts; the active tag lives in the URL (#/?tag=op-art).
   function renderTagFilters(active) {
     const count = (tag) => Motion.filterByTag(Gallery.paintings, tag).length;
@@ -97,6 +132,7 @@
       )
       .join("");
 
+    showCardLikes();
     const frames = document.querySelectorAll("#gallery-grid .thumb");
     if (!("IntersectionObserver" in window)) {
       frames.forEach(renderThumbnail);
@@ -774,6 +810,7 @@
 
     window.addEventListener("hashchange", route);
     route();
+    loadLikes();
   }
 
   init();

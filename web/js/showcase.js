@@ -108,6 +108,14 @@
       const comments = link("Comments on GitHub", entry.url);
       comments.rel = "noopener";
       links.append(comments);
+      // Likes are positive reactions on the post, counted at deploy time.
+      if (Number.isInteger(entry.likes) && entry.likes > 0) {
+        const likes = link(`\u2665 ${entry.likes}`, entry.url);
+        likes.className = "likes-link";
+        likes.title = "Like it on GitHub";
+        likes.rel = "noopener";
+        links.append(likes);
+      }
     }
     node.append(links);
     return node;

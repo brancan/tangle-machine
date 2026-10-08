@@ -105,6 +105,22 @@ Everything runs on GitHub; there is no backend and no extra login.
   rebuilds on Discussion events and every six hours. If GitHub cannot be
   reached it keeps the currently published gallery (re-validated), writes `[]`
   only when that is unavailable too, and the deploy always succeeds.
+- **Likes**: a like is a GitHub reaction, so it needs a GitHub account. 👍 ❤️
+  🎉 🚀 count; 👎 😕 😄 👀 do not. A painting's likes are the reactions on its
+  comment thread (react in the giscus box), a gallery variant's are the
+  reactions on its Show and tell post. The same build writes
+  `web/likes.json` (`{ "<painting id>": { "likes", "url" } }`) and a `likes`
+  field in each `showcase.json` entry; cards, the studio and the public gallery
+  show `♥ N` linking to the thread. Counts refresh on each deploy (Discussion
+  events and every six hours), not in real time, and fall back like the
+  gallery does (published copy, then `{}`).
+- **Share previews**: every page has Open Graph and Twitter card tags pointing
+  at `web/og-image.png` (1200x630). Regenerate it with
+  `node scripts/og-image.mjs` (needs Chrome).
+- **Speed**: with 69 paintings the home page reaches first paint in under
+  0.2 s and draws the visible thumbnails in under 0.6 s, even with a 4x slower
+  CPU on desktop or an emulated phone (thumbnails render lazily as they scroll
+  in).
 
 ### One-time setup (repository owner)
 

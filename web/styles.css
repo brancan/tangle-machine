@@ -642,3 +642,31 @@ body.focus .stage {
   border-radius: 999px;
   font-size: 0.75rem;
 }
+
+/* Likes: positive GitHub reactions, counted at deploy time (likes.json, showcase.json). */
+.card-likes {
+  margin-left: 0.45rem;
+  color: var(--accent);
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.likes-link {
+  margin-left: 0.6rem;
+  color: var(--accent);
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  font-weight: 400;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.likes-link:hover {
+  text-decoration: underline;
+}
+
+.likes-link[hidden] {
+  display: none;
+}

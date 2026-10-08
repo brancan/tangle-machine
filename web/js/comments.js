@@ -1,5 +1,5 @@
 // Comments below the studio (Giscus, one GitHub Discussion per painting) and the
-// "Publish to gallery" button. Reads only location and the DOM; app.js stays untouched.
+// "Publish to gallery" button. Reads location, the DOM and window.Likes (filled by app.js).
 (function () {
   if (typeof document === "undefined") return;
 
@@ -55,6 +55,26 @@
     container.append(script);
   }
 
+  // Likes are reactions on the painting's comment thread, counted at deploy time (window.Likes, app.js).
+  const likesLink = document.createElement("a");
+  likesLink.className = "likes-link";
+  likesLink.title = "Like it on GitHub";
+  likesLink.rel = "noopener";
+  likesLink.hidden = true;
+  section.querySelector("h3")?.append(likesLink);
+  const likesHint = document.createElement("p");
+  likesHint.className = "hint";
+  likesHint.textContent = "Like it with a reaction on the comment thread (GitHub account needed).";
+  $("#giscus").before(likesHint);
+
+  function showLikes() {
+    const entry = currentId && window.Likes?.get(currentId);
+    likesLink.hidden = !entry;
+    if (!entry) return;
+    likesLink.textContent = `\u2665 ${entry.likes}`;
+    likesLink.href = entry.url;
+  }
+
   function publish() {
     const painting = paintingFromHash();
     if (!painting) return;
@@ -78,10 +98,12 @@
     if (painting.id === currentId) return;
     currentId = painting.id;
     $("#publish-note").hidden = true;
+    showLikes();
     loadGiscus(painting.id);
   }
 
   $("#publish-gallery").addEventListener("click", publish);
   window.addEventListener("hashchange", update);
+  window.addEventListener("likes-loaded", showLikes);
   update();
 })();

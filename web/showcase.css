@@ -52,3 +52,7 @@
   font-size: 0.72rem;
   vertical-align: middle;
 }
+
+.showcase-links .likes-link {
+  margin-left: auto;
+}
