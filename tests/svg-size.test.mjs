@@ -11,7 +11,6 @@ const LIMIT = 1_000_000;
 // measured by this sweep (bytes). They are bounded at that size instead, so they cannot
 // grow further; shrink them and drop their entry when they are reworked.
 const ALLOWED = {
-  "flow-field": 3_713_000, // all max + hand max: 1000 long streamlines
   "truchet-tiles": 3_395_000, // all max + hand max: 24×24 tiles of 12 bands, bent arcs as polylines
   "triangle-paradox": 3_097_000, // all max + hand max
   "string-art": 2_242_000, // all max + hand max (1_352_000 without the hand)
