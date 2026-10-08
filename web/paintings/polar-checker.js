@@ -10,6 +10,10 @@ Gallery.register({
     { name: "growth", label: "Ring growth", type: "range", min: 1.05, max: 1.8, step: 0.01, value: 1.2 },
     { name: "dot", label: "Dot size", type: "range", min: 2, max: 20, step: 0.5, value: 7 },
     { name: "seed", label: "Seed", type: "range", min: 1, max: 100, step: 1, value: 11 },
+    { name: "palette", label: "Palette", type: "checkbox", value: true },
+    { name: "colorA", label: "Color A", type: "color", value: "#264653" },
+    { name: "colorB", label: "Color B", type: "color", value: "#e76f51" },
+    { name: "colorC", label: "Color C", type: "color", value: "#e9c46a" },
   ],
   draw: function draw(p, pen) {
     const rand = pen.random(p.seed);
@@ -31,7 +35,9 @@ Gallery.register({
         const d =
           `M${at(a0, r0)}A${f(r0)} ${f(r0)} 0 0 1 ${at(a1, r0)}` +
           `L${at(a1, r1)}A${f(r1)} ${f(r1)} 0 0 0 ${at(a0, r1)}Z`;
-        pen.path(d, (i + j) % 2 === 0 ? { fill: p.ink } : undefined);
+        // With the palette, each ring of dark cells takes the next color.
+        const color = p.palette ? [p.colorA, p.colorB, p.colorC][j % 3] : p.ink;
+        pen.path(d, (i + j) % 2 === 0 ? { fill: color } : undefined);
       }
       r0 = r1;
     }

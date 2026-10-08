@@ -20,6 +20,10 @@ Gallery.register({
     { name: "core", label: "Solid core", type: "checkbox", value: true },
     { name: "stripes", label: "Filled stripes", type: "checkbox", value: false },
     { name: "seed", label: "Seed", type: "range", min: 1, max: 100, step: 1, value: 5 },
+    { name: "palette", label: "Palette", type: "checkbox", value: true },
+    { name: "colorA", label: "Color A", type: "color", value: "#e07a5f" },
+    { name: "colorB", label: "Color B", type: "color", value: "#81b29a" },
+    { name: "colorC", label: "Color C", type: "color", value: "#f2cc8f" },
   ],
   draw: function draw(p, pen) {
     const rand = pen.random(p.seed);
@@ -52,7 +56,8 @@ Gallery.register({
         for (let k = p.bands; k >= 1; k--) {
           const r = (cell * k) / p.bands;
           const solid = (p.core && k === 1) || (p.stripes && k % 2 === 1);
-          pen.path(sector(cx, cy, r, a), solid ? { fill: p.ink } : { fill: p.paper });
+          const band = p.palette ? [p.colorA, p.colorB, p.colorC][k % 3] : p.paper;
+          pen.path(sector(cx, cy, r, a), { fill: solid ? p.ink : band });
         }
         pen.polygon([[x, y], [x + cell, y], [x + cell, y + cell], [x, y + cell]]);
       }

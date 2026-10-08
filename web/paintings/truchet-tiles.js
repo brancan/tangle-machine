@@ -12,6 +12,10 @@ Gallery.register({
     { name: "margin", label: "Margin", type: "range", min: 0, max: 120, step: 1, value: 20 },
     { name: "grid", label: "Show tile borders", type: "checkbox", value: false },
     { name: "seed", label: "Seed", type: "range", min: 1, max: 100, step: 1, value: 3 },
+    { name: "palette", label: "Palette", type: "checkbox", value: true },
+    { name: "colorA", label: "Color A", type: "color", value: "#3d5a80" },
+    { name: "colorB", label: "Color B", type: "color", value: "#ee6c4d" },
+    { name: "colorC", label: "Color C", type: "color", value: "#98c1d9" },
   ],
   draw: function draw(p, pen) {
     const rand = pen.random(p.seed);
@@ -28,11 +32,29 @@ Gallery.register({
             ? [[x, y, 0], [x + cell, y + cell, Math.PI]]
             : [[x + cell, y, quarter], [x, y + cell, 3 * quarter]];
 
+        const radius = (j) => cell * (0.5 - p.width + 2 * p.width * (p.bands === 1 ? 0.5 : j / (p.bands - 1)));
+        const f = (n) => n.toFixed(2);
+
+        // Color the stripes between neighbouring arcs. Stripe j and its mirror (bands - 2 - j)
+        // share a color, so stripes still match where tiles meet in either orientation.
+        if (p.palette) {
+          for (const [cx, cy, start] of corners) {
+            for (let j = 0; j < p.bands - 1; j++) {
+              const [r0, r1] = [radius(j), radius(j + 1)];
+              const at = (r, a) => `${f(cx + r * Math.cos(a))} ${f(cy + r * Math.sin(a))}`;
+              const color = [p.colorA, p.colorB, p.colorC][Math.min(j, p.bands - 2 - j) % 3];
+              pen.path(
+                `M${at(r0, start)}A${f(r0)} ${f(r0)} 0 0 1 ${at(r0, start + quarter)}` +
+                  `L${at(r1, start + quarter)}A${f(r1)} ${f(r1)} 0 0 0 ${at(r1, start)}Z`,
+                { fill: color, stroke: "none" }
+              );
+            }
+          }
+        }
+
         for (const [cx, cy, start] of corners) {
           for (let j = 0; j < p.bands; j++) {
-            const t = p.bands === 1 ? 0.5 : j / (p.bands - 1);
-            const r = cell * (0.5 - p.width + 2 * p.width * t);
-            pen.arc(cx, cy, r, start, start + quarter);
+            pen.arc(cx, cy, radius(j), start, start + quarter);
           }
         }
 
