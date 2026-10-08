@@ -1,13 +1,13 @@
 :root {
-  --bg: #f4f1ea;
-  --surface: #fffdf8;
-  --text: #1d1c1a;
-  --muted: #6b665d;
-  --border: #ddd6c8;
-  --accent: #b5482f;
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --text: #121212;
+  --muted: #5f5f5f;
+  --border: #dcdcdc;
+  --accent: #4a7a0c;
   --accent-text: #fff;
   --error: #b3261e;
-  --code-bg: #fbf8f0;
+  --code-bg: #f2f2f2;
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -15,15 +15,15 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #171614;
-    --surface: #211f1c;
-    --text: #ece8df;
-    --muted: #a39d92;
-    --border: #3a3631;
-    --accent: #e0775c;
-    --accent-text: #171614;
+    --bg: #121212;
+    --surface: #1c1c1c;
+    --text: #ececec;
+    --muted: #8a8a8a;
+    --border: #2e2e2e;
+    --accent: #b6f23a;
+    --accent-text: #121212;
     --error: #ff8a80;
-    --code-bg: #1b1a17;
+    --code-bg: #181818;
   }
 }
 
@@ -419,7 +419,7 @@ button[aria-pressed="true"] {
   border-left-color: var(--text);
 }
 
-.cm-s-default .cm-keyword { color: #a3402a; }
+.cm-s-default .cm-keyword { color: #7a3fb0; }
 .cm-s-default .cm-def,
 .cm-s-default .cm-variable-2 { color: #2c5d8a; }
 .cm-s-default .cm-number { color: #6f7f1f; }
@@ -427,7 +427,7 @@ button[aria-pressed="true"] {
 .cm-s-default .cm-comment { color: var(--muted); }
 
 @media (prefers-color-scheme: dark) {
-  .cm-s-default .cm-keyword { color: #f0917a; }
+  .cm-s-default .cm-keyword { color: #c9a2f0; }
   .cm-s-default .cm-def,
   .cm-s-default .cm-variable-2 { color: #8cbfeb; }
   .cm-s-default .cm-variable,
