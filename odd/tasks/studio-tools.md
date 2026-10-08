@@ -20,7 +20,8 @@ per-painting presets and an on-screen pen API reference.
   - Evidence: PNG_SIZES/replaySchedule tests RED then GREEN; headless Chrome: 1x export is an 800x800 PNG, Replay runs Web Animations without touching the SVG markup, a second click cancels, it ends on its own after ~4 s, reduced motion skips it.
 - [x] T3 Global style: palette presets applied to ink/paper/color params, paper textures (plain, dark, kraft, grain) — route: delegated
   - Evidence: palette/texture/select-share tests RED then GREEN, snapshots unchanged; headless Chrome: Cyberpunk palette updates controls and link, Default clears the link, kraft/grain/watercolor/dark render noise over the paper, `paperTexture=watercolor` link restores the select.
-- [ ] T4 Presets per painting saved in localStorage + pen API help panel — route: delegated
+- [x] T4 Presets per painting saved in localStorage + pen API help panel — route: delegated
+  - Evidence: preset storage/presetValues/pen-help coverage tests RED then GREEN; headless Chrome: preset saved under `zentangles:presets:string-art`, loaded after Reset (values and link restored), deleted; `?` toggles the pen API panel; textarea fallback reports `(line 2)`.
 
 Route note: delegated, one writer (app.js, gallery.js, styles.css, index.html, tests: 4+ non-trivial files).
 
@@ -30,3 +31,7 @@ Route note: delegated, one writer (app.js, gallery.js, styles.css, index.html, t
 
 ## Progress
 - Worktree created.
+- T1-T4 done, one work-unit commit each on `feat/studio-tools`; `npm test` green with `tests/snapshots.json` unchanged.
+
+## Next step
+- Parent review, then push / PR as the user decides.

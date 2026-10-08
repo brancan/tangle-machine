@@ -96,3 +96,38 @@ test("dark and kraft textures bring their own paper and ink", () => {
   assert.deepEqual({ ...StudioTools.textureValues(values, "kraft") }, { ink: "#1a1a1a", paper: "#c8a878", paperTexture: "kraft" });
   assert.deepEqual({ ...StudioTools.textureValues(values, "grain") }, { ...values, paperTexture: "grain" });
 });
+
+test("presets survive a storage round trip and garbage reads as no presets", () => {
+  let list = StudioTools.savePreset([], "  Calm  ", { n: 4, ink: "#000000" });
+  list = StudioTools.savePreset(list, "Busy", { n: 9 });
+  list = StudioTools.savePreset(list, "Calm", { n: 2 });
+  const read = StudioTools.parsePresets(StudioTools.serializePresets(list));
+  assert.deepEqual(JSON.parse(JSON.stringify(read)), [
+    { name: "Busy", values: { n: 9 } },
+    { name: "Calm", values: { n: 2 } },
+  ]);
+  assert.equal(StudioTools.savePreset(list, "   ", { n: 1 }), list, "blank names are ignored");
+  assert.deepEqual([...StudioTools.deletePreset(read, "Busy").map((p) => p.name)], ["Calm"]);
+  for (const garbage of [null, "", "{", "42", '{"a":1}', '[{"name":1}]', '[{"name":"x","values":null}]']) {
+    assert.deepEqual([...StudioTools.parsePresets(garbage)], [], String(garbage));
+  }
+});
+
+test("presetValues keeps only known params with valid values", () => {
+  const params = [
+    ...PAINTING.params,
+    { name: "core", type: "checkbox", value: true },
+    { name: "paperTexture", type: "select", value: "plain", options: [{ value: "plain" }, { value: "kraft" }] },
+  ];
+  const stored = { n: 99, colorA: "#00ff00", colorB: "red", core: false, paperTexture: "kraft", gone: 1 };
+  assert.deepEqual({ ...StudioTools.presetValues(params, stored) }, { n: 9, colorA: "#00ff00", core: false, paperTexture: "kraft" });
+  assert.deepEqual({ ...StudioTools.presetValues(params, { paperTexture: "velvet", core: "yes" }) }, {});
+});
+
+test("pen help documents every pen member the drawing code can use", () => {
+  let members = [];
+  Gallery.render((p, pen) => (members = Object.keys(pen)), Gallery.initialValues({ params: [] }));
+  const documented = new Set(StudioTools.PEN_HELP.map((entry) => entry.name));
+  for (const name of members.filter((m) => m !== "shapes")) assert.ok(documented.has(`pen.${name}`), name);
+  for (const entry of StudioTools.PEN_HELP) assert.ok(entry.signature && entry.description.length > 10, entry.name);
+});

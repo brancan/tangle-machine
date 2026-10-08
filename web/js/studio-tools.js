@@ -87,5 +87,87 @@
     return { ...values, ...(TEXTURE_COLORS[texture] || {}), paperTexture: texture };
   }
 
-  window.StudioTools = { errorLine, PNG_SIZES, replaySchedule, PALETTES, applyPalette, textureValues };
+  // ---------- Presets: named snapshots of every value, kept per painting ----------
+
+  const isPreset = (p) => p && typeof p.name === "string" && p.name && p.values && typeof p.values === "object";
+
+  // Stored text -> list of presets; anything unreadable counts as no presets.
+  function parsePresets(text) {
+    try {
+      const list = JSON.parse(text);
+      return Array.isArray(list) ? list.filter(isPreset) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  const serializePresets = (list) => JSON.stringify(list);
+
+  // Adds or replaces a preset by name, keeping the list sorted; blank names change nothing.
+  function savePreset(list, name, values) {
+    const clean = String(name || "").trim();
+    if (!clean) return list;
+    return [...list.filter((p) => p.name !== clean), { name: clean, values: { ...values } }].sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+  }
+
+  const deletePreset = (list, name) => list.filter((p) => p.name !== name);
+
+  // The stored values that still fit the params (the painting may have changed since).
+  function presetValues(params, stored) {
+    const values = {};
+    for (const param of params) {
+      const value = stored[param.name];
+      if (value === undefined) continue;
+      if (param.type === "checkbox") {
+        if (typeof value === "boolean") values[param.name] = value;
+      } else if (param.type === "color") {
+        if (/^#[0-9a-f]{6}$/i.test(value)) values[param.name] = value;
+      } else if (param.type === "select") {
+        if (param.options.some((option) => option.value === value)) values[param.name] = value;
+      } else if (typeof value === "number" && Number.isFinite(value)) {
+        values[param.name] = Math.min(param.max, Math.max(param.min, value));
+      }
+    }
+    return values;
+  }
+
+  // ---------- Pen API reference (mirrors createPen in gallery.js) ----------
+
+  const PEN_HELP = [
+    { name: "pen.width", signature: "pen.width", description: "Canvas width in pixels (800)." },
+    { name: "pen.height", signature: "pen.height", description: "Canvas height in pixels (800)." },
+    { name: "pen.random", signature: "pen.random(seed = 1)", description: "Deterministic random generator: same seed, same drawing." },
+    { name: "pen.line", signature: "pen.line(x1, y1, x2, y2, style?)", description: "Straight line between two points." },
+    { name: "pen.polyline", signature: "pen.polyline([[x, y], ...], style?)", description: "Open stroke through a list of points." },
+    { name: "pen.polygon", signature: "pen.polygon([[x, y], ...], style?)", description: "Closed shape through a list of points." },
+    { name: "pen.circle", signature: "pen.circle(cx, cy, r, style?)", description: "Circle around a center point." },
+    { name: "pen.arc", signature: "pen.arc(cx, cy, r, a0, a1, style?)", description: "Arc from angle a0 to a1 in radians, clockwise on screen when a1 > a0." },
+    { name: "pen.path", signature: "pen.path(d, style?)", description: "Raw SVG path data; only the roughness filter bends it." },
+    { name: "pen.clip", signature: "pen.clip(d, () => { ... })", description: "Everything drawn inside the callback is clipped to the SVG path d." },
+  ];
+
+  const STYLE_HELP = [
+    { name: "style", signature: "{ fill, stroke, width }", description: "Optional last argument of every shape: fill color, stroke color, stroke width." },
+    { name: "p.ink", signature: "p.ink", description: "Shared stroke color, applied to every shape by default." },
+    { name: "p.paper", signature: "p.paper", description: "Shared background color." },
+    { name: "p.strokeWidth", signature: "p.strokeWidth", description: "Shared stroke width, applied to every shape by default." },
+  ];
+
+  window.StudioTools = {
+    errorLine,
+    PNG_SIZES,
+    replaySchedule,
+    PALETTES,
+    applyPalette,
+    textureValues,
+    parsePresets,
+    serializePresets,
+    savePreset,
+    deletePreset,
+    presetValues,
+    PEN_HELP,
+    STYLE_HELP,
+  };
 })();

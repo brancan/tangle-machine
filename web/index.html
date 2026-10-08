@@ -63,6 +63,14 @@
               <button id="randomize" type="button" class="primary">Randomize</button>
               <button id="reset-params" type="button">Reset</button>
             </div>
+            <h3>Presets</h3>
+            <div class="presets">
+              <select id="preset-list" aria-label="Saved presets"></select>
+              <div class="buttons">
+                <button id="save-preset" type="button" title="Save every current value under a name">Save</button>
+                <button id="delete-preset" type="button" disabled>Delete</button>
+              </div>
+            </div>
             <h3>Share</h3>
             <div class="buttons">
               <button id="copy-link" type="button">Copy link</button>
@@ -89,10 +97,12 @@
             <div class="code-head">
               <h3>Code <span id="code-edited" class="badge" hidden>edited</span></h3>
               <div class="buttons">
+                <button id="pen-help-toggle" type="button" title="Pen API reference" aria-label="Pen API reference" aria-expanded="false" aria-controls="pen-help">?</button>
                 <button id="reset-code" type="button">Reset code</button>
                 <button id="run" type="button" class="primary" title="Ctrl/Cmd + Enter">Run</button>
               </div>
             </div>
+            <div id="pen-help" class="pen-help" hidden></div>
             <textarea id="code" spellcheck="false"></textarea>
             <p class="hint">
               <code>p</code> holds the variables, <code>pen</code> draws:

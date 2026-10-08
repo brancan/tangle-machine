@@ -29,6 +29,26 @@
     },
   };
 
+  // Named presets per painting: every value (style, hand and painting params), never code.
+  const presetStorage = {
+    key: (id) => `zentangles:presets:${id}`,
+    get(id) {
+      try {
+        return StudioTools.parsePresets(localStorage.getItem(this.key(id)));
+      } catch {
+        return [];
+      }
+    },
+    set(id, list) {
+      try {
+        localStorage.setItem(this.key(id), StudioTools.serializePresets(list));
+        return true;
+      } catch {
+        return false;
+      }
+    },
+  };
+
   // ---------- Gallery ----------
 
   // Thumbnails render only when a card scrolls near the viewport, and are cached
@@ -425,6 +445,61 @@
     updateUrl();
   }
 
+  // ---------- Presets ----------
+
+  function renderPresets(selected = "") {
+    const list = presetStorage.get(state.painting.id);
+    const options = list.map(
+      (p) => `<option${p.name === selected ? " selected" : ""}>${p.name.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`)}</option>`
+    );
+    $("#preset-list").innerHTML = `<option value="">${list.length ? "Load preset…" : "No presets yet"}</option>${options.join("")}`;
+    $("#delete-preset").disabled = !selected;
+  }
+
+  function savePreset() {
+    const name = window.prompt("Name for this preset:", $("#preset-list").value);
+    if (name === null || !name.trim()) return;
+    const list = StudioTools.savePreset(presetStorage.get(state.painting.id), name, state.values);
+    if (!presetStorage.set(state.painting.id, list)) {
+      setStatus("Presets cannot be saved in this browser", true);
+      return;
+    }
+    renderPresets(name.trim());
+    setStatus(`Preset "${name.trim()}" saved`);
+  }
+
+  function loadPreset(name) {
+    $("#delete-preset").disabled = !name;
+    const preset = presetStorage.get(state.painting.id).find((p) => p.name === name);
+    if (!preset) return;
+    const values = StudioTools.presetValues(allParams(state.painting), preset.values);
+    applyValues({ ...Gallery.initialValues(state.painting), ...values });
+    setStatus(`Preset "${name}" loaded`);
+  }
+
+  function deletePreset() {
+    const name = $("#preset-list").value;
+    if (!name || !window.confirm(`Delete the preset "${name}"?`)) return;
+    presetStorage.set(state.painting.id, StudioTools.deletePreset(presetStorage.get(state.painting.id), name));
+    renderPresets();
+    setStatus(`Preset "${name}" deleted`);
+  }
+
+  // ---------- Pen help ----------
+
+  function buildPenHelp() {
+    const item = (entry) => `<dt><code>${entry.signature}</code></dt><dd>${entry.description}</dd>`;
+    $("#pen-help").innerHTML =
+      `<h4>pen</h4><dl>${StudioTools.PEN_HELP.map(item).join("")}</dl>` +
+      `<h4>Style and shared values</h4><dl>${StudioTools.STYLE_HELP.map(item).join("")}</dl>`;
+  }
+
+  function togglePenHelp() {
+    const panel = $("#pen-help");
+    panel.hidden = !panel.hidden;
+    $("#pen-help-toggle").setAttribute("aria-expanded", String(!panel.hidden));
+  }
+
   // Wraps around: the last painting's "next" is the first one.
   function neighbour(offset) {
     const list = Gallery.paintings;
@@ -454,6 +529,7 @@
     $("#shared-code").hidden = true;
     buildControls(painting, state.values);
     showInstruction();
+    renderPresets();
     setSource(saved ?? original);
     if (saved) runCode(saved);
     else {
@@ -561,6 +637,11 @@
     $("#download-png").addEventListener("click", () => downloadPng());
     $("#focus").addEventListener("click", () => toggleFocus());
     $("#replay").addEventListener("click", toggleReplay);
+    $("#save-preset").addEventListener("click", savePreset);
+    $("#delete-preset").addEventListener("click", deletePreset);
+    $("#preset-list").addEventListener("change", (event) => loadPreset(event.target.value));
+    $("#pen-help-toggle").addEventListener("click", togglePenHelp);
+    buildPenHelp();
     $("#png-size").innerHTML = StudioTools.PNG_SIZES.map(
       (s) => `<option value="${s.size}"${s.default ? " selected" : ""}>${s.label}</option>`
     ).join("");

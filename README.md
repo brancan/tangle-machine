@@ -56,6 +56,9 @@ editor. PNG export offers 800, 1600 (default), 3200 or 3508 px (A4 at 300 DPI).
 for reduced motion). The **Palette** picker sets ink, paper and the painting's
 own colors in one go, and **Paper texture** (`plain`, `dark`, `kraft`, `grain`,
 `watercolor`) lays SVG noise over the paper; plain adds nothing to the SVG.
+**Presets** save every current value of a painting under a name (localStorage,
+per painting; code is not included), and the **?** button in the code panel
+lists the pen API with signatures.
 
 Current paintings: Paradox, Paradox Circle, Triangle Paradox, Honeycomb
 Paradox, Spider Web, Truchet Tiles, Scales, String Art, Bulge Checker, Polar
