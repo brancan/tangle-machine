@@ -171,6 +171,17 @@ test("the showcase reads its painting scripts from index.html", () => {
   assert.deepEqual([...Showcase.paintingScripts(index)], scriptsFromIndex().filter((s) => s.startsWith("paintings/")));
 });
 
+test("the showcase loads only the painting scripts its entries use", () => {
+  const { Showcase } = loadScript("js/showcase.js");
+  const html = `<script src="paintings/paradox.js"></script><script src="paintings/ripples.js"></script>
+    <script src="paintings/vortex.js"></script>`;
+  assert.deepEqual([...Showcase.scriptsFor(html, ["vortex", "paradox", "vortex", "missing"])], [
+    "paintings/paradox.js",
+    "paintings/vortex.js",
+  ]);
+  assert.deepEqual([...Showcase.scriptsFor(html, [])], []);
+});
+
 test("only plain painting script paths are accepted from index.html", () => {
   const { Showcase } = loadScript("js/showcase.js");
   const html = `<script src="paintings/ok-1.js"></script><script src="paintings/../evil.js"></script>

@@ -13,20 +13,29 @@
     return [...String(html).matchAll(PAINTING_SCRIPT)].map((m) => m[1]);
   }
 
+  // Only the scripts of the paintings the entries use, in index.html order (file name = painting id).
+  function scriptsFor(html, ids) {
+    const wanted = new Set(ids);
+    return paintingScripts(html).filter((src) => wanted.has(src.slice("paintings/".length, -".js".length)));
+  }
+
   function loadScript(src) {
     return new Promise((resolve, reject) => {
       const script = document.createElement("script");
       script.src = src;
+      // Download in parallel, run in insertion order.
+      script.async = false;
       script.onload = resolve;
       script.onerror = () => reject(new Error(`could not load ${src}`));
       document.body.append(script);
     });
   }
 
-  async function loadPaintings() {
+  // A painting that fails to load just drops its cards; the rest of the gallery still renders.
+  async function loadPaintings(ids) {
     const response = await fetch("index.html", { cache: "no-cache" });
     if (!response.ok) throw new Error(String(response.status));
-    for (const src of paintingScripts(await response.text())) await loadScript(src);
+    await Promise.allSettled(scriptsFor(await response.text(), ids).map(loadScript));
   }
 
   function allParams(painting) {
@@ -153,7 +162,7 @@
       if (!response.ok) throw new Error(String(response.status));
       entries = await response.json();
       if (!Array.isArray(entries)) throw new Error("not a list");
-      if (entries.length) await loadPaintings();
+      if (entries.length) await loadPaintings(entries.map((entry) => entry?.paintingId));
     } catch {
       setState("The gallery could not be loaded right now. Try again later.");
       return;
@@ -169,7 +178,7 @@
     renderLazily(cards.map((node) => node.querySelector(".thumb")));
   }
 
-  window.Showcase = { paintingScripts };
+  window.Showcase = { paintingScripts, scriptsFor };
   // Headless (tests) there is no page to render.
   if (typeof document !== "undefined") init();
 })();
