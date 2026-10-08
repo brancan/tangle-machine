@@ -43,7 +43,8 @@ the original painting and a notice; the shared code runs only after they click
 Current paintings: Paradox, Paradox Circle, Triangle Paradox, Honeycomb
 Paradox, Spider Web, Truchet Tiles, Scales, String Art, Bulge Checker, Polar
 Checker, Op Waves, Woven Circle, Quarter Arcs, Bubbles, Contour Lines, Vortex,
-Drips, Ripples, Flow Field, Star Checker and Tube Network.
+Drips, Ripples, Flow Field, Star Checker, Tube Network, Tumbling Blocks,
+Hollibaugh, Huggins, Florz, Knitting, Keeko, Lightning Bolt and Rhombus Star.
 
 ## Tests
 
