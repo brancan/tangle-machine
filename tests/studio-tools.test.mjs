@@ -52,3 +52,47 @@ test("replaySchedule spreads any number of strokes over the same total time", ()
   const { delay } = StudioTools.replaySchedule(10, 4000);
   assert.ok(delay(5) > delay(4));
 });
+
+const PAINTING = {
+  params: [
+    { name: "n", type: "range", min: 1, max: 9, step: 1, value: 3 },
+    { name: "colorA", type: "color", value: "#111111" },
+    { name: "colorB", type: "color", value: "#222222" },
+    { name: "colorC", type: "color", value: "#333333" },
+  ],
+};
+
+test("palettes set ink, paper and cycle their colors over the painting's color params", () => {
+  const initial = Gallery.initialValues(PAINTING);
+  const values = { ...initial, n: 7, colorA: "#abcdef" };
+  const duotone = StudioTools.PALETTES.find((p) => p.id === "duotone");
+  const out = StudioTools.applyPalette(PAINTING, values, "duotone", initial);
+  assert.equal(out.ink, duotone.ink);
+  assert.equal(out.paper, duotone.paper);
+  assert.equal(out.colorA, duotone.colors[0]);
+  assert.equal(out.colorB, duotone.colors[1]);
+  assert.equal(out.colorC, duotone.colors[0]);
+  assert.equal(out.n, 7);
+  assert.equal(values.colorA, "#abcdef", "input values are not mutated");
+});
+
+test("the default palette restores the painting's own colors", () => {
+  const initial = Gallery.initialValues(PAINTING);
+  const changed = { ...initial, ink: "#ff0000", paper: "#00ff00", colorB: "#0000ff", n: 5 };
+  assert.deepEqual({ ...StudioTools.applyPalette(PAINTING, changed, "default", initial) }, { ...initial, n: 5 });
+  assert.equal(StudioTools.applyPalette(PAINTING, changed, "nope", initial), changed);
+});
+
+test("every palette color is a 6-digit hex the color inputs accept", () => {
+  assert.ok(StudioTools.PALETTES.length >= 7);
+  for (const palette of StudioTools.PALETTES.filter((p) => p.id !== "default")) {
+    for (const color of [palette.ink, palette.paper, ...palette.colors]) assert.match(color, /^#[0-9a-f]{6}$/);
+  }
+});
+
+test("dark and kraft textures bring their own paper and ink", () => {
+  const values = { ink: "#1a1a1a", paper: "#fbf8f0", paperTexture: "plain" };
+  assert.deepEqual({ ...StudioTools.textureValues(values, "dark") }, { ink: "#ece8df", paper: "#1d1d1f", paperTexture: "dark" });
+  assert.deepEqual({ ...StudioTools.textureValues(values, "kraft") }, { ink: "#1a1a1a", paper: "#c8a878", paperTexture: "kraft" });
+  assert.deepEqual({ ...StudioTools.textureValues(values, "grain") }, { ...values, paperTexture: "grain" });
+});

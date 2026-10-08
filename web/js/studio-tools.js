@@ -46,5 +46,46 @@
     return { duration, delay: (index) => index * step };
   }
 
-  window.StudioTools = { errorLine, PNG_SIZES, replaySchedule };
+  // Global palettes: ink, paper and colors handed out in order to a painting's color params.
+  // "default" brings back the painting's own starting colors.
+  const PALETTES = [
+    { id: "default", label: "Default" },
+    { id: "mono", label: "Mono", ink: "#111111", paper: "#ffffff", colors: ["#111111", "#555555", "#999999", "#d4d4d4"] },
+    { id: "pastel", label: "Pastel", ink: "#4a4a5a", paper: "#fdf6ec", colors: ["#f4a6a6", "#a6d8f4", "#c6e8a6", "#f4e1a6", "#d2b6f4"] },
+    { id: "sepia", label: "Sepia", ink: "#3b2a1a", paper: "#f1e3c8", colors: ["#7a5230", "#a67b4f", "#c9a27a", "#5c3d22"] },
+    { id: "duotone", label: "Duotone", ink: "#1b2a49", paper: "#f4efe6", colors: ["#1b2a49", "#e4572e"] },
+    { id: "cyberpunk", label: "Cyberpunk", ink: "#05d9e8", paper: "#0d0221", colors: ["#ff2a6d", "#05d9e8", "#d1f7ff", "#7700ff"] },
+    { id: "vintage", label: "Vintage", ink: "#2f2a24", paper: "#efe6d2", colors: ["#c0563f", "#d9a441", "#4f7c6d", "#2e4a62"] },
+  ];
+
+  // New values with the palette applied, like a user moving the color controls.
+  // `initial` is the painting's starting values (used by "default"); unknown ids change nothing.
+  function applyPalette(painting, values, id, initial) {
+    const palette = PALETTES.find((p) => p.id === id);
+    if (!palette) return values;
+    const colorParams = painting.params.filter((param) => param.type === "color");
+    const out = { ...values };
+    if (palette.id === "default") {
+      for (const name of ["ink", "paper", ...colorParams.map((param) => param.name)]) out[name] = initial[name];
+      return out;
+    }
+    out.ink = palette.ink;
+    out.paper = palette.paper;
+    colorParams.forEach((param, index) => {
+      out[param.name] = palette.colors[index % palette.colors.length];
+    });
+    return out;
+  }
+
+  // Textures that only make sense on their own paper color (and, for dark, a light ink).
+  const TEXTURE_COLORS = {
+    dark: { paper: "#1d1d1f", ink: "#ece8df" },
+    kraft: { paper: "#c8a878" },
+  };
+
+  function textureValues(values, texture) {
+    return { ...values, ...(TEXTURE_COLORS[texture] || {}), paperTexture: texture };
+  }
+
+  window.StudioTools = { errorLine, PNG_SIZES, replaySchedule, PALETTES, applyPalette, textureValues };
 })();

@@ -10,7 +10,7 @@ const SNAPSHOTS = new URL("./snapshots.json", import.meta.url).pathname;
 
 // Clip and filter ids depend on render order, so they are normalized before hashing.
 const fingerprint = (svg) =>
-  createHash("sha256").update(svg.replace(/(clip|rough)-\d+/g, "$1-N")).digest("hex").slice(0, 16);
+  createHash("sha256").update(svg.replace(/(clip|rough|paper)-\d+/g, "$1-N")).digest("hex").slice(0, 16);
 
 test("every painting file is loaded by index.html", () => {
   const files = readdirSync(join(WEB, "paintings")).map((f) => `paintings/${f}`).sort();
@@ -25,6 +25,7 @@ test("painting ids are unique", () => {
 
 test("painting params do not collide with shared style or hand-drawn params", () => {
   const shared = new Set([...Gallery.STYLE_PARAMS, ...Gallery.HAND_PARAMS].map((p) => p.name));
+  assert.ok(shared.has("paperTexture"));
   for (const painting of Gallery.paintings) {
     const names = painting.params.map((p) => p.name);
     assert.equal(new Set(names).size, names.length, `${painting.id} repeats a param name`);

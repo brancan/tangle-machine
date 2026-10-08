@@ -273,6 +273,17 @@ main {
   background: none;
 }
 
+.control.select {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.control.select select {
+  max-width: 8.5rem;
+}
+
 .buttons {
   display: flex;
   flex-wrap: wrap;

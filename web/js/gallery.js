@@ -8,7 +8,40 @@
     { name: "ink", label: "Ink", type: "color", value: "#1a1a1a" },
     { name: "paper", label: "Paper", type: "color", value: "#fbf8f0" },
     { name: "strokeWidth", label: "Stroke width", type: "range", min: 0.2, max: 4, step: 0.1, value: 1 },
+    {
+      name: "paperTexture",
+      label: "Paper texture",
+      type: "select",
+      value: "plain",
+      options: [
+        { value: "plain", label: "Plain" },
+        { value: "dark", label: "Dark" },
+        { value: "kraft", label: "Kraft" },
+        { value: "grain", label: "Grain" },
+        { value: "watercolor", label: "Watercolor" },
+      ],
+    },
   ];
+
+  // Noise laid over the paper: feTurbulence tinted by a color matrix whose alpha row
+  // turns the noise into specks, fibers or blotches. Plain paper has no entry.
+  const PAPER_TEXTURES = {
+    dark: { frequency: "0.9", octaves: 2, rgb: "1 1 1", alpha: "0.6 0 0 0 -0.25" },
+    kraft: { frequency: "0.03 0.5", octaves: 3, rgb: "0.35 0.22 0.1", alpha: "1.3 0 0 0 -0.5" },
+    grain: { frequency: "0.9", octaves: 2, rgb: "0.2 0.15 0.1", alpha: "0.9 0 0 0 -0.38" },
+    watercolor: { frequency: "0.008", octaves: 4, rgb: "0.45 0.35 0.25", alpha: "0.7 0 0 0 -0.2" },
+  };
+
+  function paperFilter(id, texture) {
+    const [r, g, b] = texture.rgb.split(" ");
+    const matrix = `0 0 0 0 ${r} 0 0 0 0 ${g} 0 0 0 0 ${b} ${texture.alpha}`;
+    return (
+      `<filter id="${id}" x="0" y="0" width="100%" height="100%">` +
+      `<feTurbulence type="fractalNoise" baseFrequency="${texture.frequency}" numOctaves="${texture.octaves}" seed="7" stitchTiles="stitch"/>` +
+      `<feColorMatrix type="matrix" values="${matrix}"/>` +
+      `</filter>`
+    );
+  }
 
   // Shared by every painting: make the strokes look drawn by hand.
   const HAND_PARAMS = [
@@ -200,20 +233,28 @@
     draw(values, pen);
     let filter = "";
     let defs = "";
+    let texture = "";
     if (values.handRoughness > 0) {
       // Displaces every pixel with fractal noise, so even raw paths and fills tremble.
       const id = `rough-${++clipCounter}`;
-      defs =
-        `<defs><filter id="${id}" x="-5%" y="-5%" width="110%" height="110%">` +
+      defs +=
+        `<filter id="${id}" x="-5%" y="-5%" width="110%" height="110%">` +
         `<feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="${values.handSeed || 1}"/>` +
         `<feDisplacementMap in="SourceGraphic" scale="${values.handRoughness * 2}" xChannelSelector="R" yChannelSelector="G"/>` +
-        `</filter></defs>`;
+        `</filter>`;
       filter = ` filter="url(#${id})"`;
+    }
+    const paper = PAPER_TEXTURES[values.paperTexture];
+    if (paper) {
+      const id = `paper-${++clipCounter}`;
+      defs += paperFilter(id, paper);
+      texture = `<rect width="100%" height="100%" filter="url(#${id})"/>`;
     }
     return (
       `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">` +
-      defs +
+      (defs ? `<defs>${defs}</defs>` : "") +
       `<rect width="100%" height="100%" fill="${values.paper}"/>` +
+      texture +
       `<g fill="none" stroke="${values.ink}" stroke-width="${values.strokeWidth}" stroke-linejoin="round" stroke-linecap="round"${filter}>` +
       pen.shapes.join("") +
       `</g></svg>`

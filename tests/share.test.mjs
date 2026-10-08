@@ -35,3 +35,11 @@ test("decodeCode returns null for garbage", async () => {
   assert.equal(await Share.decodeCode("not-valid-data!!"), null);
   assert.equal(await Share.decodeCode(""), null);
 });
+
+test("select values must be one of the options and are kept only when changed", () => {
+  const params = [{ name: "paperTexture", type: "select", value: "plain", options: [{ value: "plain" }, { value: "kraft" }] }];
+  assert.deepEqual({ ...Share.parseQuery(params, "paperTexture=kraft") }, { paperTexture: "kraft" });
+  assert.deepEqual({ ...Share.parseQuery(params, "paperTexture=velvet") }, {});
+  assert.equal(Share.buildQuery(params, { paperTexture: "plain" }, { paperTexture: "plain" }), "");
+  assert.equal(Share.buildQuery(params, { paperTexture: "kraft" }, { paperTexture: "plain" }), "paperTexture=kraft");
+});

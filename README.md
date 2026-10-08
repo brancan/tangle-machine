@@ -49,6 +49,14 @@ it into the link (`code=`, deflate + base64url). Whoever opens such a link sees
 the original painting and a notice; the shared code runs only after they click
 **Run shared code**.
 
+Studio extras: **Ctrl/Cmd+S** downloads the SVG, **F** toggles a focus mode
+with only the canvas (Esc leaves it), and a code error marks its line in the
+editor. PNG export offers 800, 1600 (default), 3200 or 3508 px (A4 at 300 DPI).
+**Replay** animates the drawing stroke by stroke (skipped when the system asks
+for reduced motion). The **Palette** picker sets ink, paper and the painting's
+own colors in one go, and **Paper texture** (`plain`, `dark`, `kraft`, `grain`,
+`watercolor`) lays SVG noise over the paper; plain adds nothing to the SVG.
+
 Current paintings: Paradox, Paradox Circle, Triangle Paradox, Honeycomb
 Paradox, Spider Web, Truchet Tiles, Scales, String Art, Bulge Checker, Polar
 Checker, Op Waves, Woven Circle, Quarter Arcs, Bubbles, Contour Lines, Vortex,

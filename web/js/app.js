@@ -144,6 +144,13 @@
       return `<label class="control color" for="${id}"><span>${param.label}</span>
         <input type="color" id="${id}" data-param="${param.name}" value="${value}"></label>`;
     }
+    if (param.type === "select") {
+      const options = param.options.map(
+        (option) => `<option value="${option.value}"${option.value === value ? " selected" : ""}>${option.label}</option>`
+      );
+      return `<label class="control select" for="${id}"><span>${param.label}</span>
+        <select id="${id}" data-param="${param.name}">${options.join("")}</select></label>`;
+    }
     return `<label class="control" for="${id}">
       <span>${param.label}<output data-for="${param.name}">${value}</output></span>
       <input type="range" id="${id}" data-param="${param.name}"
@@ -156,10 +163,24 @@
     return input.value;
   }
 
+  // Not a value of its own: picking a palette rewrites ink, paper and the color params.
+  function paletteHtml() {
+    const options = StudioTools.PALETTES.map((p) => `<option value="${p.id}">${p.label}</option>`);
+    return `<label class="control select" for="palette-preset"><span>Palette</span>
+      <select id="palette-preset"><option value="">Apply…</option>${options.join("")}</select></label>`;
+  }
+
+  function applyPalette(id) {
+    const initial = Gallery.initialValues(state.painting);
+    applyValues(StudioTools.applyPalette(state.painting, state.values, id, initial));
+    const palette = StudioTools.PALETTES.find((p) => p.id === id);
+    if (palette) setStatus(`${palette.label} palette applied`);
+  }
+
   function buildControls(painting, values) {
     const html = (param) => controlHtml(param, values[param.name]);
     $("#controls-painting").innerHTML = painting.params.map(html).join("");
-    $("#controls-style").innerHTML = STYLE_PARAMS.map(html).join("");
+    $("#controls-style").innerHTML = paletteHtml() + STYLE_PARAMS.map(html).join("");
     $("#controls-hand").innerHTML = HAND_PARAMS.map(html).join("");
   }
 
@@ -505,10 +526,19 @@
 
   function init() {
 
+    $("#controls").addEventListener("change", (event) => {
+      if (event.target.id === "palette-preset" && event.target.value) applyPalette(event.target.value);
+    });
+
     $("#controls").addEventListener("input", (event) => {
       const input = event.target.closest("[data-param]");
       if (!input) return;
       const value = readControl(input);
+      // Dark and kraft paper come with their own colors, so the color controls must follow.
+      if (input.dataset.param === "paperTexture") {
+        applyValues(StudioTools.textureValues(state.values, value));
+        return;
+      }
       state.values[input.dataset.param] = value;
       showInstruction();
       const output = $(`output[data-for="${input.dataset.param}"]`);

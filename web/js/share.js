@@ -10,6 +10,8 @@
       if (param.type === "checkbox") values[param.name] = raw === "1";
       else if (param.type === "color") {
         if (/^#[0-9a-f]{6}$/i.test(raw)) values[param.name] = raw;
+      } else if (param.type === "select") {
+        if (param.options.some((option) => option.value === raw)) values[param.name] = raw;
       } else {
         const n = Number(raw);
         if (raw !== "" && Number.isFinite(n)) values[param.name] = Math.min(param.max, Math.max(param.min, n));

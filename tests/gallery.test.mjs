@@ -49,3 +49,27 @@ test("clip ids are unique across renders", () => {
   const id = (svg) => svg.match(/clipPath id="([^"]+)"/)[1];
   assert.notEqual(id(Gallery.render(draw, values)), id(Gallery.render(draw, values)));
 });
+
+test("paper texture is a shared style param that defaults to plain", () => {
+  const texture = Gallery.STYLE_PARAMS.find((p) => p.name === "paperTexture");
+  assert.equal(texture.type, "select");
+  assert.equal(texture.value, "plain");
+  assert.deepEqual([...texture.options.map((o) => o.value)], ["plain", "dark", "kraft", "grain", "watercolor"]);
+});
+
+test("plain paper adds nothing; other textures overlay noise on the paper", () => {
+  const draw = (p, pen) => pen.line(0, 0, 10, 10);
+  const values = Gallery.initialValues({ params: [] });
+  const plain = Gallery.render(draw, values);
+  const { paperTexture, ...withoutTexture } = values;
+  assert.equal(paperTexture, "plain");
+  assert.equal(Gallery.render(draw, withoutTexture), plain);
+  assert.doesNotMatch(plain, /feTurbulence|<defs>/);
+  for (const texture of ["dark", "kraft", "grain", "watercolor"]) {
+    const svg = Gallery.render(draw, { ...values, paperTexture: texture });
+    assert.match(svg, /<filter id="paper-\d+"[^>]*><feTurbulence /, texture);
+    assert.match(svg, /<rect width="100%" height="100%" fill="#fbf8f0"\/><rect width="100%" height="100%" filter="url\(#paper-\d+\)"\/>/);
+  }
+  const both = Gallery.render(draw, { ...values, paperTexture: "grain", handRoughness: 2 });
+  assert.equal(both.match(/<defs>/g).length, 1);
+});
