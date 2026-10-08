@@ -29,6 +29,9 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history: sitemap.xml takes each page's lastmod from git log.
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -37,6 +40,9 @@ jobs:
         run: node scripts/build-showcase.mjs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Fails the deploy on any error: the painting pages are what search engines index.
+      - name: Build painting pages, sitemap.xml and llms.txt
+        run: node scripts/build-pages.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

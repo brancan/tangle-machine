@@ -670,3 +670,47 @@ body.focus .stage {
 .likes-link[hidden] {
   display: none;
 }
+
+/* ---------- Painting index (home, filled at deploy by scripts/build-pages.mjs) ---------- */
+
+.painting-index {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.painting-index h2 {
+  margin: 0 0 0.75rem;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.2rem;
+}
+
+.painting-index p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.painting-index ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  columns: 4 12rem;
+  column-gap: 2rem;
+}
+
+.painting-index li {
+  break-inside: avoid;
+  padding: 0.1rem 0;
+}
+
+.painting-index a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.painting-index a:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
