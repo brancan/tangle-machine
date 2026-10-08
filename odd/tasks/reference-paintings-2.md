@@ -14,8 +14,10 @@ Add ten new paintings inspired by the second batch of user reference photos.
   - Evidence: headless Chrome renders inspected; `npm test` 16/16 pass; extreme-param stress shows no NaN/Infinity.
 - [x] T2 Pattern paintings: arc-scales (3), radial-sampler (9), pattern-peaks (15), pattern-hills (11) — route: delegated
   - Evidence: headless Chrome renders inspected (hills in color and b/w); `npm test` 16/16 pass; stress over extremes clean, hidden motifs culled to keep SVG small.
-- [ ] T3 Op-art paintings: rainbow-petals (10/11), ribbon-arcs (13) — route: delegated
-- [ ] T4 Register in index.html, README, snapshots — route: delegated (same writer)
+- [x] T3 Op-art paintings: rainbow-petals (10/11), ribbon-arcs (13) — route: delegated
+  - Evidence: headless Chrome renders inspected; `npm test` 16/16 pass; stress over extremes clean.
+- [x] T4 Register in index.html, README, snapshots — route: delegated (same writer)
+  - Evidence: scripts appended after tube-network in brief order; README list updated; snapshots regenerated with each group; `instruction` added to all ten (main's new requirement).
 
 ## Checks
 - `npm test` green with new snapshots.
