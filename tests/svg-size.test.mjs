@@ -11,18 +11,22 @@ const LIMIT = 1_000_000;
 // measured by this sweep (bytes). They are bounded at that size instead, so they cannot
 // grow further; shrink them and drop their entry when they are reworked.
 const ALLOWED = {
-  "flow-field": 3_689_000, // all max: 1000 long streamlines
-  "truchet-tiles": 2_432_000, // all max: 24×24 tiles of 12 bands
+  "flow-field": 3_713_000, // all max + hand max: 1000 long streamlines
+  "truchet-tiles": 3_395_000, // all max + hand max: 24×24 tiles of 12 bands, bent arcs as polylines
+  "triangle-paradox": 3_097_000, // all max + hand max
+  "string-art": 2_242_000, // all max + hand max (1_352_000 without the hand)
   "woven-circle": 2_185_000, // all max
-  "triangle-paradox": 2_045_000, // all max
+  paradox: 2_080_000, // all max + hand max (1_418_000 without the hand)
   vortex: 1_553_000, // random mix with many arms and ribs
-  paradox: 1_418_000, // all max
-  "string-art": 1_352_000, // all max
+  "star-checker": 1_240_000, // all max + hand max only: wobble and pressure on ~14600 strokes
+  "paradox-circle": 1_158_000, // all max + hand max only: ~11700 bent strokes
 };
 
-// Defaults, every range at its min, every range at its max, and a few seeded random mixes.
-// The shared hand-drawn params stay at their defaults: wobble resamples every stroke and
-// would inflate every painting alike, which is the hand's cost, not the painting's.
+// Every shared hand-drawn param at its max: wobble, jitter, pressure and roughness.
+const HAND_MAX = Object.fromEntries(Gallery.HAND_PARAMS.filter((p) => p.name !== "handSeed").map((p) => [p.name, p.max]));
+
+// Defaults, every range at its min, every range at its max, a few seeded random mixes, and
+// the defaults and the max with the hand-drawn params at their max (bent strokes cost bytes).
 function variants(painting) {
   const own = [...painting.params, ...Gallery.STYLE_PARAMS.filter((p) => p.type === "select")];
   const out = [["defaults", Gallery.initialValues(painting)]];
@@ -31,6 +35,8 @@ function variants(painting) {
     for (const p of painting.params) if (p.type === "range") values[p.name] = p[end];
     out.push([`all ${end}`, values]);
   }
+  out.push(["defaults + hand max", { ...out[0][1], ...HAND_MAX }]);
+  out.push(["all max + hand max", { ...out[2][1], ...HAND_MAX }]);
   const rand = Gallery.random(2024);
   for (let round = 0; round < 6; round++) {
     const values = Gallery.initialValues(painting);
