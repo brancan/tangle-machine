@@ -8,7 +8,7 @@ on:
   discussion:
     types: [created, edited, deleted, category_changed, labeled, unlabeled, locked, unlocked]
   schedule:
-    - cron: "17 */6 * * *"
+    - cron: "17 * * * *"
   workflow_dispatch:
 
 permissions:

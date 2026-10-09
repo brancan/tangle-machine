@@ -102,7 +102,7 @@ Everything runs on GitHub; there is no backend and no extra login.
   kept. Thumbnails render the original painting with the link's variables;
   shared code is never run there (variants with code get a *custom code* badge
   and open behind the studio's **Run shared code** gate). The workflow
-  rebuilds on Discussion events and every six hours. If GitHub cannot be
+  rebuilds on Discussion events and every hour. If GitHub cannot be
   reached it keeps the currently published gallery (re-validated), writes `[]`
   only when that is unavailable too, and the deploy always succeeds.
 - **Likes**: a like is a GitHub reaction, so it needs a GitHub account. 👍 ❤️
@@ -112,7 +112,7 @@ Everything runs on GitHub; there is no backend and no extra login.
   `web/likes.json` (`{ "<painting id>": { "likes", "url" } }`) and a `likes`
   field in each `showcase.json` entry; cards, the studio and the public gallery
   show `♥ N` linking to the thread. Counts refresh on each deploy (Discussion
-  events and every six hours), not in real time, and fall back like the
+  events and every hour; GitHub has no event for reactions), not in real time, and fall back like the
   gallery does (published copy, then `{}`).
 - **Share previews**: every page has Open Graph and Twitter card tags pointing
   at `web/og-image.png` (1200x630). Regenerate it with

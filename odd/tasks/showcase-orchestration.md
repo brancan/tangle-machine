@@ -24,7 +24,7 @@ likes more often.
   token fall back to the published copy; unreachable published copy writes
   `[]` / `{}`; pagination stops at the page cap — route: delegated (writer);
   trigger: 2 non-trivial files (script + new test)
-- [ ] T2 Run the Pages workflow hourly instead of every six hours and update the
+- [x] T2 Run the Pages workflow hourly instead of every six hours and update the
   README — route: inline (parent); mechanical cron + text change
 
 ## Acceptance criteria
@@ -50,7 +50,10 @@ Forecast ~250 authored lines; strategy `ask-on-risk`, single PR/merge.
   copy, skipping re-validation, published-before-live, no empty fallback,
   dropping the token check and changing the page cap each fail >= 1 test.
   `node scripts/build-showcase.mjs` without `GITHUB_TOKEN` reused 6 showcase
-  entries and 0 likes from the published copy, exit 0.
+  entries and 0 likes from the published copy, exit 0. Commit 0f7e319.
+
+- T2 done: cron `17 * * * *` in `.github/workflows/pages.yml`; README says
+  every hour and that reactions have no Actions event. `npm test` 112/112.
 
 ## Next step
-T2.
+None: feature complete; merge to main needs the user's approval.
