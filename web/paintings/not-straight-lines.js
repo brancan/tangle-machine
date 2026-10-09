@@ -18,9 +18,9 @@ Gallery.register({
     { name: "waviness", label: "Waviness", type: "range", min: 0.02, max: 0.2, step: 0.01, value: 0.08 },
     { name: "grid", label: "Show grid", type: "checkbox", value: true },
     { name: "seed", label: "Seed", type: "range", min: 1, max: 100, step: 1, value: 1 },
-    { name: "colorA", label: "Color A", type: "color", value: "#c8282a" },
-    { name: "colorB", label: "Color B", type: "color", value: "#f2c81f" },
-    { name: "colorC", label: "Color C", type: "color", value: "#1f4e9c" },
+    { name: "colorA", label: "Color A", type: "color", value: "#111111" },
+    { name: "colorB", label: "Color B", type: "color", value: "#4a7a0c" },
+    { name: "colorC", label: "Color C", type: "color", value: "#8a8a8a" },
   ],
   draw: function draw(p, pen) {
     const rand = pen.random(p.seed);

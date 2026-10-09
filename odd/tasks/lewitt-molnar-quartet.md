@@ -38,3 +38,4 @@ Instagram plan needs new pieces (the "sun" #254 also anchors a future reel).
 - T2 done: 832f5e2 (`npm test` 112/112).
 - T3 done: 4e9bb93 (`npm test` 112/112).
 - T4 done in the commit that adds m-for-malevich.js (`npm test` 112/112); dossier count 69 → 73. README's "with 69 paintings" speed figure is a past measurement and stays.
+- T2 palette moved to brand ink #111111 / lime #4a7a0c / grey #8a8a8a at user's request (red/yellow/blue read off-brand, yellow faint).
