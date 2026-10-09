@@ -54,6 +54,10 @@ Forecast ~250 authored lines; strategy `ask-on-risk`, single PR/merge.
 
 - T2 done: cron `17 * * * *` in `.github/workflows/pages.yml`; README says
   every hour and that reactions have no Actions event. `npm test` 112/112.
+- Review: high risk (shell in pages.yml), consent granted, 4 lenses approved
+  and acknowledged (lineage review-0de1b89e71717893). Non-blocking
+  suggestions: README.md:115 wording, unused param at
+  tests/build-showcase.test.mjs:196, hourly cron load.
 
 ## Next step
 None: feature complete; merge to main needs the user's approval.
