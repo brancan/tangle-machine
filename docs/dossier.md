@@ -72,11 +72,12 @@ Three principles follow from that frame:
 
 ## 3. Current state (verified)
 
-- **69 paintings**, among them Paradox variations, op art (Bulge Checker, Op
+- **73 paintings**, among them Paradox variations, op art (Bulge Checker, Op
   Waves, Polar Checker), field-based pieces (Contour Lines, Ripples, Flow
   Field), classic tangles (Hollibaugh, Florz, Huggins, Keeko, Knitting,
   Tumbling Blocks, Rhombus Star…) and homages to generative and modern art
-  (Schotter after Nees, Interruptions after Molnar, Wall Drawing after LeWitt,
+  (Schotter after Nees, Interruptions, Letters and M for Malevich after Molnar,
+  Wall Drawing, Lines from the Center and Not-Straight Lines after LeWitt,
   Mondrian, Kandinsky, Hokusai…).
 - **Studio** per painting: live variables, editable code with automatic
   re-run, Randomize, previous/next navigation with arrow keys.
