@@ -182,6 +182,14 @@ verification. Then, under **Sitemaps** in
 [Search Console](https://search.google.com/search-console), submit
 `sitemap.xml`.
 
+## Visits
+
+Every page loads [GoatCounter](https://www.goatcounter.com) (no cookies, no
+consent banner); the dashboard is https://tanglemachine.goatcounter.com. The
+studio routes by hash, so `web/index.html` counts each painting as
+`/tangle-machine/#/<id>` (variables stripped) instead of one count per page
+load. GoatCounter ignores `localhost`, so local runs are never counted.
+
 ## Brand
 
 `brand/` holds the Instagram assets: the profile picture and the first posts

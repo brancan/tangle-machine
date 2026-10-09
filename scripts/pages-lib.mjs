@@ -134,6 +134,7 @@ export function paintingPage(painting, { svg, instruction = [], number, prev, ne
     <script type="application/ld+json">
 ${jsonForScript(artworkLd(painting))}
     </script>
+    <script data-goatcounter="https://tanglemachine.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
   </head>
   <body>
     <header class="site-header">

@@ -31,6 +31,20 @@
         "inLanguage": "en"
       }
     </script>
+    <script>
+      // The studio routes by hash (#/<id>), which a plain page count never sees:
+      // count each painting once per visit, without its variables.
+      window.goatcounter = { no_onload: true };
+      let countedPath;
+      function countView() {
+        const path = location.pathname + location.hash.split("?")[0];
+        if (path === countedPath || !window.goatcounter.count) return;
+        countedPath = path;
+        window.goatcounter.count({ path });
+      }
+      window.addEventListener("hashchange", countView);
+    </script>
+    <script data-goatcounter="https://tanglemachine.goatcounter.com/count" onload="countView()" async src="https://gc.zgo.at/count.js"></script>
   </head>
   <body>
     <header class="site-header">

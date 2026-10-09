@@ -60,3 +60,18 @@ test("the home page has a descriptive title, a gallery h1, WebSite JSON-LD and t
   assert.equal(ld["@type"], "WebSite");
   assert.equal(ld.url, SITE);
 });
+
+const COUNTER = /<script data-goatcounter="https:\/\/tanglemachine\.goatcounter\.com\/count"[^>]* src="https:\/\/gc\.zgo\.at\/count\.js"><\/script>/;
+
+for (const page of ["index.html", "showcase.html", "about.html"]) {
+  test(`${page} loads the GoatCounter visit counter`, () => {
+    assert.match(readFileSync(join(WEB, page), "utf8"), COUNTER);
+  });
+}
+
+test("the studio counts each painting view once, without its variables", () => {
+  const html = readFileSync(join(WEB, "index.html"), "utf8");
+  assert.match(html, /no_onload: true/);
+  assert.match(html, /location\.hash\.split\("\?"\)\[0\]/);
+  assert.match(html, /addEventListener\("hashchange", countView\)/);
+});

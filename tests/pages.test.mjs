@@ -64,7 +64,10 @@ test("every real painting gets a complete page", () => {
     assert.ok(description.length <= 160, `${painting.id} description is ${description.length} chars`);
     assert.equal((html.match(/<h1[\s>]/g) || []).length, 1, `${painting.id} has one h1`);
     assert.match(html, /<svg[\s>]/);
-    assert.doesNotMatch(html.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/g, ""), /<script/);
+    const scripts = html
+      .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/g, "")
+      .replace(/<script data-goatcounter="[^"]*" async src="https:\/\/gc\.zgo\.at\/count\.js"><\/script>/, "");
+    assert.doesNotMatch(scripts, /<script/, `${painting.id} runs no script but the visit counter`);
     assert.ok(html.includes(`href="../index.html#/${painting.id}"`), `${painting.id} studio link`);
     assert.ok(html.includes('href="../favicon.svg"'));
     assert.ok(html.includes("Zentangle®"));
@@ -169,4 +172,9 @@ test("llms.txt summarises the site and lists every painting", () => {
   assert.match(text, /\n## Paintings\n/);
   assert.ok(text.includes(`(${SITE}about.html)`));
   for (const painting of paintings) assert.ok(text.includes(`](${SITE}p/${painting.id}.html): `), painting.id);
+});
+
+test("painting pages load the GoatCounter visit counter", () => {
+  const html = pageFor(paintings[0], 0);
+  assert.match(html, /<script data-goatcounter="https:\/\/tanglemachine\.goatcounter\.com\/count" async src="https:\/\/gc\.zgo\.at\/count\.js"><\/script>/);
 });
