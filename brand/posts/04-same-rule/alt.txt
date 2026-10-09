@@ -1,0 +1,9 @@
+Slide 1: Near-black background. Green heading "Same rule, different values" and the title "Two pendulums steer one pen." Below, a harmonograph trace in fine light-grey lines: dense silky ribbons that sweep diagonally and fold around each other into a knot at the centre. Small monospace values underneath: x 2, y 3, detune 0.2%, phase 1.2, damping 2‰, beats 90.
+
+Slide 2: Heading "Same rule" and "One swing against two." The trace is a narrow, twisted ribbon shaped like a bow or a propeller, with one long pointed blade running down to the lower right. Values: x 1, y 2, detune 0.2%, phase 0.6, damping 3‰, beats 90.
+
+Slide 3: Heading "Same rule" and "In unison, slightly out of tune." A wide lens shape made of crossing curved lines like a net, with a small bright diamond knot at its centre. Values: x 1, y 1, detune 1.5%, phase 1.5, damping 3‰, beats 90.
+
+Slide 4: Heading "Same rule" and "Five swings against four." Many nested tilted ellipses, spaced wide at the outside and tightening into a bright swirl near the middle. Values: x 5, y 4, detune 0.1%, phase 2.4, damping 5‰, beats 90.
+
+Slide 5: Green heading "Only the numbers changed" and "Set your own. Link in bio." A star-like burst of thin pointed petals at the centre, wrapped in sets of nested loops that spread diagonally. Values: x 5, y 6, detune 0.1%, phase 0.3, damping 6‰, beats 90.

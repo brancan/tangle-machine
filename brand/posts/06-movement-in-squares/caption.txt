@@ -1,0 +1,7 @@
+A plain checkerboard: 22 columns, 14 rows, every other square filled.
+Then the columns get narrower toward a fold, squeezed by up to 90%, and the flat grid seems to bend away from you.
+Movement in Squares, after Bridget Riley's painting from 1961. An interpretation, not the original.
+Slide the fold and the bend moves with it.
+Try it: link in bio.
+
+#GenerativeArt #BridgetRiley #OpArt #OpticalIllusion #CreativeCoding #AlgorithmicArt #CodeArt #GeometricArt #JavaScriptArt #MathArt

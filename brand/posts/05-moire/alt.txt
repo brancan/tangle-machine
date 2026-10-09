@@ -1,0 +1,3 @@
+Reel: A large circle filled with fine, horizontal light-grey lines on a near-black background, with the green heading "Moiré" above it. A second layer of lines on top turns slowly, and soft dark and light bands appear across the circle: at first a few broad, blurry shadows, then narrower near-vertical stripes that crowd together as the turn grows, then broad again as it turns back, looping. A label below counts the turn between 0.5° and 6.0°, with the small text "lines 6 apart · second layer turned".
+
+Cover: Green heading "Moiré · Tangle Machine" and the title "Two layers of lines, one small turn" above the same circle of fine lines, crossed by faint vertical bands. Caption below: "Neither layer has the bands".

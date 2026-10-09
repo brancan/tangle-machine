@@ -1,0 +1,7 @@
+Same rule, five sets of numbers.
+A harmonograph is two swinging pendulums steering one pen. As the swing dies away, the line winds inward into a knot.
+The instruction never changes: only how often each pendulum swings, how far out of step, how fast it fades.
+Two against three, one against two, in unison, five against four, five against six.
+Swipe, then set your own numbers: link in bio.
+
+#GenerativeArt #Harmonograph #CreativeCoding #AlgorithmicArt #CodeArt #MathArt #JavaScriptArt #GeometricArt #PlotterArt #LineArt

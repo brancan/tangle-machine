@@ -305,7 +305,138 @@ async function post3() {
   );
 }
 
+// ====================== Posts 4–6 (second batch) ======================
+// A second renderer page holds the paintings these posts need, so the code above stays as is.
+const EXTRA = ["harmonograph", "moire", "movement-in-squares"];
+const xpage = await browser.newPage({ deviceScaleFactor: 1 });
+await xpage.setContent(`<!doctype html><html><head>
+  <script src="${BASE}/js/gallery.js"></script>
+  ${EXTRA.map((id) => `<script src="${BASE}/paintings/${id}.js"></script>`).join("\n  ")}
+</head><body></body></html>`);
+await xpage.waitForFunction((n) => window.Gallery && Gallery.paintings.length === n, EXTRA.length);
+
+// Same as svg(), on the second renderer page (no partial drawing needed here).
+async function xsvg(id, overrides = {}, size = 800) {
+  return xpage
+    .evaluate(
+      ({ id, overrides, size }) => {
+        const painting = Gallery.find(id);
+        return Gallery.render(painting.draw, { ...Gallery.initialValues(painting), ...overrides }, size);
+      },
+      { id, overrides, size }
+    )
+    .catch((e) => {
+      throw new Error(`render ${id}: ${e.message}`);
+    });
+}
+
+// ---------- 04 · Same rule, different values (carousel) ----------
+// Harmonograph: one instruction, five sets of numbers.
+const HARMO = [
+  { fx: 2, fy: 3, detune: 0.2, phase: 1.2, damping: 2, beats: 90 },
+  { fx: 1, fy: 2, detune: 0.2, phase: 0.6, damping: 3, beats: 90 },
+  { fx: 1, fy: 1, detune: 1.5, phase: 1.5, damping: 3, beats: 90 },
+  { fx: 5, fy: 4, detune: 0.1, phase: 2.4, damping: 5, beats: 90 },
+  { fx: 5, fy: 6, detune: 0.1, phase: 0.3, damping: 6, beats: 90 },
+];
+const harmoValues = (v) =>
+  `x ${v.fx} · y ${v.fy} · detune ${v.detune}% · phase ${v.phase}<br>damping ${v.damping}‰ · beats ${v.beats}`;
+
+async function post4() {
+  const dir = join(OUT, "04-same-rule");
+  const style = { ...BRAND, strokeWidth: 1.6 };
+  const foot = (n) => `
+    <div style="position:absolute;left:96px;right:96px;bottom:70px;display:flex;justify-content:space-between;align-items:baseline">
+      <span class="brand">Tangle Machine · Harmonograph</span><span class="brand">${n} / 5</span>
+    </div>`;
+  for (let i = 0; i < HARMO.length; i++) {
+    const v = HARMO[i];
+    const art = await xsvg("harmonograph", { ...style, ...v }, 800);
+    const head =
+      i === 0
+        ? `<div class="kicker">Same rule, different values</div>
+           <div style="margin-top:22px;font-size:62px;line-height:1.1">Two pendulums steer one pen.</div>`
+        : i === HARMO.length - 1
+          ? `<div class="kicker">Only the numbers changed</div>
+             <div style="margin-top:22px;font-size:62px;line-height:1.1">Set your own. <span class="accent">Link in bio.</span></div>`
+          : `<div class="kicker">Same rule</div>
+             <div style="margin-top:22px;font-size:62px;line-height:1.1">${["", "One swing against two.", "In unison, slightly out of tune.", "Five swings against four."][i]}</div>`;
+    await shoot(
+      `<div style="position:absolute;left:96px;right:96px;top:96px">${head}</div>
+       <div class="art" style="position:absolute;left:60px;top:240px;width:960px;height:960px">${art}</div>
+       <div class="muted" style="position:absolute;left:96px;right:96px;top:1150px;text-align:center;font-family:${MONO};font-size:25px;line-height:1.55">${harmoValues(v)}</div>
+       ${foot(i + 1)}`,
+      W, H, join(dir, `slide-${i + 1}.png`)
+    );
+  }
+}
+
+// ---------- 05 · Moiré (reel) ----------
+// The studio's Turn slider swept by hand: the second layer of lines turns from 0.5° to 6°
+// and back, so the reel loops seamlessly.
+const MOIRE = { ...BRAND, spacing: 6, strokeWidth: 1.2, circles: false };
+const turnAt = (t) => 0.5 + 5.5 * (1 - Math.cos((2 * Math.PI * t) / DURATION)) / 2;
+
+function moireFrame(art, turn, { cover = false } = {}) {
+  // Text and drawing stay inside the centered 1080×1350 crop (y 285–1635).
+  return `
+    <div style="position:absolute;left:0;right:0;top:330px;text-align:center">
+      <div class="kicker">${cover ? "Moiré · Tangle Machine" : "Moiré"}</div>
+      ${cover ? `<div style="margin-top:22px;font-size:76px;line-height:1.08">Two layers of lines,<br>one small turn</div>` : ""}
+    </div>
+    <div class="art" style="position:absolute;left:62px;top:${cover ? 562 : 402}px;width:956px;height:956px">${art}</div>
+    <div style="position:absolute;left:0;right:0;top:${cover ? 1530 : 1380}px;text-align:center">
+      ${
+        cover
+          ? `<div class="muted" style="font-size:34px">Neither layer has the bands</div>`
+          : `<div style="font-size:46px">turn <span class="accent">${turn.toFixed(1)}°</span></div>
+             <div class="muted" style="margin-top:12px;font-size:28px">lines ${MOIRE.spacing} apart · second layer turned</div>`
+      }
+    </div>`;
+}
+
+async function post5() {
+  const dir = join(OUT, "05-moire");
+  const frames = join(FRAMES, "05");
+  mkdirSync(frames, { recursive: true });
+  const total = FPS * DURATION;
+  const arts = [];
+  for (let f = 0; f < total; f++) {
+    const turn = turnAt(f / FPS);
+    arts.push({ turn, art: await xsvg("moire", { ...MOIRE, angle: turn }, 800) });
+  }
+  await page.setViewportSize({ width: 1080, height: 1920 });
+  await page.setContent(
+    `<!doctype html><html><head><style>${BASE_CSS}</style></head><body><div id="p" class="page" style="width:1080px;height:1920px"></div></body></html>`
+  );
+  await page.evaluate(() => document.fonts.ready);
+  for (let f = 0; f < total; f++) {
+    await page.evaluate((html) => (document.getElementById("p").innerHTML = html), moireFrame(arts[f].art, arts[f].turn));
+    await page.screenshot({ path: join(frames, `f${String(f).padStart(4, "0")}.png`) });
+  }
+  await reloadRenderer();
+  const coverArt = await xsvg("moire", { ...MOIRE, angle: 2 }, 800);
+  await shoot(moireFrame(coverArt, 2, { cover: true }), 1080, 1920, join(dir, "cover.png"));
+}
+
+// ---------- 06 · Movement in Squares (single image) ----------
+async function post6() {
+  const dir = join(OUT, "06-movement-in-squares");
+  const art = await xsvg("movement-in-squares", { ...BRAND, strokeWidth: 1.4 }, 800);
+  await shoot(
+    `<div class="art" style="position:absolute;left:100px;top:150px;width:880px;height:880px">${art}</div>
+     <div style="position:absolute;left:140px;right:140px;top:1100px;text-align:center">
+       <div style="font-size:34px"><i>Movement in Squares</i>, after Bridget Riley</div>
+       <div class="muted" style="margin-top:12px;font-size:24px">Tangle Machine · 22 columns · fold 62% · squeeze 90%</div>
+     </div>`,
+    W, H, join(dir, "movement-in-squares.png")
+  );
+}
+
 if (ONLY === "all" || ONLY === "1") await post1();
 if (ONLY === "all" || ONLY === "3") await post3();
 if (ONLY === "all" || ONLY === "2") await post2();
+if (ONLY === "all" || ONLY === "4") await post4();
+if (ONLY === "all" || ONLY === "6") await post6();
+if (ONLY === "all" || ONLY === "5") await post5();
 await browser.close();
