@@ -637,6 +637,62 @@ async function post8() {
   await shoot(draughtFrame(coverArt, DRAUGHT.seed, coverText, { cover: true }), 1080, 1920, join(dir, "cover.png"));
 }
 
+// ---------- 09 · The tremor (reel) ----------
+// The same Wall Drawing, seed fixed, while the studio's hand-drawn sliders rise from 0 to
+// their maximum (web/js/gallery.js HAND_PARAMS). The hand seed stays fixed, so the shake grows
+// smoothly instead of flickering.
+const TREMOR = { ...DRAUGHT, handSeed: 7 };
+const TREMOR_MAX = { handWobble: 8, handJitter: 8, handPressure: 0.9, handRoughness: 6 };
+const TREMOR_START = 0.7; // seconds of the steady drawing first
+const TREMOR_RISE = 9;
+const TREMOR_DURATION = 12;
+const tremorAt = (t) => {
+  const x = Math.min(1, Math.max(0, (t - TREMOR_START) / TREMOR_RISE));
+  const k = x * x * (3 - 2 * x);
+  return Object.fromEntries(Object.entries(TREMOR_MAX).map(([name, max]) => [name, max * k]));
+};
+const TREMOR_LABELS = [
+  ["wobble", "handWobble", 1],
+  ["jitter", "handJitter", 1],
+  ["pressure", "handPressure", 2],
+  ["roughness", "handRoughness", 1],
+];
+
+function tremorFrame(art, hand, { cover = false } = {}) {
+  // Text and drawing stay inside the centered 1080×1350 crop (y 285–1635).
+  const values = TREMOR_LABELS.map(
+    ([label, name, digits]) =>
+      `<div style="display:flex;justify-content:space-between"><span class="muted">${label}</span>` +
+      `<span class="accent" style="font-variant-numeric:tabular-nums">${hand[name].toFixed(digits)}</span></div>`
+  ).join("");
+  return `
+    <div style="position:absolute;left:90px;right:90px;top:330px;text-align:center">
+      <div class="kicker">The tremor · after Sol LeWitt</div>
+      <div style="margin-top:20px;font-size:${cover ? 64 : 58}px;line-height:1.1">Same drawing, same seed.<br>Only the hand shakes.</div>
+    </div>
+    <div class="art" style="position:absolute;left:${cover ? 150 : 130}px;top:${cover ? 590 : 560}px;width:${cover ? 780 : 820}px;height:${cover ? 780 : 820}px">${art}</div>
+    ${
+      cover
+        ? `<div class="muted" style="position:absolute;left:0;right:0;top:1420px;text-align:center;font-size:34px">From a steady hand to a shaking one · Tangle Machine</div>`
+        : `<div style="position:absolute;left:170px;right:170px;top:1405px;display:grid;grid-template-columns:1fr 1fr;column-gap:90px;row-gap:6px;font-family:${MONO};font-size:34px">${values}</div>
+           <div class="muted" style="position:absolute;left:0;right:0;top:1520px;text-align:center;font-size:28px">hand-drawn sliders, from 0 to their maximum</div>`
+    }`;
+}
+
+async function post9() {
+  const dir = join(OUT, "09-tremor");
+  const total = FPS * TREMOR_DURATION;
+  const frames = [];
+  for (let f = 0; f < total; f++) {
+    const hand = tremorAt(f / FPS);
+    frames.push({ hand, art: await rsvg("wall-drawing", { ...TREMOR, ...hand }, 800) });
+  }
+  await shootFrames(join(FRAMES, "09"), total, (f) => tremorFrame(frames[f].art, frames[f].hand));
+  const coverHand = Object.fromEntries(Object.entries(TREMOR_MAX).map(([name, max]) => [name, max * 0.45]));
+  const coverArt = await rsvg("wall-drawing", { ...TREMOR, ...coverHand }, 800);
+  await shoot(tremorFrame(coverArt, coverHand, { cover: true }), 1080, 1920, join(dir, "cover.png"));
+}
+
 if (ONLY === "all" || ONLY === "1") await post1();
 if (ONLY === "all" || ONLY === "3") await post3();
 if (ONLY === "all" || ONLY === "2") await post2();
@@ -645,4 +701,5 @@ if (ONLY === "all" || ONLY === "6") await post6();
 if (ONLY === "all" || ONLY === "5") await post5();
 if (ONLY === "all" || ONLY === "7" || ONLY === "07") await post7();
 if (ONLY === "all" || ONLY === "8" || ONLY === "08") await post8();
+if (ONLY === "all" || ONLY === "9" || ONLY === "09") await post9();
 await browser.close();

@@ -13,7 +13,7 @@ following the existing reel pattern (posts 02 and 05).
 ## Tasks
 - [x] T1 07 sun debut: Lines from the Center (#254) accumulating, counter 0 → ~1000 — route: delegated (writer: render.mjs + new post folder + README)
 - [x] T2 08 "The draughtsman": Wall Drawing drawn square by square via `limit`, then several seed jumps; hook "One instruction. Your browser holds the pencil."
-- [ ] T3 09 "The tremor": same drawing with wobble, jitter, roughness rising 0 → max, values counting at the bottom
+- [x] T3 09 "The tremor": same drawing with wobble, jitter, roughness rising 0 → max, values counting at the bottom
 
 ## Checks
 - Reel renders, ffprobe shows 1080×1920/30 fps/no audio; frames spot-checked; `npm test` green.
@@ -22,4 +22,5 @@ following the existing reel pattern (posts 02 and 05).
 - Branch `feat/reels` from main 01310bc.
 - T1 done: `07-sun-debut/` reel 11 s (9 s eased drawing 0 → 1,000 lines via `limit`, 2 s hold), cover, caption, alt; render.mjs gets a third renderer page (`rsvg`, `shootFrames`, `ONLY=07`). ffprobe 1080×1920, 30 fps, 11.0 s, video only; frames 60/135/329 and cover checked.
 - T2 done: `08-draughtsman/` reel 13 s (8 s drawing by `limit` in drawing order, 0.8 s hold, seeds 17/42/88/61/25 at 0.6 s each, hold), filled instruction via `Instruction.render`, cover, caption, alt. T1 nit fixed: live numbers sit in a fixed-width box (`liveNumber`), 07 re-rendered. ffprobe 1080×1920, 30 fps, 13.0 s, video only; frames 10/90/300/389 and cover checked.
-- Next: T3 09 "The tremor".
+- T3 done: `09-tremor/` reel 12 s (0.7 s steady, 9 s smoothstep rise of handWobble 0→8, handJitter 0→8, handPressure 0→0.9, handRoughness 0→6 with hand seed 7, hold), live values in tabular mono, cover at 45%, caption, alt. ffprobe 1080×1920, 30 fps, 12.0 s, video only; frames 60/170/359 and cover checked.
+- Next: all three reels done; push and PR are the user's decision.

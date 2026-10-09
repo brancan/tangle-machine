@@ -1,0 +1,7 @@
+Same drawing, same seed. Only the hand shakes.
+A machine draws a perfectly straight line. A hand doesn't.
+Every drawing on the site has four hand-drawn sliders: wobble bends the lines, jitter moves their ends, pressure changes their weight, roughness frays their edges.
+Here they rise from 0 to their maximum over a Wall Drawing after Sol LeWitt (an interpretation in code, not his original). The squares stay the same; the hand gets less steady.
+Find your own amount of tremor: link in bio.
+
+#GenerativeArt #SolLeWitt #ConceptualArt #CreativeCoding #AlgorithmicArt #CodeArt #GeometricArt #JavaScriptArt #HandDrawn #PlotterArt

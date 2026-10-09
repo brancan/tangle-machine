@@ -14,6 +14,7 @@ The first six posts (two weeks) for Tangle Machine (brancan.github.io/tangle-mac
 | 6 | `06-movement-in-squares/` | Single image, `movement-in-squares.png` 1080×1350 | Day 12 |
 | 7 | `07-sun-debut/` | Reel, `reel.mp4` 1080×1920, 11 s, 30 fps, no audio; cover `cover.png`: Lines from the Center (#254) drawn line by line, 0 → 1,000 | — |
 | 8 | `08-draughtsman/` | Reel, `reel.mp4` 1080×1920, 13 s, 30 fps, no audio; cover `cover.png`: Wall Drawing drawn square by square, then five seed jumps | — |
+| 9 | `09-tremor/` | Reel, `reel.mp4` 1080×1920, 12 s, 30 fps, no audio; cover `cover.png`: the same drawing while the hand-drawn sliders rise from 0 to their maximum | — |
 
 Each folder has `caption.txt` (paste as is) and `alt.txt` (paste per slide under Advanced settings → Accessibility → Write alt text).
 
@@ -62,4 +63,13 @@ ffmpeg -framerate 30 -i /tmp/reel-frames/08/f%04d.png -c:v libx264 -pix_fmt yuv4
   -crf 18 -movflags +faststart -an brand/posts/08-draughtsman/reel.mp4
 ```
 
-`ONLY=1|2|3|4|5|6|07|08` renders a single post.
+Post 9 renders the same Wall Drawing (seed 3, hand seed 7) on the reels page and writes its frames to `<framesDir>/09`:
+
+```sh
+ONLY=09 PLAYWRIGHT_PATH=<path to playwright> CHROME_PATH=/usr/bin/google-chrome \
+  node brand/posts/_tools/render.mjs http://localhost:8765 /tmp/reel-frames
+ffmpeg -framerate 30 -i /tmp/reel-frames/09/f%04d.png -c:v libx264 -pix_fmt yuv420p \
+  -crf 18 -movflags +faststart -an brand/posts/09-tremor/reel.mp4
+```
+
+`ONLY=1|2|3|4|5|6|07|08|09` renders a single post.
