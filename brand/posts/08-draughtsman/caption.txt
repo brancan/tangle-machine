@@ -1,0 +1,8 @@
+One instruction. Your browser holds the pencil.
+Sol LeWitt wrote his wall drawings as instructions and let draughtsmen carry them out.
+Here the instruction is a function: a 4 × 4 grid, lines in four directions, a random combination in each square.
+The reel shows it drawn line by line, square by square, in the order the code draws them. Then the seed changes: same words, different random choices.
+An interpretation in code, not LeWitt's original.
+Pick your own seed: link in bio.
+
+#GenerativeArt #SolLeWitt #ConceptualArt #CreativeCoding #AlgorithmicArt #CodeArt #GeometricArt #JavaScriptArt #MathArt #PlotterArt

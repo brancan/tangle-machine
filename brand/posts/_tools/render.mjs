@@ -435,10 +435,11 @@ async function post6() {
 
 // ====================== Post 7 (reels) ======================
 // A third renderer page for the reels' paintings, so the pages above stay as they are.
-const REELS = ["lines-from-center"];
+const REELS = ["lines-from-center", "wall-drawing"];
 const rpage = await browser.newPage({ deviceScaleFactor: 1 });
 await rpage.setContent(`<!doctype html><html><head>
   <script src="${BASE}/js/gallery.js"></script>
+  <script src="${BASE}/js/instruction.js"></script>
   ${REELS.map((id) => `<script src="${BASE}/paintings/${id}.js"></script>`).join("\n  ")}
 </head><body></body></html>`);
 await rpage.waitForFunction((n) => window.Gallery && Gallery.paintings.length === n, REELS.length);
@@ -477,6 +478,45 @@ async function rsvg(id, overrides = {}, size = 800, limit = Infinity) {
       throw new Error(`render ${id}: ${e.message}`);
     });
 }
+
+// How many shapes a painting draws (the `limit` that finishes it).
+async function rshapes(id, overrides = {}) {
+  return rpage.evaluate(
+    ({ id, overrides }) => {
+      const painting = Gallery.find(id);
+      let count = 0;
+      Gallery.render(
+        (p, pen) => {
+          const wrapped = Object.create(pen);
+          for (const name of ["polygon", "polyline", "line", "circle", "arc", "path"]) {
+            wrapped[name] = (...args) => (count++, pen[name](...args));
+          }
+          painting.draw(p, wrapped);
+        },
+        { ...Gallery.initialValues(painting), ...overrides },
+        800
+      );
+      return count;
+    },
+    { id, overrides }
+  );
+}
+
+// A painting's written instruction with its blanks filled (web/js/instruction.js).
+async function rinstruction(id, overrides = {}) {
+  return rpage.evaluate(
+    ({ id, overrides }) => {
+      const painting = Gallery.find(id);
+      const values = { ...Gallery.initialValues(painting), ...overrides };
+      return Instruction.render(painting.instruction, values).map((part) => part.text).join("");
+    },
+    { id, overrides }
+  );
+}
+
+// A live number that keeps its place as digits are added: fixed width, left aligned.
+const liveNumber = (text, width) =>
+  `<span class="accent" style="display:inline-block;width:${width}px;text-align:left;font-variant-numeric:tabular-nums">${text}</span>`;
 
 // Shoots reel frames: `frameHtml(f)` gives each frame's markup.
 async function shootFrames(dir, total, frameHtml) {
@@ -518,7 +558,7 @@ function sunFrame(art, lines, { cover = false } = {}) {
       ${
         cover
           ? `<div class="muted" style="font-size:34px">One rule, ${SUN.count.toLocaleString("en-US")} lines · Tangle Machine</div>`
-          : `<div style="font-size:46px">lines <span class="accent">${lines.toLocaleString("en-US")}</span></div>
+          : `<div style="font-size:46px">lines ${liveNumber(lines.toLocaleString("en-US"), 120)}</div>
              <div class="muted" style="margin-top:12px;font-size:28px">an interpretation, not the original · seed ${SUN.seed}</div>`
       }
     </div>`;
@@ -537,6 +577,66 @@ async function post7() {
   await shoot(sunFrame(coverArt, SUN.count, { cover: true }), 1080, 1920, join(dir, "cover.png"));
 }
 
+// ---------- 08 · The draughtsman (reel) ----------
+// Wall Drawing carried out shape by shape in drawing order (square by square), then a few
+// quick seed jumps: same instruction, different random choices.
+const DRAUGHT = { ...BRAND, cells: 4, spacing: 9, systematic: false, seed: 3, strokeWidth: 1.2 };
+const DRAUGHT_DRAW = 8; // seconds of drawing
+const DRAUGHT_PAUSE = 0.8; // the finished first drawing, before the jumps
+const DRAUGHT_SEEDS = [17, 42, 88, 61, 25];
+const DRAUGHT_JUMP = 0.6; // seconds per seed
+const DRAUGHT_DURATION = 13;
+
+function draughtFrame(art, seed, instruction, { drawing = false, cover = false } = {}) {
+  // Text and drawing stay inside the centered 1080×1350 crop (y 285–1635).
+  return `
+    <div style="position:absolute;left:90px;right:90px;top:330px;text-align:center">
+      <div class="kicker">The draughtsman · after Sol LeWitt</div>
+      <div style="margin-top:20px;font-size:${cover ? 64 : 58}px;line-height:1.1">One instruction.<br>Your browser holds the pencil.</div>
+      <div class="muted" style="margin-top:22px;font-size:24px;line-height:1.4;font-style:italic">${instruction}</div>
+    </div>
+    <div class="art" style="position:absolute;left:180px;top:${cover ? 700 : 690}px;width:720px;height:720px">${art}</div>
+    <div style="position:absolute;left:0;right:0;top:${cover ? 1460 : 1440}px;text-align:center">
+      ${
+        cover
+          ? `<div class="muted" style="font-size:34px">Drawn line by line · Tangle Machine</div>`
+          : `<div style="font-size:46px">seed ${liveNumber(seed, 60)}</div>
+             <div class="muted" style="margin-top:12px;font-size:28px">${
+               drawing ? "drawn line by line, square by square" : "same instruction, new random choices"
+             }</div>`
+      }
+    </div>`;
+}
+
+async function post8() {
+  const dir = join(OUT, "08-draughtsman");
+  const total = FPS * DRAUGHT_DURATION;
+  const shapes = await rshapes("wall-drawing", DRAUGHT);
+  const jumps = DRAUGHT_DRAW + DRAUGHT_PAUSE;
+  const cache = new Map();
+  const frames = [];
+  for (let f = 0; f < total; f++) {
+    const t = f / FPS;
+    let seed = DRAUGHT.seed;
+    let limit = Infinity;
+    if (t < DRAUGHT_DRAW) limit = Math.round((shapes * t) / DRAUGHT_DRAW);
+    else if (t >= jumps) seed = DRAUGHT_SEEDS[Math.min(DRAUGHT_SEEDS.length - 1, Math.floor((t - jumps) / DRAUGHT_JUMP))];
+    const key = `${seed}/${limit}`;
+    if (!cache.has(key)) {
+      const values = { ...DRAUGHT, seed };
+      cache.set(key, {
+        art: await rsvg("wall-drawing", values, 800, limit),
+        instruction: await rinstruction("wall-drawing", values),
+      });
+    }
+    frames.push({ seed, drawing: t < DRAUGHT_DRAW, ...cache.get(key) });
+  }
+  await shootFrames(join(FRAMES, "08"), total, (f) => draughtFrame(frames[f].art, frames[f].seed, frames[f].instruction, frames[f]));
+  const coverArt = await rsvg("wall-drawing", DRAUGHT, 800);
+  const coverText = await rinstruction("wall-drawing", DRAUGHT);
+  await shoot(draughtFrame(coverArt, DRAUGHT.seed, coverText, { cover: true }), 1080, 1920, join(dir, "cover.png"));
+}
+
 if (ONLY === "all" || ONLY === "1") await post1();
 if (ONLY === "all" || ONLY === "3") await post3();
 if (ONLY === "all" || ONLY === "2") await post2();
@@ -544,4 +644,5 @@ if (ONLY === "all" || ONLY === "4") await post4();
 if (ONLY === "all" || ONLY === "6") await post6();
 if (ONLY === "all" || ONLY === "5") await post5();
 if (ONLY === "all" || ONLY === "7" || ONLY === "07") await post7();
+if (ONLY === "all" || ONLY === "8" || ONLY === "08") await post8();
 await browser.close();
