@@ -433,10 +433,115 @@ async function post6() {
   );
 }
 
+// ====================== Post 7 (reels) ======================
+// A third renderer page for the reels' paintings, so the pages above stay as they are.
+const REELS = ["lines-from-center"];
+const rpage = await browser.newPage({ deviceScaleFactor: 1 });
+await rpage.setContent(`<!doctype html><html><head>
+  <script src="${BASE}/js/gallery.js"></script>
+  ${REELS.map((id) => `<script src="${BASE}/paintings/${id}.js"></script>`).join("\n  ")}
+</head><body></body></html>`);
+await rpage.waitForFunction((n) => window.Gallery && Gallery.paintings.length === n, REELS.length);
+
+// Same as svg() (including `limit`, the drawing in progress), on the reels' renderer page.
+async function rsvg(id, overrides = {}, size = 800, limit = Infinity) {
+  return rpage
+    .evaluate(
+      ({ id, overrides, size, limit }) => {
+        const painting = Gallery.find(id);
+        const values = { ...Gallery.initialValues(painting), ...overrides };
+        let draw = painting.draw;
+        if (limit !== null) {
+          draw = (p, pen) => {
+            let count = 0;
+            const stop = {};
+            const wrapped = Object.create(pen);
+            for (const name of ["polygon", "polyline", "line", "circle", "arc", "path"]) {
+              wrapped[name] = (...args) => {
+                if (count++ >= limit) throw stop;
+                return pen[name](...args);
+              };
+            }
+            try {
+              painting.draw(p, wrapped);
+            } catch (e) {
+              if (e !== stop) throw e;
+            }
+          };
+        }
+        return Gallery.render(draw, values, size);
+      },
+      { id, overrides, size, limit: Number.isFinite(limit) ? limit : null }
+    )
+    .catch((e) => {
+      throw new Error(`render ${id}: ${e.message}`);
+    });
+}
+
+// Shoots reel frames: `frameHtml(f)` gives each frame's markup.
+async function shootFrames(dir, total, frameHtml) {
+  mkdirSync(dir, { recursive: true });
+  await page.setViewportSize({ width: 1080, height: 1920 });
+  await page.setContent(
+    `<!doctype html><html><head><style>${BASE_CSS}</style></head><body><div id="p" class="page" style="width:1080px;height:1920px"></div></body></html>`
+  );
+  await page.evaluate(() => document.fonts.ready);
+  for (let f = 0; f < total; f++) {
+    await page.evaluate((html) => (document.getElementById("p").innerHTML = html), frameHtml(f));
+    await page.screenshot({ path: join(dir, `f${String(f).padStart(4, "0")}.png`) });
+  }
+  await reloadRenderer();
+}
+
+// ---------- 07 · The sun (reel) ----------
+// Lines from the Center (#254) drawn line by line: the pen stops after n lines of the same
+// seeded drawing, so earlier lines never move. Slow start, fast middle, then a hold.
+const SUN = { ...BRAND, count: 1000, seed: 1, strokeWidth: 0.6 };
+const SUN_DRAW = 9; // seconds of drawing; the rest of the reel holds the finished sun
+const SUN_DURATION = 11;
+const sunLinesAt = (t) => {
+  const x = Math.min(1, t / SUN_DRAW);
+  return Math.round(SUN.count * x * x * (3 - 2 * x));
+};
+
+function sunFrame(art, lines, { cover = false } = {}) {
+  // Text and drawing stay inside the centered 1080×1350 crop (y 285–1635).
+  return `
+    <div style="position:absolute;left:0;right:0;top:330px;text-align:center">
+      <div class="kicker">Wall Drawing #254 · after Sol LeWitt</div>
+      <div style="margin-top:${cover ? 22 : 16}px;font-size:${cover ? 76 : 46}px;line-height:1.08">${
+        cover ? "Lines from the center<br>to points at random" : "Lines from the center to points at random"
+      }</div>
+    </div>
+    <div class="art" style="position:absolute;left:${cover ? 110 : 80}px;top:${cover ? 580 : 460}px;width:${cover ? 860 : 920}px;height:${cover ? 860 : 920}px">${art}</div>
+    <div style="position:absolute;left:0;right:0;top:${cover ? 1490 : 1410}px;text-align:center">
+      ${
+        cover
+          ? `<div class="muted" style="font-size:34px">One rule, ${SUN.count.toLocaleString("en-US")} lines · Tangle Machine</div>`
+          : `<div style="font-size:46px">lines <span class="accent">${lines.toLocaleString("en-US")}</span></div>
+             <div class="muted" style="margin-top:12px;font-size:28px">an interpretation, not the original · seed ${SUN.seed}</div>`
+      }
+    </div>`;
+}
+
+async function post7() {
+  const dir = join(OUT, "07-sun-debut");
+  const total = FPS * SUN_DURATION;
+  const arts = [];
+  for (let f = 0; f < total; f++) {
+    const lines = sunLinesAt(f / FPS);
+    arts.push({ lines, art: await rsvg("lines-from-center", SUN, 800, lines) });
+  }
+  await shootFrames(join(FRAMES, "07"), total, (f) => sunFrame(arts[f].art, arts[f].lines));
+  const coverArt = await rsvg("lines-from-center", SUN, 800);
+  await shoot(sunFrame(coverArt, SUN.count, { cover: true }), 1080, 1920, join(dir, "cover.png"));
+}
+
 if (ONLY === "all" || ONLY === "1") await post1();
 if (ONLY === "all" || ONLY === "3") await post3();
 if (ONLY === "all" || ONLY === "2") await post2();
 if (ONLY === "all" || ONLY === "4") await post4();
 if (ONLY === "all" || ONLY === "6") await post6();
 if (ONLY === "all" || ONLY === "5") await post5();
+if (ONLY === "all" || ONLY === "7" || ONLY === "07") await post7();
 await browser.close();

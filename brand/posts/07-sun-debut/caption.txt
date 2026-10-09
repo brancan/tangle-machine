@@ -1,0 +1,7 @@
+One rule: start at the center, end anywhere.
+Sol LeWitt's Wall Drawing #254 joins the middle of the wall to points chosen at random.
+This is an interpretation in code, not the original: a seeded random list of points, one straight line each.
+The first lines look like a scribble. By a thousand, they gather into a small sun.
+Same seed, same sun. Change it and draw your own: link in bio.
+
+#GenerativeArt #SolLeWitt #ConceptualArt #CreativeCoding #AlgorithmicArt #CodeArt #GeometricArt #JavaScriptArt #MathArt #PlotterArt
