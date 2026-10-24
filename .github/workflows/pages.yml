@@ -34,7 +34,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       # Never fails: without a token, the category or the network it writes an empty gallery.
       - name: Build showcase.json
         run: node scripts/build-showcase.mjs
